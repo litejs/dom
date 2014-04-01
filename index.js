@@ -29,6 +29,7 @@ function Node(){}
 Node.prototype = {
 	nodeName:        null,
 	parentNode:      null,
+	ownerDocument:   null,
 	childNodes:      null,
 	get textContent() {
 		return this.hasChildNodes() ? this.childNodes.map(function(child){
@@ -37,7 +38,7 @@ Node.prototype = {
 	},
 	set textContent(text) {
 		for (var self = this; self.firstChild;) self.removeChild(self.firstChild)
-		self.appendChild(new Text(text))
+		self.appendChild(self.ownerDocument.createTextNode(text))
 	},
 	get firstChild() {
 		return this.childNodes && this.childNodes[0] || null
@@ -277,20 +278,25 @@ function Document(){
 	this.body = this.createElement("body")
 }
 
+function own(self, node) {
+	node.ownerDocument = self
+	return node
+}
+
 extend(Document, Node, {
 	nodeType: 9,
 	nodeName: "#document",
 	createElement: function(tag) {
-		return new HTMLElement(tag)
+		return own(this, new HTMLElement(tag))
 	},
 	createTextNode: function(value) {
-		return new Text(value)
+		return own(this, new Text(value))
 	},
 	createComment: function(value) {
-		return new Comment(value)
+		return own(this, new Comment(value))
 	},
 	createDocumentFragment: function() {
-		return new DocumentFragment()
+		return own(this, new DocumentFragment())
 	},
 	getElementById: function(id) {
 		return this.body.getElementById(id)
