@@ -57,6 +57,8 @@ test("can clone HTMLElements", function (assert) {
     assert.equal(clone.nodeName, "h1")
     assert.equal(clone.id, 1)
     assert.equal(clone.style.top, "5px")
+    assert.equal(el.ownerDocument, clone.ownerDocument)
+    assert.equal(el.ownerDocument, deepClone.ownerDocument)
 
     assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top:5px;\"><img></h1>")
 

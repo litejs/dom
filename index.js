@@ -103,7 +103,7 @@ Node.prototype = {
 	cloneNode: function(deep) {
 		var key
 		, self = this
-		, node = new self.constructor(self.tagName || self.data)
+		, node = own(self.ownerDocument, new self.constructor(self.tagName || self.data))
 
 		if (self.hasAttribute) {
 			for (key in self) if (self.hasAttribute(key)) node[key] = self[key]
