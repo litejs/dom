@@ -27,15 +27,30 @@ function extend(obj, _super, extras) {
 function Node(){}
 
 Node.prototype = {
-	__fake:          true,
 	textContent:     "",
 	nodeName:        null,
 	parentNode:      null,
 	childNodes:      null,
-	firstChild:      null,
-	lastChild:       null,
-	previousSibling: null,
-	nextSibling:     null,
+	get firstChild() {
+		return this.childNodes[0] || null
+	},
+	get lastChild() {
+		return this.childNodes[ this.childNodes.length - 1 ] || null
+	},
+	get previousSibling() {
+		var self = this
+		, childs = self.parentNode && self.parentNode.childNodes
+		, index = childs && childs.indexOf(self) || 0
+
+		return index > 0 && childs[ index - 1 ] || null
+	},
+	get nextSibling() {
+		var self = this
+		, childs = self.parentNode && self.parentNode.childNodes
+		, index = childs && childs.indexOf(self) || 0
+
+		return childs && childs[ index + 1 ] || null
+	},
 	get innerHTML() {
 		return Node.prototype.toString.call(this)
 	},
@@ -46,25 +61,23 @@ Node.prototype = {
 		return this.insertBefore(el)
 	},
 	insertBefore: function(el, ref) {
-		var t = this
-		, childs = t.childNodes
+		var self = this
+		, childs = self.childNodes
 
 		if (el.parentNode) el.parentNode.removeChild(el)
-			el.parentNode = t
+		el.parentNode = self
 
 		// If ref is null, insert el at the end of the list of children.
 		childs.splice(ref ? childs.indexOf(ref) : childs.length, 0, el)
-		t._updateLinks(el, ref, ref && ref.previousSibling)
 		return el
 	},
 	removeChild: function(el) {
-		var t = this
-		, index = t.childNodes.indexOf(el)
+		var self = this
+		, index = self.childNodes.indexOf(el)
 		if (index == -1) throw new Error("NOT_FOUND_ERR")
 
-		t.childNodes.splice(index, 1)
+		self.childNodes.splice(index, 1)
 		el.parentNode = null
-		t._updateLinks(el.previousSibling, el.nextSibling, el)
 		return el
 	},
 	replaceChild: function(el, ref) {
@@ -73,16 +86,16 @@ Node.prototype = {
 	},
 	cloneNode: function(deep) {
 		var key
-		, t = this
-		, node = new t.constructor(t.tagName || t.textContent)
+		, self = this
+		, node = new self.constructor(self.tagName || self.textContent)
 
-		if (t.hasAttribute) {
-			for (key in t) if (t.hasAttribute(key)) node[key] = t[key]
-			for (key in t.style) node.style[key] = t.style[key]
+		if (self.hasAttribute) {
+			for (key in self) if (self.hasAttribute(key)) node[key] = self[key]
+			for (key in self.style) node.style[key] = self.style[key]
 		}
 
-		if (deep && t.childNodes) {
-			node.childNodes = t.childNodes.map(function(child){
+		if (deep && self.childNodes) {
+			node.childNodes = self.childNodes.map(function(child){
 				return child.cloneNode(deep)
 			})
 		}
@@ -90,26 +103,6 @@ Node.prototype = {
 	},
 	hasChildNodes: function() {
 		return this.childNodes && this.childNodes.length > 0
-	},
-	_updateLinks: function() {
-		var el, index
-		, t = this
-		, childs = t.childNodes
-		, len = arguments.length
-
-		t.firstChild = childs[0] || null
-		t.lastChild  = childs[ childs.length - 1 ] || null
-
-		if (len) while (len--) {
-			el = arguments[len]
-			if (!el) continue
-			childs = el.parentNode && el.parentNode.childNodes
-			index = childs && childs.indexOf(el) || 0
-			el.nextSibling = childs && childs[ index + 1 ] || null
-			if (el.nextSibling) el.nextSibling.previousSibling = el
-			el.previousSibling = index > 0 && childs[ index - 1 ] || null
-			if (el.previousSibling) el.previousSibling.nextSibling = el
-		}
 	},
 	toString: function() {
 		var result = this.textContent || ""
@@ -134,27 +127,71 @@ extend(DocumentFragment, Node, {
 
 
 function HTMLElement(tag) {
-	var t = this
-	t.nodeName = t.tagName = tag.toLowerCase()
-	t.childNodes = []
-	t.style = {}
+	var self = this
+	self.nodeName = self.tagName = tag.toLowerCase()
+	self.childNodes = []
+	self.style = {}
 }
 
-var el_re = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
+var elRe = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
+
+function findEl(node, sel, first) {
+	var el
+	, i = 0
+	, out = []
+	, rules = ["_"]
+	, tag = sel.replace(elRe, function(_, o, s, v) {
+		rules.push(
+			o == "." ? "(' '+_.className+' ').indexOf(' "+s+" ')>-1" :
+			o == "#" ? "_.id=='"+s+"'" :
+			"_.getAttribute('"+s+"')"+(v?"=='"+v+"'":"")
+		)
+		return ""
+	}) || "*"
+	, els = node.getElementsByTagName(tag)
+	, fn = Function("_", "return " + rules.join("&&"))
+
+	for (; el = els[i++]; ) if (fn(el)) {
+		if (first) return el
+		out.push(el)
+	}
+	return first ? null : out
+}
+
+/*
+* Void elements:
+* http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+*/
+var voidElements = {
+	area:1, base:1, br:1, col:1, embed:1, hr:1, img:1, input:1,
+	keygen:1, link:1, menuitem:1, meta:1, param:1, source:1, track:1, wbr:1
+}
+
+function attributesToString(node) {
+	var key
+	, attrs = []
+
+	for (key in node) if (node.hasAttribute(key)) {
+		attrs.push(key + '="' + node[key] + '"')
+	}
+
+	if (node.className) {
+		attrs.push('class="' + node.className + '"')
+	}
+
+	var style = Object.keys(node.style).reduce(function (str, key) {
+		return str + key + ":" + node.style[key] + ";"
+	}, "")
+	if (style) attrs.push('style="' + style + '"')
+
+	return attrs.length ? " " + attrs.join(" ") : ""
+}
 
 extend(HTMLElement, Node, {
 	nodeType: 1,
 	tagName: null,
 	style: null,
 	className: "",
-	/*
-	* Void elements:
-	* http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
-	*/
-	_voidElements: {
-		area:1, base:1, br:1, col:1, embed:1, hr:1, img:1, input:1,
-		keygen:1, link:1, menuitem:1, meta:1, param:1, source:1, track:1, wbr:1
-	},
 	hasAttribute: function(name) {
 		return this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
 	},
@@ -185,61 +222,20 @@ extend(HTMLElement, Node, {
 		return els
 	},
 	querySelector: function(sel) {
-		return this._find(sel, 1)
+		return findEl(this, sel, 1)
 	},
 	querySelectorAll: function(sel) {
-		return this._find(sel)
-	},
-	_find: function(sel, first) {
-		var el
-		, i = 0
-		, out = []
-		, rules = ["_"]
-		, tag = sel.replace(el_re, function(_, o, s, v) {
-			rules.push(
-				o == "." ? "(' '+_.className+' ').indexOf(' "+s+" ')>-1" :
-				o == "#" ? "_.id=='"+s+"'" :
-				"_.getAttribute('"+s+"')"+(v?"=='"+v+"'":"")
-			)
-			return ""
-		}) || "*"
-		, els = this.getElementsByTagName(tag)
-		, fn = Function("_", "return " + rules.join("&&"))
-
-		for (; el = els[i++]; ) if (fn(el)) {
-			if (first) return el
-			out.push(el)
-		}
-		return first ? null : out
-	},
-	_getAttributesString: function() {
-		var key
-		, t = this
-		, attrs = []
-
-		for (key in t) if (t.hasAttribute(key)) {
-			attrs.push(key + '="' + t[key] + '"')
-		}
-
-		if (t.className) {
-			attrs.push('class="' + t.className + '"')
-		}
-
-		var style = Object.keys(t.style).reduce(function (str, key) {
-			return str + key + ":" + t.style[key] + ";"
-		}, "")
-		if (style) attrs.push('style="' + style + '"')
-
-		return attrs.length ? " " + attrs.join(" ") : ""
+		return findEl(this, sel)
 	},
 	toString: function() {
-		var t = this, result = "<" + t.tagName + t._getAttributesString()
+		var self = this
+		, result = "<" + self.tagName + attributesToString(self)
 
-		if (t._voidElements[t.tagName]) {
+		if (voidElements[self.tagName]) {
 			return result + ">"
 		}
 
-		return result + ">" + t.innerHTML + "</" + t.tagName + ">"
+		return result + ">" + self.innerHTML + "</" + self.tagName + ">"
 	}
 })
 
