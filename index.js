@@ -299,7 +299,7 @@ extend(Document, Node, {
 })
 
 module.exports = {
-        document: new Document,
-        Document: Document,
-        HTMLElement: HTMLElement
+       document: new Document,
+       Document: Document,
+       HTMLElement: HTMLElement
 }
