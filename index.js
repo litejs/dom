@@ -64,11 +64,15 @@ Node.prototype = {
 		var self = this
 		, childs = self.childNodes
 
-		if (el.parentNode) el.parentNode.removeChild(el)
-		el.parentNode = self
+		if (el.nodeType == 11) {
+			while (el.firstChild) self.insertBefore(el.firstChild, ref)
+		} else {
+			if (el.parentNode) el.parentNode.removeChild(el)
+			el.parentNode = self
 
-		// If ref is null, insert el at the end of the list of children.
-		childs.splice(ref ? childs.indexOf(ref) : childs.length, 0, el)
+			// If ref is null, insert el at the end of the list of children.
+			childs.splice(ref ? childs.indexOf(ref) : childs.length, 0, el)
+		}
 		return el
 	},
 	removeChild: function(el) {

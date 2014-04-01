@@ -98,6 +98,7 @@ test("can do stuff", function (assert) {
 
 
 function testNode(assert, mask, node) {
+    var p  = document.createElement("p")
     var h1 = document.createElement("h1")
     var h2 = document.createElement("h2")
 
@@ -115,6 +116,10 @@ function testNode(assert, mask, node) {
 
     assert.equal(node.replaceChild(h1, h2), h2)
     assert.equal(""+node, mask.replace("%s", "<h1></h1>"))
+
+    assert.equal(node.appendChild(h2), h2)
+    p.appendChild(node)
+    assert.equal(""+p, "<p>"+mask.replace("%s", "<h1></h1><h2></h2>")+"</p>")
 }
 
 test("HTMLElement", function (assert) {
