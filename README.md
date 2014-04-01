@@ -6,7 +6,7 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.0.6
+    @version    0.0.7
     @date       2014-04-01
     @stability  2 - Unstable
 
@@ -42,6 +42,87 @@ el.outerHTML;
 el.innerHTML;
 // hello world
 ```
+
+Implemented features
+--------------------
+
+### Node
+
+- nodeName
+- parentNode
+- ownerDocument
+- childNodes
+- textContent
+- firstChild
+- lastChild
+- previousSibling
+- nextSibling
+- innerHTML() - Read Only
+- outerHTML() - Read Only
+- hasChildNodes()
+- appendChild()
+- insertBefore()
+- removeChild()
+- replaceChild()
+- cloneNode()
+
+
+### DocumentFragment
+
+Extends Node.
+
+- nodeType
+
+
+### HTMLElement
+
+Extends Node.
+
+- nodeType
+- tagName
+- style
+- className
+- hasAttribute()
+- getAttribute()
+- setAttribute()
+- removeAttribute()
+- getElementById()
+- getElementsByTagName()
+- querySelector() - Only simple selectors
+- querySelectorAll() - Only simple selectors
+
+
+### Text
+
+Extends Node.
+
+- nodeType
+- data
+
+
+### Comment
+
+Extends Node.
+
+- nodeType
+- data
+
+
+### Document
+
+Extends Node.
+
+- nodeType
+- createElement()
+- createTextNode()
+- createComment()
+- createDocumentFragment()
+- getElementById()
+- getElementsByTagName()
+- querySelector()
+- querySelectorAll()
+
+
 
 Coding Style Guidelines
 -----------------------

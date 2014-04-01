@@ -66,6 +66,9 @@ Node.prototype = {
 	get outerHTML() {
 		return this.toString()
 	},
+	hasChildNodes: function() {
+		return this.childNodes && this.childNodes.length > 0
+	},
 	appendChild: function(el) {
 		return this.insertBefore(el)
 	},
@@ -107,24 +110,17 @@ Node.prototype = {
 			for (key in self.style) node.style[key] = self.style[key]
 		}
 
-		if (deep && self.childNodes) {
+		if (deep && self.hasChildNodes()) {
 			node.childNodes = self.childNodes.map(function(child){
 				return child.cloneNode(deep)
 			})
 		}
 		return node
 	},
-	hasChildNodes: function() {
-		return this.childNodes && this.childNodes.length > 0
-	},
 	toString: function() {
-		var result = this.data || ""
-
-		if (this.childNodes) return this.childNodes.reduce(function (memo, node) {
+		return this.hasChildNodes() ? this.childNodes.reduce(function (memo, node) {
 			return memo + node
-		}, result)
-
-		return result
+		}, "") : this.data || ""
 	}
 }
 
@@ -215,7 +211,7 @@ extend(HTMLElement, Node, {
 		this[name] = value
 	},
 	removeAttribute: function(name) {
-		delete this.name
+		delete this[name]
 	},
 	getElementById: function(id) {
 		if (this.id == id) return this
@@ -241,14 +237,8 @@ extend(HTMLElement, Node, {
 		return findEl(this, sel)
 	},
 	toString: function() {
-		var self = this
-		, result = "<" + self.tagName + attributesToString(self)
-
-		if (voidElements[self.tagName]) {
-			return result + ">"
-		}
-
-		return result + ">" + self.innerHTML + "</" + self.tagName + ">"
+		return "<" + this.tagName + attributesToString(this) + ">"
+			+ (voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.tagName + ">" )
 	}
 })
 

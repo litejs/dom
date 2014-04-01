@@ -123,6 +123,12 @@ function testNode(assert, mask, node) {
     assert.equal(""+node, mask.replace("%s", "<h1>Head</h1>"))
 
     assert.equal(node.appendChild(h2), h2)
+    assert.equal(node.firstChild, h1)
+    assert.equal(node.lastChild, h2)
+    assert.equal(h1.previousSibling, null)
+    assert.equal(h1.nextSibling, h2)
+    assert.equal(h2.previousSibling, h1)
+    assert.equal(h2.nextSibling, null)
     p.appendChild(node)
     assert.equal(""+p, "<p>"+mask.replace("%s", "<h1>Head</h1><h2></h2>")+"</p>")
 
@@ -140,6 +146,15 @@ test("HTMLElement", function (assert) {
 test("HTMLElement.attributes", function (assert) {
     var h1 = document.createElement("h1")
     h1.id = 123
+    h1.setAttribute("id2", 321)
+    assert.equal(h1.getAttribute("id"), 123)
+    assert.equal(h1.getAttribute("id2"), 321)
+
+    h1.removeAttribute("id2")
+    assert.equal(h1.getAttribute("id"), 123)
+    assert.equal(h1.getAttribute("id2"), null)
+
+    assert.equal(h1.getAttribute("toString"), null)
     assert.equal(""+h1, '<h1 id="123"></h1>')
 
     h1.className = "my-class"
