@@ -254,14 +254,14 @@ extend(Text, Node, {
 })
 
 function Comment(value) {
-	this.textContent = value
+	this.data = value
 }
 
 extend(Comment, Node, {
 	nodeType: 8,
 	nodeName: "#comment",
 	toString: function() {
-		return "<!--" + this.textContent + "-->"
+		return "<!--" + this.data + "-->"
 	}
 })
 
@@ -278,7 +278,7 @@ extend(Document, Node, {
 	createTextNode: function(value) {
 		return new Text(value)
 	},
-	createCommentNode: function(value) {
+	createComment: function(value) {
 		return new Comment(value)
 	},
 	createDocumentFragment: function() {

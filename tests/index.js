@@ -28,10 +28,10 @@ test("can create nodes", function (assert) {
     assert.equal(el.nodeName, "#text")
     assert.equal(el.textContent, "hello")
 
-    el = document.createCommentNode("hello comment")
+    el = document.createComment("hello comment")
     assert.equal(el.nodeType, 8)
     assert.equal(el.nodeName, "#comment")
-    assert.equal(el.textContent, "hello comment")
+    assert.equal(el.data, "hello comment")
     assert.equal(el.outerHTML, "<!--hello comment-->")
 
     assert.end()
