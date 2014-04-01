@@ -37,7 +37,7 @@ Node.prototype = {
     previousSibling: null,
     nextSibling:     null,
     get outerHTML() {
-        return this.toString()
+		return this.toString()
     },
     appendChild: function(el) {
         return this.insertBefore(el)
@@ -299,7 +299,7 @@ extend(Document, Node, {
 })
 
 module.exports = {
-       document: new Document,
-       Document: Document,
-       HTMLElement: HTMLElement
+	document: new Document,
+	Document: Document,
+	HTMLElement: HTMLElement
 }
