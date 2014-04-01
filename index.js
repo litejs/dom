@@ -37,7 +37,7 @@ Node.prototype = {
     previousSibling: null,
     nextSibling:     null,
     get outerHTML() {
-	    return this.toString()
+    	return this.toString()
     },
     appendChild: function(el) {
         return this.insertBefore(el)
