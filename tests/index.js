@@ -26,7 +26,7 @@ test("can create nodes", function (assert) {
     el = document.createTextNode("hello")
     assert.equal(el.nodeType, 3)
     assert.equal(el.nodeName, "#text")
-    assert.equal(el.textContent, "hello")
+    assert.equal(el.data, "hello")
 
     el = document.createComment("hello comment")
     assert.equal(el.nodeType, 8)
@@ -38,12 +38,14 @@ test("can create nodes", function (assert) {
 })
 
 test("can clone HTMLElements", function (assert) {
-    var el, clone;
+    var el, clone, deepClone;
 
     el = document.createElement("h1")
+    el.appendChild(document.createElement("img"))
     el.id = 1
     el.style.top = "5px"
     clone = el.cloneNode()
+    deepClone = el.cloneNode(true)
 
     assert.notEqual(el, clone)
     assert.notEqual(el.style, clone.style)
@@ -55,6 +57,8 @@ test("can clone HTMLElements", function (assert) {
     assert.equal(clone.nodeName, "h1")
     assert.equal(clone.id, 1)
     assert.equal(clone.style.top, "5px")
+
+    assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top:5px;\"><img></h1>")
 
     clone.id = 2
     assert.equal(el.id, 1)
@@ -100,26 +104,31 @@ test("can do stuff", function (assert) {
 function testNode(assert, mask, node) {
     var p  = document.createElement("p")
     var h1 = document.createElement("h1")
+    h1.textContent = "Head"
     var h2 = document.createElement("h2")
 
     assert.equal(node.appendChild(h2), h2)
     assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
 
     assert.equal(node.insertBefore(h1, h2), h1)
-    assert.equal(""+node, mask.replace("%s", "<h1></h1><h2></h2>"))
+    assert.equal(""+node, mask.replace("%s", "<h1>Head</h1><h2></h2>"))
 
     assert.equal(node.appendChild(h1), h1)
-    assert.equal(""+node, mask.replace("%s", "<h2></h2><h1></h1>"))
+    assert.equal(""+node, mask.replace("%s", "<h2></h2><h1>Head</h1>"))
 
     assert.equal(node.removeChild(h1), h1)
     assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
 
     assert.equal(node.replaceChild(h1, h2), h2)
-    assert.equal(""+node, mask.replace("%s", "<h1></h1>"))
+    assert.equal(""+node, mask.replace("%s", "<h1>Head</h1>"))
 
     assert.equal(node.appendChild(h2), h2)
     p.appendChild(node)
-    assert.equal(""+p, "<p>"+mask.replace("%s", "<h1></h1><h2></h2>")+"</p>")
+    assert.equal(""+p, "<p>"+mask.replace("%s", "<h1>Head</h1><h2></h2>")+"</p>")
+
+    assert.equal(p.textContent, "Head")
+    p.textContent = "Hello"
+    assert.equal(""+p, "<p>Hello</p>")
 }
 
 test("HTMLElement", function (assert) {

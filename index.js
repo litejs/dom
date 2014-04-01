@@ -27,12 +27,20 @@ function extend(obj, _super, extras) {
 function Node(){}
 
 Node.prototype = {
-	textContent:     "",
 	nodeName:        null,
 	parentNode:      null,
 	childNodes:      null,
+	get textContent() {
+		return this.hasChildNodes() ? this.childNodes.map(function(child){
+			return child[ child.nodeType == 3 ? "data" : "textContent" ]
+		}).join("") : ""
+	},
+	set textContent(text) {
+		for (var self = this; self.firstChild;) self.removeChild(self.firstChild)
+		self.appendChild(new Text(text))
+	},
 	get firstChild() {
-		return this.childNodes[0] || null
+		return this.childNodes && this.childNodes[0] || null
 	},
 	get lastChild() {
 		return this.childNodes[ this.childNodes.length - 1 ] || null
@@ -91,7 +99,7 @@ Node.prototype = {
 	cloneNode: function(deep) {
 		var key
 		, self = this
-		, node = new self.constructor(self.tagName || self.textContent)
+		, node = new self.constructor(self.tagName || self.data)
 
 		if (self.hasAttribute) {
 			for (key in self) if (self.hasAttribute(key)) node[key] = self[key]
@@ -109,7 +117,7 @@ Node.prototype = {
 		return this.childNodes && this.childNodes.length > 0
 	},
 	toString: function() {
-		var result = this.textContent || ""
+		var result = this.data || ""
 
 		if (this.childNodes) return this.childNodes.reduce(function (memo, node) {
 			return memo + node
@@ -244,8 +252,8 @@ extend(HTMLElement, Node, {
 })
 
 
-function Text(value) {
-	this.textContent = value
+function Text(data) {
+	this.data = data
 }
 
 extend(Text, Node, {
@@ -253,8 +261,8 @@ extend(Text, Node, {
 	nodeName: "#text"
 })
 
-function Comment(value) {
-	this.data = value
+function Comment(data) {
+	this.data = data
 }
 
 extend(Comment, Node, {
