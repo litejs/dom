@@ -253,6 +253,18 @@ extend(Text, Node, {
 	nodeName: "#text"
 })
 
+function Comment(value) {
+	this.textContent = value
+}
+
+extend(Comment, Node, {
+	nodeType: 8,
+	nodeName: "#comment",
+	toString: function() {
+		return "<!--" + this.textContent + "-->"
+	}
+})
+
 function Document(){
 	this.body = this.createElement("body")
 }
@@ -265,6 +277,9 @@ extend(Document, Node, {
 	},
 	createTextNode: function(value) {
 		return new Text(value)
+	},
+	createCommentNode: function(value) {
+		return new Comment(value)
 	},
 	createDocumentFragment: function() {
 		return new DocumentFragment()
@@ -288,5 +303,4 @@ module.exports = {
 	Document: Document,
 	HTMLElement: HTMLElement
 }
-
 
