@@ -43,6 +43,16 @@ el.innerHTML;
 // hello world
 ```
 
+Coding Style Guidelines
+-----------------------
+
+-   Use tabs for indentation, align with spaces
+-   Use lowerCamelCase for method and variable names
+-   Use UpperCamelCase for constructor names
+-   Commit files with Unix-style line endings
+-   Do not use spaces in file and directory names
+    Consider substituting a dash (-) where you would normally use spaces.
+-   Rebase before pushing
 
 
 External links
