@@ -82,6 +82,11 @@ test("can do stuff", function (assert) {
     assert.equal(html, "<div class=\"foo bar\">" +
         "<span>Hello!</span></div>")
 
+    assert.equal(div.outerHTML, "<div class=\"foo bar\">" +
+        "<span>Hello!</span></div>")
+
+    assert.equal(div.innerHTML, "<span>Hello!</span>")
+
     assert.end()
 })
 

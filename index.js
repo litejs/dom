@@ -36,8 +36,11 @@ Node.prototype = {
     lastChild:       null,
     previousSibling: null,
     nextSibling:     null,
+    get innerHTML() {
+        return Node.prototype.toString.call(this)
+    },
     get outerHTML() {
-    	return this.toString()
+        return this.toString()
     },
     appendChild: function(el) {
         return this.insertBefore(el)
@@ -148,8 +151,8 @@ extend(HTMLElement, Node, {
     * Void elements:
     * http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
     */
-    _voidElements: { AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
-        KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1 },
+    _voidElements: { area:1, base:1, br:1, col:1, embed:1, hr:1, img:1, input:1,
+        keygen:1, link:1, menuitem:1, meta:1, param:1, source:1, track:1, wbr:1 },
     hasAttribute: function(name) {
         return this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
     },
@@ -231,12 +234,10 @@ extend(HTMLElement, Node, {
         var t = this, result = "<" + t.tagName + t._getAttributesString()
 
         if (t._voidElements[t.tagName]) {
-            return result + "/>"
+            return result + ">"
         }
 
-        return result + ">" +
-            Node.prototype.toString.call(t) +
-            "</" + t.tagName + ">"
+        return result + ">" + t.innerHTML + "</" + t.tagName + ">"
     }
 })
 

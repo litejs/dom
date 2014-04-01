@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.0.1
-    @date       2014-03-21
+    @version    0.0.2
+    @date       2014-04-01
     @stability  2 - Unstable
 
 
@@ -37,6 +37,10 @@ el.appendChild(fragment);
 
 el.toString();
 // <h1 id="123" class="large">hello world</h1>
+el.outerHTML;
+// <h1 id="123" class="large">hello world</h1>
+el.innerHTML;
+// hello world
 ```
 
 
