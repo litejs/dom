@@ -1,6 +1,6 @@
 {
   "name": "dom-lite",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "stability": 2,
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -20,6 +20,6 @@
     "url": "https://github.com/litejs/dom-lite/issues"
   },
   "devDependencies": {
-    "tape": "~1.0.2"
+    "tape": "2.12.x"
   }
 }

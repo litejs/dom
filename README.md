@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.0.8
-    @date       2014-04-01
+    @version    0.0.9
+    @date       2014-04-02
     @stability  2 - Unstable
 
 
@@ -141,6 +141,7 @@ External links
 
 -   [GitHub repo][]
 -   [npm package][]
+-   [DOM spec](http://dom.spec.whatwg.org/)
 
 
 

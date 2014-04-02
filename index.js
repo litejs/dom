@@ -1,12 +1,12 @@
+
+
+
 /*
-* Object
-* |- Node
-*    |- DocumentFragment
-*    |- Element             // skip
-*    |  |- HTMLElement
-*    |     |- HTML*Element  // skip
-*    |- CharacterData       // skip
-*    |  |- Text
+* @version    0.0.9
+* @date       2014-04-02
+* @stability  2 - Unstable
+* @author     Lauri Rooden <lauri@rooden.ee>
+* @license    MIT License
 */
 
 
@@ -20,10 +20,6 @@ function extend(obj, _super, extras) {
 }
 
 
-
-/*
-* http://dom.spec.whatwg.org/#node
-*/
 function Node(){}
 
 Node.prototype = {
@@ -137,7 +133,7 @@ extend(DocumentFragment, Node, {
 
 function HTMLElement(tag) {
 	var self = this
-	self.nodeName = self.tagName = tag.toLowerCase()
+	self.nodeName = self.tagName = tag.toUpperCase()
 	self.childNodes = []
 	self.style = {}
 }
@@ -172,8 +168,8 @@ function findEl(node, sel, first) {
 * http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
 */
 var voidElements = {
-	area:1, base:1, br:1, col:1, embed:1, hr:1, img:1, input:1,
-	keygen:1, link:1, menuitem:1, meta:1, param:1, source:1, track:1, wbr:1
+	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
+	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
 
 function attributesToString(node) {
@@ -222,7 +218,7 @@ extend(HTMLElement, Node, {
 	},
 	getElementsByTagName: function(tag) {
 		var el, els = [], next = this.firstChild
-		tag = tag === "*" ? 1 : tag.toLowerCase()
+		tag = tag === "*" ? 1 : tag.toUpperCase()
 		for (var i = 0, key = tag === 1 ? "nodeType" : "nodeName"; (el = next); ) {
 			if (el[key] === tag) els[i++] = el
 			next = el.firstChild || el.nextSibling

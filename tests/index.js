@@ -15,7 +15,7 @@ test("can create nodes", function (assert) {
 
     el = document.createElement("h1")
     assert.equal(el.nodeType, 1)
-    assert.equal(el.nodeName, "h1")
+    assert.equal(el.nodeName, "H1")
     assert.equal(el.textContent, "")
 
     el = document.createDocumentFragment()
@@ -51,16 +51,16 @@ test("can clone HTMLElements", function (assert) {
     assert.notEqual(el.style, clone.style)
     assert.notEqual(el.childNodes, clone.childNodes)
 
-    assert.equal(el.nodeName, "h1")
+    assert.equal(el.nodeName, "H1")
     assert.equal(el.id, 1)
     assert.equal(el.style.top, "5px")
-    assert.equal(clone.nodeName, "h1")
+    assert.equal(clone.nodeName, "H1")
     assert.equal(clone.id, 1)
     assert.equal(clone.style.top, "5px")
     assert.equal(el.ownerDocument, clone.ownerDocument)
     assert.equal(el.ownerDocument, deepClone.ownerDocument)
 
-    assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top:5px;\"><img></h1>")
+    assert.equal(deepClone.outerHTML, "<H1 id=\"1\" style=\"top:5px;\"><IMG></H1>")
 
     clone.id = 2
     assert.equal(el.id, 1)
@@ -91,13 +91,13 @@ test("can do stuff", function (assert) {
 
     var html = String(div)
 
-    assert.equal(html, "<div class=\"foo bar\">" +
-        "<span>Hello!</span></div>")
+    assert.equal(html, "<DIV class=\"foo bar\">" +
+        "<SPAN>Hello!</SPAN></DIV>")
 
-    assert.equal(div.outerHTML, "<div class=\"foo bar\">" +
-        "<span>Hello!</span></div>")
+    assert.equal(div.outerHTML, "<DIV class=\"foo bar\">" +
+        "<SPAN>Hello!</SPAN></DIV>")
 
-    assert.equal(div.innerHTML, "<span>Hello!</span>")
+    assert.equal(div.innerHTML, "<SPAN>Hello!</SPAN>")
 
     assert.end()
 })
@@ -110,19 +110,19 @@ function testNode(assert, mask, node) {
     var h2 = document.createElement("h2")
 
     assert.equal(node.appendChild(h2), h2)
-    assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
+    assert.equal(""+node, mask.replace("%s", "<H2></H2>"))
 
     assert.equal(node.insertBefore(h1, h2), h1)
-    assert.equal(""+node, mask.replace("%s", "<h1>Head</h1><h2></h2>"))
+    assert.equal(""+node, mask.replace("%s", "<H1>Head</H1><H2></H2>"))
 
     assert.equal(node.appendChild(h1), h1)
-    assert.equal(""+node, mask.replace("%s", "<h2></h2><h1>Head</h1>"))
+    assert.equal(""+node, mask.replace("%s", "<H2></H2><H1>Head</H1>"))
 
     assert.equal(node.removeChild(h1), h1)
-    assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
+    assert.equal(""+node, mask.replace("%s", "<H2></H2>"))
 
     assert.equal(node.replaceChild(h1, h2), h2)
-    assert.equal(""+node, mask.replace("%s", "<h1>Head</h1>"))
+    assert.equal(""+node, mask.replace("%s", "<H1>Head</H1>"))
 
     assert.equal(node.appendChild(h2), h2)
     assert.equal(node.firstChild, h1)
@@ -132,15 +132,15 @@ function testNode(assert, mask, node) {
     assert.equal(h2.previousSibling, h1)
     assert.equal(h2.nextSibling, null)
     p.appendChild(node)
-    assert.equal(""+p, "<p>"+mask.replace("%s", "<h1>Head</h1><h2></h2>")+"</p>")
+    assert.equal(""+p, "<P>"+mask.replace("%s", "<H1>Head</H1><H2></H2>")+"</P>")
 
     assert.equal(p.textContent, "Head")
     p.textContent = "Hello"
-    assert.equal(""+p, "<p>Hello</p>")
+    assert.equal(""+p, "<P>Hello</P>")
 }
 
 test("HTMLElement", function (assert) {
-    testNode(assert, "<body>%s</body>", document.body)
+    testNode(assert, "<BODY>%s</BODY>", document.body)
 
     assert.end()
 })
@@ -157,14 +157,14 @@ test("HTMLElement.attributes", function (assert) {
     assert.equal(h1.getAttribute("id2"), null)
 
     assert.equal(h1.getAttribute("toString"), null)
-    assert.equal(""+h1, '<h1 id="123"></h1>')
+    assert.equal(""+h1, '<H1 id="123"></H1>')
 
     h1.className = "my-class"
-    assert.equal(""+h1, '<h1 id="123" class="my-class"></h1>')
+    assert.equal(""+h1, '<H1 id="123" class="my-class"></H1>')
 
     h1.style.top = "5px"
     h1.style.left = "15px"
-    assert.equal(""+h1, '<h1 id="123" class="my-class" style="top:5px;left:15px;"></h1>')
+    assert.equal(""+h1, '<H1 id="123" class="my-class" style="top:5px;left:15px;"></H1>')
 
     assert.end()
 })
