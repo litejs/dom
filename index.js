@@ -2,7 +2,7 @@
 
 
 /*
-* @version    0.0.10
+* @version    0.0.11
 * @date       2014-04-03
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
@@ -33,6 +33,7 @@ Node.prototype = {
 		}).join("") : ""
 	},
 	set textContent(text) {
+		if(this.nodeType === 3) return this.data = text
 		for (var self = this; self.firstChild;) self.removeChild(self.firstChild)
 		self.appendChild(self.ownerDocument.createTextNode(text))
 	},
