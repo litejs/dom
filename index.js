@@ -2,7 +2,7 @@
 
 
 /*
-* @version    0.0.12
+* @version    0.0.13
 * @date       2014-04-03
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
@@ -19,6 +19,20 @@ function extend(obj, _super, extras) {
 	obj.prototype.constructor = obj
 }
 
+function StyleMap(style) {
+	var self = this
+	if (style) style.split(/\s*;\s*/g).map(function(val) {
+		val = val.split(/\s*:\s*/)
+		self[val[0]] = val[1]
+	})
+}
+
+StyleMap.prototype.valueOf = function() {
+	var self = this
+	return Object.keys(self).map(function(key) {
+		return key + ": " + self[key]
+	}).join("; ")
+}
 
 function Node(){}
 
@@ -75,6 +89,12 @@ Node.prototype = {
 	set className(value) {
 		this["class"] = value
 	},
+	get style() {
+		return this.styleMap || (this.styleMap = new StyleMap())
+	},
+	set style(value) {
+		this.styleMap = new StyleMap(value)
+	},
 	hasChildNodes: function() {
 		return this.childNodes && this.childNodes.length > 0
 	},
@@ -115,8 +135,8 @@ Node.prototype = {
 		, node = own(self.ownerDocument, new self.constructor(self.tagName || self.data))
 
 		if (self.hasAttribute) {
-			for (key in self) if (self.hasAttribute(key)) node[key] = self[key]
-			for (key in self.style) node.style[key] = self.style[key]
+			for (key in self) if (self.hasAttribute(key)) node[key] = self[key].valueOf()
+
 		}
 
 		if (deep && self.hasChildNodes()) {
@@ -148,7 +168,6 @@ function HTMLElement(tag) {
 	var self = this
 	self.nodeName = self.tagName = tag.toUpperCase()
 	self.childNodes = []
-	self.style = {}
 }
 
 var elRe = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
@@ -190,13 +209,9 @@ function attributesToString(node) {
 	, attrs = []
 
 	for (key in node) if (node.hasAttribute(key)) {
-		attrs.push(key + '="' + node[key] + '"')
+		var val = "" + node[key]
+		if (val) attrs.push(key + '="' + val + '"')
 	}
-
-	var style = Object.keys(node.style).reduce(function (str, key) {
-		return str + key + ":" + node.style[key] + ";"
-	}, "")
-	if (style) attrs.push('style="' + style + '"')
 
 	return attrs.length ? " " + attrs.join(" ") : ""
 }
@@ -204,17 +219,19 @@ function attributesToString(node) {
 extend(HTMLElement, Node, {
 	nodeType: 1,
 	tagName: null,
-	style: null,
+	styleMap: null,
 	hasAttribute: function(name) {
-		return this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
+		// HACK
+		return name == "style" || this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
 	},
 	getAttribute: function(name) {
-		return this.hasAttribute(name) ? this[name] : null
+		return this.hasAttribute(name) ? "" + this[name] : null
 	},
 	setAttribute: function(name, value) {
-		this[name] = value
+		this[name] = "" + value
 	},
 	removeAttribute: function(name) {
+		this[name] = ""
 		delete this[name]
 	},
 	getElementById: function(id) {

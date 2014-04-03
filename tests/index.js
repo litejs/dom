@@ -43,20 +43,22 @@ test("can clone HTMLElements", function (assert) {
     function testAttr(name, value, propName) {
 	    el[propName || name] = value
 	    assert.equal(el.getAttribute(name), value)
-	    assert.equal(el[propName || name], value)
+	    assert.equal("" + el[propName || name], value)
 
 	    el.setAttribute(name, "val-"+value)
 	    assert.equal(el.getAttribute(name), "val-"+value)
-	    assert.equal(el[propName || name], "val-"+value)
+	    assert.equal("" + el[propName || name], "val-"+value)
 
 	    el.removeAttribute(name)
-	    assert.equal(!!el.getAttribute(name), !!false)
-	    assert.equal(!!el[propName || name], !!false)
+	    assert.equal(!!el.getAttribute(name), false)
+	    value = el[propName || name]
+	    assert.equal(!!(value && ("" + value)), false)
     }
 
-    testAttr("id", 123)
+    testAttr("id", "123")
     testAttr("class", "my-class", "className")
     testAttr("for", "my-field", "htmlFor")
+    testAttr("style", "top: 1px")
     testAttr("title", "Header")
     testAttr("href", "#123")
     testAttr("href", "http://example.com")
@@ -87,7 +89,7 @@ test("can clone HTMLElements", function (assert) {
     assert.equal(el.ownerDocument, clone.ownerDocument)
     assert.equal(el.ownerDocument, deepClone.ownerDocument)
 
-    assert.equal(deepClone.outerHTML, "<H1 id=\"1\" style=\"top:5px;\"><IMG></H1>")
+    assert.equal(deepClone.outerHTML, "<H1 id=\"1\" style=\"top: 5px\"><IMG></H1>")
 
     clone.id = 2
     assert.equal(el.id, 1)
@@ -174,13 +176,13 @@ test("HTMLElement", function (assert) {
 
 test("HTMLElement.attributes", function (assert) {
     var h1 = document.createElement("h1")
-    h1.id = 123
-    h1.setAttribute("id2", 321)
-    assert.equal(h1.getAttribute("id"), 123)
-    assert.equal(h1.getAttribute("id2"), 321)
+    h1.id = "123"
+    h1.setAttribute("id2", "321")
+    assert.equal(h1.getAttribute("id"), "123")
+    assert.equal(h1.getAttribute("id2"), "321")
 
     h1.removeAttribute("id2")
-    assert.equal(h1.getAttribute("id"), 123)
+    assert.equal(h1.getAttribute("id"), "123")
     assert.equal(h1.getAttribute("id2"), null)
 
     assert.equal(h1.getAttribute("toString"), null)
@@ -191,7 +193,7 @@ test("HTMLElement.attributes", function (assert) {
 
     h1.style.top = "5px"
     h1.style.left = "15px"
-    assert.equal(""+h1, '<H1 id="123" class="my-class" style="top:5px;left:15px;"></H1>')
+    assert.equal(""+h1, '<H1 id="123" class="my-class" style="top: 5px; left: 15px"></H1>')
 
     assert.end()
 })
