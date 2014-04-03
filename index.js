@@ -70,7 +70,7 @@ Node.prototype = {
 		this["for"] = value
 	},
 	get className() {
-		return this["class"]
+		return this["class"] || ""
 	},
 	set className(value) {
 		this["class"] = value
