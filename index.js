@@ -2,8 +2,8 @@
 
 
 /*
-* @version    0.0.9
-* @date       2014-04-02
+* @version    0.0.10
+* @date       2014-04-03
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
@@ -61,6 +61,18 @@ Node.prototype = {
 	},
 	get outerHTML() {
 		return this.toString()
+	},
+	get htmlFor() {
+		return this["for"]
+	},
+	set htmlFor(value) {
+		this["for"] = value
+	},
+	get className() {
+		return this["class"]
+	},
+	set className(value) {
+		this["class"] = value
 	},
 	hasChildNodes: function() {
 		return this.childNodes && this.childNodes.length > 0
@@ -180,10 +192,6 @@ function attributesToString(node) {
 		attrs.push(key + '="' + node[key] + '"')
 	}
 
-	if (node.className) {
-		attrs.push('class="' + node.className + '"')
-	}
-
 	var style = Object.keys(node.style).reduce(function (str, key) {
 		return str + key + ":" + node.style[key] + ";"
 	}, "")
@@ -196,7 +204,6 @@ extend(HTMLElement, Node, {
 	nodeType: 1,
 	tagName: null,
 	style: null,
-	className: "",
 	hasAttribute: function(name) {
 		return this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
 	},

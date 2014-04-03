@@ -38,6 +38,33 @@ test("can create nodes", function (assert) {
 })
 
 test("can clone HTMLElements", function (assert) {
+    var el = document.createElement("a");
+
+    function testAttr(name, value, propName) {
+	    el[propName || name] = value
+	    assert.equal(el.getAttribute(name), value)
+	    assert.equal(el[propName || name], value)
+
+	    el.setAttribute(name, "val-"+value)
+	    assert.equal(el.getAttribute(name), "val-"+value)
+	    assert.equal(el[propName || name], "val-"+value)
+
+	    el.removeAttribute(name)
+	    assert.equal(!!el.getAttribute(name), !!false)
+	    assert.equal(!!el[propName || name], !!false)
+    }
+
+    testAttr("id", 123)
+    testAttr("class", "my-class", "className")
+    testAttr("for", "my-field", "htmlFor")
+    testAttr("title", "Header")
+    testAttr("href", "#123")
+    testAttr("href", "http://example.com")
+
+    assert.end()
+})
+
+test("can clone HTMLElements", function (assert) {
     var el, clone, deepClone;
 
     el = document.createElement("h1")
