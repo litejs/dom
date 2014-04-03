@@ -2,7 +2,7 @@
 
 
 /*
-* @version    0.0.11
+* @version    0.0.12
 * @date       2014-04-03
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
@@ -30,7 +30,7 @@ Node.prototype = {
 	get textContent() {
 		return this.hasChildNodes() ? this.childNodes.map(function(child){
 			return child[ child.nodeType == 3 ? "data" : "textContent" ]
-		}).join("") : ""
+		}).join("") : this.nodeType === 3 ? this.data : ""
 	},
 	set textContent(text) {
 		if(this.nodeType === 3) return this.data = text
