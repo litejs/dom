@@ -23,7 +23,7 @@ function StyleMap(style) {
 	var self = this
 	if (style) style.split(/\s*;\s*/g).map(function(val) {
 		val = val.split(/\s*:\s*/)
-		self[val[0]] = val[1]
+		if(val[1]) self[val[0]] = val[1]
 	})
 }
 
@@ -163,11 +163,30 @@ extend(DocumentFragment, Node, {
 	nodeName: "#document-fragment"
 })
 
+function Attribute(node, name) {
+	this.name = name
+
+	Object.defineProperty(this, "value", {
+		get: function() {return node.getAttribute(name)},
+		set: function(val) {node.setAttribute(name, val)}
+	})
+}
 
 function HTMLElement(tag) {
 	var self = this
 	self.nodeName = self.tagName = tag.toUpperCase()
 	self.childNodes = []
+
+	Object.defineProperties(self, {
+		attributes: {
+			get: function() {
+				var attrs = []
+				, self = this
+				for(key in self) if(self.hasAttribute(key)) attrs.push(key)
+				return attrs.map(function(name) {return new Attribute(self, name)})
+			}
+		}
+	})
 }
 
 var elRe = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
@@ -222,7 +241,7 @@ extend(HTMLElement, Node, {
 	styleMap: null,
 	hasAttribute: function(name) {
 		// HACK
-		return name == "style" || this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
+		return name == "style" && !!this.style.valueOf() || this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
 	},
 	getAttribute: function(name) {
 		return this.hasAttribute(name) ? "" + this[name] : null
