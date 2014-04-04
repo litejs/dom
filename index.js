@@ -176,17 +176,6 @@ function HTMLElement(tag) {
 	var self = this
 	self.nodeName = self.tagName = tag.toUpperCase()
 	self.childNodes = []
-
-	Object.defineProperties(self, {
-		attributes: {
-			get: function() {
-				var attrs = []
-				, self = this
-				for(key in self) if(self.hasAttribute(key)) attrs.push(key)
-				return attrs.map(function(name) {return new Attribute(self, name)})
-			}
-		}
-	})
 }
 
 var elRe = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
@@ -278,6 +267,17 @@ extend(HTMLElement, Node, {
 	}
 })
 
+Object.defineProperties(HTMLElement.prototype, {
+	attributes: {
+		get: function() {
+			var key
+			, attrs = []
+			, self = this
+			for (key in self) if (self.hasAttribute(key)) attrs.push(new Attribute(self, key))
+			return attrs
+		}
+	}
+})
 
 function Text(data) {
 	this.data = data
