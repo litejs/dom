@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.0.13
-    @date       2014-04-03
+    @version    0.0.14
+    @date       2014-04-04
     @stability  2 - Unstable
 
 
@@ -78,6 +78,7 @@ Extends Node.
 
 Extends Node.
 
+- attributes
 - nodeType
 - tagName
 - style
