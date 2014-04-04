@@ -224,13 +224,9 @@ var voidElements = {
 }
 
 function attributesToString(node) {
-	var key
-	, attrs = []
-
-	for (key in node) if (node.hasAttribute(key)) {
-		var val = "" + node[key]
-		if (val) attrs.push(key + '="' + val + '"')
-	}
+	var attrs = node.attributes.map(function(attr) {
+		return attr.name + '="' + attr.value + '"'
+	})
 
 	return attrs.length ? " " + attrs.join(" ") : ""
 }
