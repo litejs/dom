@@ -184,16 +184,29 @@ test("HTMLElement.attributes", function (assert) {
     h1.removeAttribute("id2")
     assert.equal(h1.getAttribute("id"), "123")
     assert.equal(h1.getAttribute("id2"), null)
+    assert.equal(h1.attributes.length, 1)
+    assert.equal(h1.attributes[0].name, "id")
+    assert.equal(h1.attributes[0].value, "123")
 
     assert.equal(h1.getAttribute("toString"), null)
     assert.equal(""+h1, '<H1 id="123"></H1>')
 
     h1.className = "my-class"
     assert.equal(""+h1, '<H1 id="123" class="my-class"></H1>')
+    assert.equal(h1.attributes.length, 2)
+    assert.equal(h1.attributes[1].name, "class")
+    assert.equal(h1.attributes[1].value, "my-class")
+
 
     h1.style.top = "5px"
     h1.style.left = "15px"
     assert.equal(""+h1, '<H1 id="123" class="my-class" style="top: 5px; left: 15px"></H1>')
+    assert.equal(h1.attributes.length, 3)
+    assert.equal(h1.attributes[2].name, "style")
+    assert.equal(h1.attributes[2].value, "top: 5px; left: 15px")
+
+    h1.attributes[2].value = "top: 15px;"
+    assert.equal(h1.attributes[2].value, "top: 15px")
 
     assert.end()
 })
