@@ -1,6 +1,5 @@
 
 
-
 /*
 * @version    0.0.14
 * @date       2014-04-04
@@ -262,8 +261,8 @@ extend(HTMLElement, Node, {
 		return findEl(this, sel)
 	},
 	toString: function() {
-		return "<" + this.tagName + attributesToString(this) + ">"
-			+ (voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.tagName + ">" )
+		return "<" + this.tagName.toLowerCase() + attributesToString(this) + ">"
+			+ (voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.tagName.toLowerCase() + ">" )
 	}
 })
 
