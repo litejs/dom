@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.0.14
-    @date       2014-04-04
+    @version    0.0.15
+    @date       2014-04-10
     @stability  2 - Unstable
 
 
@@ -135,6 +135,7 @@ Coding Style Guidelines
 -   Do not use spaces in file and directory names
     Consider substituting a dash (-) where you would normally use spaces.
 -   Rebase before pushing
+-   Fix tests before push or pull request
 
 
 External links

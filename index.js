@@ -2,8 +2,8 @@
 
 
 /*
-* @version    0.0.14
-* @date       2014-04-04
+* @version    0.0.15
+* @date       2014-04-10
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
@@ -175,6 +175,7 @@ function Attribute(node, name) {
 function HTMLElement(tag) {
 	var self = this
 	self.nodeName = self.tagName = tag.toUpperCase()
+	self.localName = tag.toLowerCase()
 	self.childNodes = []
 }
 
@@ -222,6 +223,7 @@ function attributesToString(node) {
 
 extend(HTMLElement, Node, {
 	nodeType: 1,
+	localName: null,
 	tagName: null,
 	styleMap: null,
 	hasAttribute: function(name) {
@@ -262,8 +264,8 @@ extend(HTMLElement, Node, {
 		return findEl(this, sel)
 	},
 	toString: function() {
-		return "<" + this.tagName + attributesToString(this) + ">"
-			+ (voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.tagName + ">" )
+		return "<" + this.localName + attributesToString(this) + ">"
+			+ (voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">" )
 	}
 })
 
