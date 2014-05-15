@@ -2,14 +2,16 @@
 
 
 /*
-* @version    0.0.15
-* @date       2014-04-10
+* @version    0.0.16
+* @date       2014-05-15
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
 */
 
-
+function escape(string) {
+	return string.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
 
 function extend(obj, _super, extras) {
 	obj.prototype = Object.create(_super.prototype)
@@ -149,7 +151,7 @@ Node.prototype = {
 	toString: function() {
 		return this.hasChildNodes() ? this.childNodes.reduce(function (memo, node) {
 			return memo + node
-		}, "") : this.data || ""
+		}, "") : escape(this.data || "")
 	}
 }
 
