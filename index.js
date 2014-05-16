@@ -2,8 +2,8 @@
 
 
 /*
-* @version    0.0.16
-* @date       2014-05-15
+* @version    0.1.0
+* @date       2014-05-16
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
@@ -134,7 +134,9 @@ Node.prototype = {
 	cloneNode: function(deep) {
 		var key
 		, self = this
-		, node = own(self.ownerDocument, new self.constructor(self.tagName || self.data))
+		, node = new self.constructor(self.tagName || self.data)
+
+		node.ownerDocument = self.ownerDocument
 
 		if (self.hasAttribute) {
 			for (key in self) if (self.hasAttribute(key)) node[key] = self[key].valueOf()
@@ -308,38 +310,31 @@ function Document(){
 	this.body = this.createElement("body")
 }
 
-function own(self, node) {
-	node.ownerDocument = self
-	return node
+function own(Element) {
+	return function(value) {
+		var node = new Element(value)
+		node.ownerDocument = this
+		return node
+	}
+}
+
+function body(getter) {
+	return function(value) {
+		return this.body[getter](value)
+	}
 }
 
 extend(Document, Node, {
 	nodeType: 9,
 	nodeName: "#document",
-	createElement: function(tag) {
-		return own(this, new HTMLElement(tag))
-	},
-	createTextNode: function(value) {
-		return own(this, new Text(value))
-	},
-	createComment: function(value) {
-		return own(this, new Comment(value))
-	},
-	createDocumentFragment: function() {
-		return own(this, new DocumentFragment())
-	},
-	getElementById: function(id) {
-		return this.body.getElementById(id)
-	},
-	getElementsByTagName: function(tag) {
-		return this.body.getElementsByTagName(tag)
-	},
-	querySelector: function(sel) {
-		return this.body.querySelector(sel)
-	},
-	querySelectorAll: function(sel) {
-		return this.body.querySelectorAll(sel)
-	}
+	createElement: own(HTMLElement),
+	createTextNode: own(Text),
+	createComment: own(Comment),
+	createDocumentFragment: own(DocumentFragment),
+	getElementById: body("getElementById"),
+	getElementsByTagName: body("getElementsByTagName"),
+	querySelector: body("querySelector"),
+	querySelectorAll: body("querySelectorAll")
 })
 
 module.exports = {
