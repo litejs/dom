@@ -135,12 +135,10 @@ Node.prototype = {
 		var key
 		, self = this
 		, node = new self.constructor(self.tagName || self.data)
-
 		node.ownerDocument = self.ownerDocument
 
 		if (self.hasAttribute) {
 			for (key in self) if (self.hasAttribute(key)) node[key] = self[key].valueOf()
-
 		}
 
 		if (deep && self.hasChildNodes()) {
@@ -174,6 +172,9 @@ function Attribute(node, name) {
 		get: function() {return node.getAttribute(name)},
 		set: function(val) {node.setAttribute(name, val)}
 	})
+}
+Attribute.prototype.toString = function() {
+	return this.name + '="' + this.value + '"'
 }
 
 function HTMLElement(tag) {
@@ -215,14 +216,6 @@ function findEl(node, sel, first) {
 var voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
-}
-
-function attributesToString(node) {
-	var attrs = node.attributes.map(function(attr) {
-		return attr.name + '="' + attr.value + '"'
-	})
-
-	return attrs.length ? " " + attrs.join(" ") : ""
 }
 
 extend(HTMLElement, Node, {
@@ -268,20 +261,19 @@ extend(HTMLElement, Node, {
 		return findEl(this, sel)
 	},
 	toString: function() {
-		return "<" + this.localName + attributesToString(this) + ">"
+		var attrs = this.attributes.join(" ")
+		return "<" + this.localName + (attrs ? " " + attrs : "") + ">"
 			+ (voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">" )
 	}
 })
 
-Object.defineProperties(HTMLElement.prototype, {
-	attributes: {
-		get: function() {
-			var key
-			, attrs = []
-			, self = this
-			for (key in self) if (self.hasAttribute(key)) attrs.push(new Attribute(self, key))
-			return attrs
-		}
+Object.defineProperty(HTMLElement.prototype, "attributes", {
+	get: function() {
+		var key
+		, attrs = []
+		, self = this
+		for (key in self) if (self.hasAttribute(key)) attrs.push(new Attribute(self, key))
+		return attrs
 	}
 })
 
