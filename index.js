@@ -174,7 +174,7 @@ function Attribute(node, name) {
 	})
 }
 Attribute.prototype.toString = function() {
-	return this.name + '="' + this.value + '"'
+	return this.name + '="' + this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"'
 }
 
 function HTMLElement(tag) {
