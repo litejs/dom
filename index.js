@@ -2,12 +2,14 @@
 
 
 /*
-* @version    0.1.2
+* @version    0.1.3
 * @date       2014-07-26
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
 */
+
+var hasOwn = Object.prototype.hasOwnProperty
 
 function escape(string) {
 	return string.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -226,7 +228,8 @@ extend(HTMLElement, Node, {
 	styleMap: null,
 	hasAttribute: function(name) {
 		// HACK
-		return name == "style" && !!this.style.valueOf() || this.hasOwnProperty(name) && this[name] !== "" && !(name in HTMLElement.prototype)
+		return name == "style" && !!this.style.valueOf() ||
+			hasOwn.call(this, name) && this[name] !== "" && !(name in HTMLElement.prototype)
 	},
 	getAttribute: function(name) {
 		return this.hasAttribute(name) ? "" + this[name] : null
