@@ -37,6 +37,15 @@ test("can create nodes", function (assert) {
     assert.end()
 })
 
+test("can create elements with namespace", function (assert) {
+    var el;
+
+    el = document.createElementNS(null, "clipPath")
+    assert.equal("" + el, "<clipPath></clipPath>")
+
+    assert.end()
+})
+
 test("can clone HTMLElements", function (assert) {
     var el = document.createElement("a");
 

@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.1.1
-    @date       2014-05-18
+    @version    0.1.2
+    @date       2014-07-26
     @stability  2 - Unstable
 
 
@@ -116,6 +116,7 @@ Extends Node.
 
 - nodeType
 - createElement()
+- createElementNS()
 - createTextNode()
 - createComment()
 - createDocumentFragment()

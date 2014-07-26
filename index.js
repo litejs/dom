@@ -2,8 +2,8 @@
 
 
 /*
-* @version    0.1.1
-* @date       2014-05-18
+* @version    0.1.2
+* @date       2014-07-26
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
@@ -219,6 +219,7 @@ var voidElements = {
 }
 
 extend(HTMLElement, Node, {
+	namespaceURI: "http://www.w3.org/1999/xhtml",
 	nodeType: 1,
 	localName: null,
 	tagName: null,
@@ -277,6 +278,15 @@ Object.defineProperty(HTMLElement.prototype, "attributes", {
 	}
 })
 
+function ElementNS(namespace, tag) {
+	var self = this
+	self.namespaceURI = namespace
+	self.nodeName = self.tagName = self.localName = tag
+	self.childNodes = []
+}
+
+ElementNS.prototype = HTMLElement.prototype
+
 function Text(data) {
 	this.data = data
 }
@@ -303,8 +313,8 @@ function Document(){
 }
 
 function own(Element) {
-	return function(value) {
-		var node = new Element(value)
+	return function($1, $2) {
+		var node = new Element($1, $2)
 		node.ownerDocument = this
 		return node
 	}
@@ -320,6 +330,7 @@ extend(Document, Node, {
 	nodeType: 9,
 	nodeName: "#document",
 	createElement: own(HTMLElement),
+	createElementNS: own(ElementNS),
 	createTextNode: own(Text),
 	createComment: own(Comment),
 	createDocumentFragment: own(DocumentFragment),
