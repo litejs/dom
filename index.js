@@ -225,7 +225,7 @@ extend(HTMLElement, Node, {
 	styleMap: null,
 	hasAttribute: function(name) {
 		// HACK
-		return name == "style" && !!this.style.valueOf() || this.hasOwnProperty(name) && !(name in HTMLElement.prototype)
+		return name == "style" && !!this.style.valueOf() || this.hasOwnProperty(name) && this[name] !== "" && !(name in HTMLElement.prototype)
 	},
 	getAttribute: function(name) {
 		return this.hasAttribute(name) ? "" + this[name] : null
