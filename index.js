@@ -144,8 +144,8 @@ Node.prototype = {
 		}
 
 		if (deep && self.hasChildNodes()) {
-			node.childNodes = self.childNodes.map(function(child){
-				return child.cloneNode(deep)
+			self.childNodes.forEach(function(child){
+				node.appendChild(child.cloneNode(deep))
 			})
 		}
 		return node
