@@ -2,8 +2,8 @@
 
 
 /*
-* @version    0.1.3
-* @date       2014-07-26
+* @version    0.1.4
+* @date       2014-08-05
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
@@ -144,8 +144,8 @@ Node.prototype = {
 		}
 
 		if (deep && self.hasChildNodes()) {
-			node.childNodes = self.childNodes.map(function(child){
-				return child.cloneNode(deep)
+			self.childNodes.forEach(function(child){
+				node.appendChild(child.cloneNode(deep))
 			})
 		}
 		return node
