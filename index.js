@@ -44,9 +44,9 @@ Node.prototype = {
 	nodeName:        null,
 	parentNode:      null,
 	ownerDocument:   null,
-    nodeValue: null,
+    nodeValue:       null,
     setNodeValue: function(e){
-      this.nodeValue = e;
+        this.nodeValue = e.data;
     },
 	childNodes:      null,
 	get textContent() {
