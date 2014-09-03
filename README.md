@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.1.4
-    @date       2014-08-05
+    @version    0.1.5
+    @date       2014-09-03
     @stability  2 - Unstable
 
 
@@ -49,6 +49,7 @@ Implemented features
 ### Node
 
 - nodeName
+- nodeValue
 - parentNode
 - ownerDocument
 - childNodes

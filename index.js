@@ -2,8 +2,8 @@
 
 
 /*
-* @version    0.1.4
-* @date       2014-08-05
+* @version    0.1.5
+* @date       2014-09-03
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
@@ -45,6 +45,12 @@ Node.prototype = {
 	parentNode:      null,
 	ownerDocument:   null,
 	childNodes:      null,
+	get nodeValue() {
+		return this.nodeType === 3 || this.nodeType === 8 ? this.data : null
+	},
+	set nodeValue(text) {
+		return this.nodeType === 3 || this.nodeType === 8 ? (this.data = text) : null
+	},
 	get textContent() {
 		return this.hasChildNodes() ? this.childNodes.map(function(child){
 			return child[ child.nodeType == 3 ? "data" : "textContent" ]
