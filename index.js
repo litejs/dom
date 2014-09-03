@@ -44,6 +44,10 @@ Node.prototype = {
 	nodeName:        null,
 	parentNode:      null,
 	ownerDocument:   null,
+    nodeValue: null,
+    setNodeValue: function(e){
+      this.nodeValue = e;
+    },
 	childNodes:      null,
 	get textContent() {
 		return this.hasChildNodes() ? this.childNodes.map(function(child){
