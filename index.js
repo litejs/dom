@@ -44,16 +44,13 @@ Node.prototype = {
 	nodeName:        null,
 	parentNode:      null,
 	ownerDocument:   null,
-    nodeValue:       null,
-    setNodeValue: function(e){
-        this.nodeValue = e.data;
-    },
 	childNodes:      null,
 	get textContent() {
-		return this.hasChildNodes() ? this.childNodes.map(function(child){
-			return child[ child.nodeType == 3 ? "data" : "textContent" ]
-		}).join("") : this.nodeType === 3 ? this.data : ""
+        return this.hasChildNodes() ? this.childNodes.map(function(child){
+            return child[ child.nodeType == 3 ? "data" : "textContent" ]
+        }).join("") : this.nodeType === 3 ? this.data : ""
 	},
+    nodeValue: this.data,
 	set textContent(text) {
 		if(this.nodeType === 3) return this.data = text
 		for (var self = this; self.firstChild;) self.removeChild(self.firstChild)
