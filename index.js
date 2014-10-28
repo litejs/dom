@@ -2,18 +2,14 @@
 
 
 /*
-* @version    0.1.5
-* @date       2014-09-03
+* @version    0.1.6
+* @date       2014-10-28
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
 */
 
 var hasOwn = Object.prototype.hasOwnProperty
-
-function escape(string) {
-	return string.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-}
 
 function extend(obj, _super, extras) {
 	obj.prototype = Object.create(_super.prototype)
@@ -159,7 +155,7 @@ Node.prototype = {
 	toString: function() {
 		return this.hasChildNodes() ? this.childNodes.reduce(function (memo, node) {
 			return memo + node
-		}, "") : escape(this.data || "")
+		}, "") : ""
 	}
 }
 
@@ -302,7 +298,10 @@ function Text(data) {
 
 extend(Text, Node, {
 	nodeType: 3,
-	nodeName: "#text"
+	nodeName: "#text",
+	toString: function() {
+		return ("" + this.data).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+	}
 })
 
 function Comment(data) {

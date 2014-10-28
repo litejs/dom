@@ -11,7 +11,7 @@ test("document is a Document", function (assert) {
 })
 
 test("can create nodes", function (assert) {
-    var el;
+    var el, undef
 
     el = document.createElement("h1")
     assert.equal(el.nodeType, 1)
@@ -39,6 +39,15 @@ test("can create nodes", function (assert) {
     assert.equal(el.data, "value")
     assert.equal(el.nodeValue, "value")
     assert.equal(el.textContent, "value")
+
+    el = document.createTextNode(null)
+    assert.equal("" + el, "null")
+
+    el = document.createTextNode(undef)
+    assert.equal("" + el, "undefined")
+
+    el = document.createTextNode(123)
+    assert.equal("" + el, "123")
 
     el = document.createComment("hello comment")
     assert.equal(el.nodeType, 8)

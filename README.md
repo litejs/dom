@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.1.5
-    @date       2014-09-03
+    @version    0.1.6
+    @date       2014-10-28
     @stability  2 - Unstable
 
 
