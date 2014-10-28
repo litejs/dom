@@ -305,6 +305,18 @@ extend(Text, Node, {
 	nodeName: "#text"
 })
 
+Object.defineProperty(Text.prototype, 'data', {
+  get: function() { return this.__data__; },
+  set: function(data) {
+  	if(data == null){
+		data = '';
+	}
+	this.__data__ = '' + data;
+  },
+  enumerable: true,
+  configurable: true
+});
+
 function Comment(data) {
 	this.data = data
 }
@@ -316,6 +328,18 @@ extend(Comment, Node, {
 		return "<!--" + this.data + "-->"
 	}
 })
+
+Object.defineProperty(Comment.prototype, 'data', {
+  get: function() { return this.__data__; },
+  set: function(data) {
+  	if(data == null){
+		data = '';
+	}
+	this.__data__ = '' + data;
+  },
+  enumerable: true,
+  configurable: true
+});
 
 function Document(){
 	this.body = this.createElement("body")
