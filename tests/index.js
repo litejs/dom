@@ -318,3 +318,12 @@ test("getElementById, getElementsByTagName, querySelector", function (assert) {
     assert.end()
 })
 
+test("testNode.data", function (assert) {
+    var textNode = document.createTextNode('foo')
+
+    textNode.data = null;
+
+    assert.equal(textNode.data, '')
+
+    assert.end()
+})
