@@ -48,15 +48,25 @@ Node.prototype = {
 		return this.nodeType === 3 || this.nodeType === 8 ? (this.data = text) : null
 	},
 	get textContent() {
-		return this.hasChildNodes() ? this.childNodes.map(function(child){
-			return child[ child.nodeType == 3 ? "data" : "textContent" ]
-		}).join("") : this.nodeType === 3 ? this.data : ""
+        return this.hasChildNodes() ? this.childNodes.map(function(child){
+            return child[ child.nodeType == 3 ? "data" : "textContent" ]
+        }).join("") : this.nodeType === 3 ? this.data : ""
 	},
 	set textContent(text) {
 		if(this.nodeType === 3) return this.data = text
 		for (var self = this; self.firstChild;) self.removeChild(self.firstChild)
 		self.appendChild(self.ownerDocument.createTextNode(text))
 	},
+    get nodeValue() {
+        return this.hasChildNodes() ? this.childNodes.map(function(child){
+            return child[ child.nodeType == 3 ? "data" : "textContent" ]
+        }).join("") : this.nodeType === 3 ? this.data : ""
+    },
+    set nodeValue(text) {
+        if(this.nodeType === 3) return this.data = text
+        for (var self = this; self.firstChild;) self.removeChild(self.firstChild)
+        self.appendChild(self.ownerDocument.createTextNode(text))
+    },
 	get firstChild() {
 		return this.childNodes && this.childNodes[0] || null
 	},
