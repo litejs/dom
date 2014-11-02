@@ -2,8 +2,8 @@
 
 
 /*
-* @version    0.1.6
-* @date       2014-10-28
+* @version    0.1.7
+* @date       2014-11-02
 * @stability  2 - Unstable
 * @author     Lauri Rooden <lauri@rooden.ee>
 * @license    MIT License
@@ -36,6 +36,13 @@ StyleMap.prototype.valueOf = function() {
 
 function Node(){}
 
+function getSibling(node, step) {
+	var silbings = node.parentNode && node.parentNode.childNodes
+	, index = silbings && silbings.indexOf(node)
+
+	return silbings && index > -1 && silbings[ index + step ] || null
+}
+
 Node.prototype = {
 	nodeName:        null,
 	parentNode:      null,
@@ -48,7 +55,7 @@ Node.prototype = {
 		return this.nodeType === 3 || this.nodeType === 8 ? (this.data = text) : null
 	},
 	get textContent() {
-		return this.hasChildNodes() ? this.childNodes.map(function(child){
+		return this.hasChildNodes() ? this.childNodes.map(function(child) {
 			return child[ child.nodeType == 3 ? "data" : "textContent" ]
 		}).join("") : this.nodeType === 3 ? this.data : ""
 	},
@@ -61,21 +68,13 @@ Node.prototype = {
 		return this.childNodes && this.childNodes[0] || null
 	},
 	get lastChild() {
-		return this.childNodes[ this.childNodes.length - 1 ] || null
+		return this.childNodes && this.childNodes[ this.childNodes.length - 1 ] || null
 	},
 	get previousSibling() {
-		var self = this
-		, childs = self.parentNode && self.parentNode.childNodes
-		, index = childs && childs.indexOf(self) || 0
-
-		return index > 0 && childs[ index - 1 ] || null
+		return getSibling(this, -1)
 	},
 	get nextSibling() {
-		var self = this
-		, childs = self.parentNode && self.parentNode.childNodes
-		, index = childs && childs.indexOf(self) || 0
-
-		return childs && childs[ index + 1 ] || null
+		return getSibling(this, 1)
 	},
 	get innerHTML() {
 		return Node.prototype.toString.call(this)
