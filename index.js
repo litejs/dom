@@ -20,17 +20,17 @@ function extend(obj, _super, extras) {
 }
 
 function StyleMap(style) {
-	var self = this
+	var styleMap = this
 	if (style) style.split(/\s*;\s*/g).map(function(val) {
 		val = val.split(/\s*:\s*/)
-		if(val[1]) self[val[0]] = val[1]
+		if(val[1]) styleMap[val[0]] = val[1]
 	})
 }
 
 StyleMap.prototype.valueOf = function() {
-	var self = this
-	return Object.keys(self).map(function(key) {
-		return key + ": " + self[key]
+	var styleMap = this
+	return Object.keys(styleMap).map(function(key) {
+		return key + ": " + styleMap[key]
 	}).join("; ")
 }
 
@@ -61,8 +61,8 @@ Node.prototype = {
 	},
 	set textContent(text) {
 		if(this.nodeType === 3) return this.data = text
-		for (var self = this; self.firstChild;) self.removeChild(self.firstChild)
-		self.appendChild(self.ownerDocument.createTextNode(text))
+		for (var node = this; node.firstChild;) node.removeChild(node.firstChild)
+		node.appendChild(node.ownerDocument.createTextNode(text))
 	},
 	get firstChild() {
 		return this.childNodes && this.childNodes[0] || null
@@ -107,14 +107,14 @@ Node.prototype = {
 		return this.insertBefore(el)
 	},
 	insertBefore: function(el, ref) {
-		var self = this
-		, childs = self.childNodes
+		var node = this
+		, childs = node.childNodes
 
 		if (el.nodeType == 11) {
-			while (el.firstChild) self.insertBefore(el.firstChild, ref)
+			while (el.firstChild) node.insertBefore(el.firstChild, ref)
 		} else {
 			if (el.parentNode) el.parentNode.removeChild(el)
-			el.parentNode = self
+			el.parentNode = node
 
 			// If ref is null, insert el at the end of the list of children.
 			childs.splice(ref ? childs.indexOf(ref) : childs.length, 0, el)
@@ -122,11 +122,11 @@ Node.prototype = {
 		return el
 	},
 	removeChild: function(el) {
-		var self = this
-		, index = self.childNodes.indexOf(el)
+		var node = this
+		, index = node.childNodes.indexOf(el)
 		if (index == -1) throw new Error("NOT_FOUND_ERR")
 
-		self.childNodes.splice(index, 1)
+		node.childNodes.splice(index, 1)
 		el.parentNode = null
 		return el
 	},
@@ -136,23 +136,23 @@ Node.prototype = {
 	},
 	cloneNode: function(deep) {
 		var key
-		, self = this
-		, node = new self.constructor(self.tagName || self.data)
-		node.ownerDocument = self.ownerDocument
+		, node = this
+		, clone = new node.constructor(node.tagName || node.data)
+		clone.ownerDocument = node.ownerDocument
 
-		if (self.hasAttribute) {
-			for (key in self) if (self.hasAttribute(key)) node[key] = self[key].valueOf()
+		if (node.hasAttribute) {
+			for (key in node) if (node.hasAttribute(key)) clone[key] = node[key].valueOf()
 		}
 
-		if (deep && self.hasChildNodes()) {
-			self.childNodes.forEach(function(child){
-				node.appendChild(child.cloneNode(deep))
+		if (deep && node.hasChildNodes()) {
+			node.childNodes.forEach(function(child){
+				clone.appendChild(child.cloneNode(deep))
 			})
 		}
-		return node
+		return clone
 	},
 	toString: function() {
-		return this.hasChildNodes() ? this.childNodes.reduce(function (memo, node) {
+		return this.hasChildNodes() ? this.childNodes.reduce(function(memo, node) {
 			return memo + node
 		}, "") : ""
 	}
@@ -181,10 +181,10 @@ Attribute.prototype.toString = function() {
 }
 
 function HTMLElement(tag) {
-	var self = this
-	self.nodeName = self.tagName = tag.toUpperCase()
-	self.localName = tag.toLowerCase()
-	self.childNodes = []
+	var element = this
+	element.nodeName = element.tagName = tag.toUpperCase()
+	element.localName = tag.toLowerCase()
+	element.childNodes = []
 }
 
 var elRe = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
@@ -276,17 +276,17 @@ Object.defineProperty(HTMLElement.prototype, "attributes", {
 	get: function() {
 		var key
 		, attrs = []
-		, self = this
-		for (key in self) if (self.hasAttribute(key)) attrs.push(new Attribute(self, key))
+		, element = this
+		for (key in element) if (element.hasAttribute(key)) attrs.push(new Attribute(element, key))
 		return attrs
 	}
 })
 
 function ElementNS(namespace, tag) {
-	var self = this
-	self.namespaceURI = namespace
-	self.nodeName = self.tagName = self.localName = tag
-	self.childNodes = []
+	var element = this
+	element.namespaceURI = namespace
+	element.nodeName = element.tagName = element.localName = tag
+	element.childNodes = []
 }
 
 ElementNS.prototype = HTMLElement.prototype
