@@ -247,6 +247,14 @@ test("HTMLElement.attributes", function (assert) {
     h1.attributes[2].value = "top: 15px;"
     assert.equal(h1.attributes[2].value, "top: 15px")
 
+    h1.removeAttribute('style')
+    h1.removeAttribute('class')
+    h1.removeAttribute('id')
+    h1.setAttribute('getAttribute', 'Get me')
+    assert.equal(h1.getAttribute('GetAttribute'), 'Get me')
+    h1.setAttribute('no-value', '')
+    assert.equal(h1.toString(), '<h1 getattribute="Get me" no-value></h1>')
+
     assert.end()
 })
 

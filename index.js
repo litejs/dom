@@ -169,7 +169,7 @@ extend(DocumentFragment, Node, {
 })
 
 function Attribute(node, name) {
-	this.name = name
+	this.name = name.toLowerCase()
 
 	Object.defineProperty(this, "value", {
 		get: function() {return node.getAttribute(name)},
@@ -177,6 +177,7 @@ function Attribute(node, name) {
 	})
 }
 Attribute.prototype.toString = function() {
+	if(!this.value) return this.name
 	return this.name + '="' + this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"'
 }
 
@@ -221,6 +222,12 @@ var voidElements = {
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
 
+function escapeAttributeName(name) {
+	name = name.toLowerCase()
+	if (name === 'constructor' || name === 'attributes') return name.toUpperCase()
+	return name
+}
+
 extend(HTMLElement, Node, {
 	namespaceURI: "http://www.w3.org/1999/xhtml",
 	nodeType: 1,
@@ -228,17 +235,20 @@ extend(HTMLElement, Node, {
 	tagName: null,
 	styleMap: null,
 	hasAttribute: function(name) {
+		name = escapeAttributeName(name)
 		// HACK
-		return name == "style" && !!this.style.valueOf() ||
-			hasOwn.call(this, name) && this[name] !== "" && !(name in HTMLElement.prototype)
+		return name == "style" && !!this.style.valueOf() || hasOwn.call(this, name)
 	},
 	getAttribute: function(name) {
+		name = escapeAttributeName(name)
 		return this.hasAttribute(name) ? "" + this[name] : null
 	},
 	setAttribute: function(name, value) {
+		name = escapeAttributeName(name)
 		this[name] = "" + value
 	},
 	removeAttribute: function(name) {
+		name = escapeAttributeName(name)
 		this[name] = ""
 		delete this[name]
 	},
@@ -277,7 +287,8 @@ Object.defineProperty(HTMLElement.prototype, "attributes", {
 		var key
 		, attrs = []
 		, element = this
-		for (key in element) if (element.hasAttribute(key)) attrs.push(new Attribute(element, key))
+		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
+			attrs.push(new Attribute(element, escapeAttributeName(key)))
 		return attrs
 	}
 })
