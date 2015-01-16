@@ -1,13 +1,14 @@
 
 
 
-/*
-* @version    0.1.7
-* @date       2014-11-02
-* @stability  2 - Unstable
-* @author     Lauri Rooden <lauri@rooden.ee>
-* @license    MIT License
-*/
+/**
+ * @version    0.2.0
+ * @date       2015-01-16
+ * @stability  2 - Unstable
+ * @author     Lauri Rooden <lauri@rooden.ee>
+ * @license    MIT License
+ */
+
 
 var hasOwn = Object.prototype.hasOwnProperty
 
@@ -60,7 +61,7 @@ Node.prototype = {
 		}).join("") : this.nodeType === 3 ? this.data : ""
 	},
 	set textContent(text) {
-		if(this.nodeType === 3) return this.data = text
+		if (this.nodeType === 3) return this.data = text
 		for (var node = this; node.firstChild;) node.removeChild(node.firstChild)
 		node.appendChild(node.ownerDocument.createTextNode(text))
 	},
@@ -177,7 +178,7 @@ function Attribute(node, name) {
 	})
 }
 Attribute.prototype.toString = function() {
-	if(!this.value) return this.name
+	if (!this.value) return this.name
 	return this.name + '="' + this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"'
 }
 
@@ -236,7 +237,6 @@ extend(HTMLElement, Node, {
 	styleMap: null,
 	hasAttribute: function(name) {
 		name = escapeAttributeName(name)
-		// HACK
 		return name == "style" && !!this.style.valueOf() || hasOwn.call(this, name)
 	},
 	getAttribute: function(name) {
