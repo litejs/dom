@@ -1,6 +1,5 @@
 
 
-
 /**
  * @version    0.2.0
  * @date       2015-01-16
@@ -61,7 +60,7 @@ Node.prototype = {
 		}).join("") : this.nodeType === 3 ? this.data : ""
 	},
 	set textContent(text) {
-		if (this.nodeType === 3) return this.data = text
+		if (this.nodeType === 3) return this.data = text // jshint boss:true
 		for (var node = this; node.firstChild;) node.removeChild(node.firstChild)
 		node.appendChild(node.ownerDocument.createTextNode(text))
 	},
@@ -179,6 +178,7 @@ function Attribute(node, name) {
 }
 Attribute.prototype.toString = function() {
 	if (!this.value) return this.name
+	// jshint -W108
 	return this.name + '="' + this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"'
 }
 
@@ -205,8 +205,9 @@ function findEl(node, sel, first) {
 		return ""
 	}) || "*"
 	, els = node.getElementsByTagName(tag)
-	, fn = Function("_", "return " + rules.join("&&"))
+	, fn = Function("_", "return " + rules.join("&&")) // jshint evil:true
 
+	// jshint -W084
 	for (; el = els[i++]; ) if (fn(el)) {
 		if (first) return el
 		out.push(el)
@@ -225,7 +226,7 @@ var voidElements = {
 
 function escapeAttributeName(name) {
 	name = name.toLowerCase()
-	if (name === 'constructor' || name === 'attributes') return name.toUpperCase()
+	if (name === "constructor" || name === "attributes") return name.toUpperCase()
 	return name
 }
 
@@ -277,8 +278,8 @@ extend(HTMLElement, Node, {
 	},
 	toString: function() {
 		var attrs = this.attributes.join(" ")
-		return "<" + this.localName + (attrs ? " " + attrs : "") + ">"
-			+ (voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">" )
+		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
+		(voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">" )
 	}
 })
 
@@ -359,7 +360,7 @@ extend(Document, Node, {
 })
 
 module.exports = {
-	document: new Document,
+	document: new Document(),
 	Document: Document,
 	HTMLElement: HTMLElement
 }

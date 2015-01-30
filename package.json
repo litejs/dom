@@ -13,6 +13,7 @@
   "scripts": {
     "build": "node node_modules/buildman/index.js --all",
     "travis-test": "istanbul cover ./tests/index.js && (coveralls < coverage/lcov.info || exit 0)",
+    "cover-climate": "istanbul cover ./tests/index.js && (codeclimate < coverage/lcov.info || exit 0)",
     "test": "node tests/index.js"
   },
   "repository": "git://github.com/litejs/dom-lite.git",
@@ -22,5 +23,11 @@
   "devDependencies": {
     "buildman": "*",
     "tape": "2.12.x"
+  },
+  "jshintConfig": {
+    "asi": true,
+    "laxcomma": true,
+    "maxdepth": 6,
+    "quotmark": "double"
   }
 }
