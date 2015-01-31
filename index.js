@@ -329,6 +329,7 @@ extend(Comment, Node, {
 
 function Document(){
 	this.body = this.createElement("body")
+	this.documentElement = this.body;
 }
 
 function own(Element) {
