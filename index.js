@@ -266,7 +266,7 @@ extend(HTMLElement, Node, {
 		for (var i = 0, key = tag === 1 ? "nodeType" : "nodeName"; (el = next); ) {
 			if (el[key] === tag) els[i++] = el
 			next = el.firstChild || el.nextSibling
-			while (!next && (el = el.parentNode)) next = el.nextSibling
+			while (!next && ((el = el.parentNode) !== this)) next = el.nextSibling
 		}
 		return els
 	},
