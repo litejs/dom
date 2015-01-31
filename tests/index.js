@@ -1,6 +1,7 @@
 var test = require("tape")
 
-var document = require("../").document
+var DOM = require("../")
+, document = DOM.document
 
 test("document is a Document", function (assert) {
     assert.equal(typeof document.createTextNode, "function")
@@ -277,6 +278,8 @@ test("documentFragment", function (assert) {
 
 test("getElementById, getElementsByTagName, querySelector", function (assert) {
 
+    document = new DOM.Document()
+
     function append_el(id, parent, tag) {
         var el = document.createElement(tag || "div")
         el.id = id
@@ -331,6 +334,11 @@ test("getElementById, getElementsByTagName, querySelector", function (assert) {
     assert.equal(document.querySelectorAll("div").length,         8)
     assert.equal(document.querySelectorAll(".findme").length,     2)
     assert.equal(document.querySelectorAll("span.findme").length, 1)
+
+    assert.equal(document.querySelectorAll("html").length,        1)
+    assert.equal(document.querySelectorAll("body").length,        1)
+    assert.equal(document.querySelector("html"), document.documentElement)
+    assert.equal(document.querySelector("body"), document.body)
 
     assert.equal(el1.querySelectorAll("div").length, 2);
     // assert.equal(document.querySelectorAll("body").length, 1)

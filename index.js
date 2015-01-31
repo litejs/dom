@@ -327,9 +327,12 @@ extend(Comment, Node, {
 	}
 })
 
-function Document(){
+function Document() {
+	this.childNodes = []
+	this.documentElement = this.createElement("html")
+	this.appendChild(this.documentElement)
 	this.body = this.createElement("body")
-	this.documentElement = this.body;
+	this.documentElement.appendChild(this.body)
 }
 
 function own(Element) {
@@ -337,12 +340,6 @@ function own(Element) {
 		var node = new Element($1, $2)
 		node.ownerDocument = this
 		return node
-	}
-}
-
-function body(getter) {
-	return function(value) {
-		return this.body[getter](value)
 	}
 }
 
@@ -354,10 +351,10 @@ extend(Document, Node, {
 	createTextNode: own(Text),
 	createComment: own(Comment),
 	createDocumentFragment: own(DocumentFragment),
-	getElementById: body("getElementById"),
-	getElementsByTagName: body("getElementsByTagName"),
-	querySelector: body("querySelector"),
-	querySelectorAll: body("querySelectorAll")
+	getElementById: HTMLElement.prototype.getElementById,
+	getElementsByTagName: HTMLElement.prototype.getElementsByTagName,
+	querySelector: HTMLElement.prototype.querySelector,
+	querySelectorAll: HTMLElement.prototype.querySelectorAll
 })
 
 module.exports = {
