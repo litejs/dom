@@ -192,26 +192,32 @@ function HTMLElement(tag) {
 var elRe = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
 
 function findEl(node, sel, first) {
-	var el
-	, i = 0
-	, out = []
-	, rules = ["_"]
-	, tag = sel.replace(elRe, function(_, o, s, v) {
-		rules.push(
-			o == "." ? "(' '+_.className+' ').indexOf(' "+s+" ')>-1" :
-			o == "#" ? "_.id=='"+s+"'" :
-			"_.getAttribute('"+s+"')"+(v?"=='"+v+"'":"")
-		)
-		return ""
-	}) || "*"
-	, els = node.getElementsByTagName(tag)
-	, fn = Function("_", "return " + rules.join("&&")) // jshint evil:true
+	var sels = sel.split(/\s*,\s*/)
+	, j = 0
+	, out = [];
 
-	// jshint -W084
-	for (; el = els[i++]; ) if (fn(el)) {
-		if (first) return el
-		out.push(el)
+	for (; sel = sels[j++]; ) {
+		var el
+		, i = 0
+		, rules = ["_"]
+		, tag = sel.replace(elRe, function(_, o, s, v) {
+			rules.push(
+				o == "." ? "(' '+_.className+' ').indexOf(' "+s+" ')>-1" :
+				o == "#" ? "_.id=='"+s+"'" :
+				"_.getAttribute('"+s+"')"+(v?"=='"+v+"'":"")
+			)
+			return ""
+		}) || "*"
+		, els = node.getElementsByTagName(tag)
+		, fn = Function("_", "return " + rules.join("&&")) // jshint evil:true
+
+		// jshint -W084
+		for (; el = els[i++]; ) if (fn(el)) {
+			if (first) return el
+			out.push(el)
+		}
 	}
+
 	return first ? null : out
 }
 
