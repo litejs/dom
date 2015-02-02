@@ -9,7 +9,22 @@
  */
 
 
-var hasOwn = Object.prototype.hasOwnProperty
+// Void elements: http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+var voidElements = {
+	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
+	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
+}
+, hasOwn = Object.prototype.hasOwnProperty
+, selectorCache = {}
+, selectorRe = /([.#:[])([-\w]+)(?:=((["'\/])(?:\\?.)*?\4|[-\w]+)]])?/g
+, lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
+, pseudoClasses = {
+	"empty": "!_.hasChildNodes()",
+	"first-child": "_.parentNode&&_.parentNode.firstChild==_",
+	"last-child" : "_.parentNode&&_.parentNode.lastChild==_",
+	"link": "_.nodeName=='A'&&_.getAttribute('href')"
+}
+
 
 function extend(obj, _super, extras) {
 	obj.prototype = Object.create(_super.prototype)
@@ -182,13 +197,6 @@ Attribute.prototype.toString = function() {
 	return this.name + '="' + this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"'
 }
 
-function HTMLElement(tag) {
-	var element = this
-	element.nodeName = element.tagName = tag.toUpperCase()
-	element.localName = tag.toLowerCase()
-	element.childNodes = []
-}
-
 function findEl(node, sel, first) {
 	var el
 	, i = 0
@@ -202,24 +210,6 @@ function findEl(node, sel, first) {
 	}
 	return first ? null : out
 }
-
-/*
-* Void elements:
-* http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
-*/
-var voidElements = {
-	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
-	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
-}
-, pseudoClasses = {
-	"empty": "!_.hasChildNodes()",
-	"first-child": "_.parentNode&&_.parentNode.firstChild==_",
-	"last-child" : "_.parentNode&&_.parentNode.lastChild==_",
-	"link": "_.nodeName=='A'&&_.getAttribute('href')"
-}
-, selectorRe = /([.#:[])([-\w]+)(?:=((["'\/])(?:\\?.)*?\4|[-\w]+)]])?/g
-, lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
-, fnCache = {}
 
 function escapeAttributeName(name) {
 	name = name.toLowerCase()
@@ -246,8 +236,15 @@ function selectorFnStr(sel) {
 
 function selectorFn(str) {
 	// jshint evil:true
-	return fnCache[str] ||
-	(fnCache[str] = Function("_", "return " + str))
+	return selectorCache[str] ||
+	(selectorCache[str] = Function("_", "return " + str))
+}
+
+function HTMLElement(tag) {
+	var element = this
+	element.nodeName = element.tagName = tag.toUpperCase()
+	element.localName = tag.toLowerCase()
+	element.childNodes = []
 }
 
 extend(HTMLElement, Node, {
