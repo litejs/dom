@@ -270,13 +270,13 @@ extend(HTMLElement, Node, {
 			relation = _rel.trim()
 			return ""
 		})
-		, next = relation == ">" ? this.parentNode : relation == "+" ? this.previousSibling : this
+		, next = relation == "+" ? this.previousSibling : this.parentNode
 		, fn = selectorFn(selectorFnStr(sel.slice(from)))
 
 		if (!fn(this)) return false
 
 		if (parentSel) {
-			if (!relation) return !!(next.parentNode && next.parentNode.closest && next.parentNode.closest(parentSel))
+			if (!relation) return !!(next && next.closest && next.closest(parentSel))
 			return next && next.matches && next.matches(parentSel) || false
 		}
 		return true
@@ -299,8 +299,7 @@ extend(HTMLElement, Node, {
 		return this.hasAttribute(name) ? "" + this[name] : null
 	},
 	setAttribute: function(name, value) {
-		name = escapeAttributeName(name)
-		this[name] = "" + value
+		this[escapeAttributeName(name)] = "" + value
 	},
 	removeAttribute: function(name) {
 		name = escapeAttributeName(name)
