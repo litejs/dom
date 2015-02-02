@@ -1,7 +1,7 @@
 
 
 /**
- * @version    0.3.0
+ * @version    0.3.1
  * @date       2015-02-02
  * @stability  2 - Unstable
  * @author     Lauri Rooden <lauri@rooden.ee>
@@ -194,7 +194,7 @@ function findEl(node, sel, first) {
 	, i = 0
 	, out = []
 	, els = node.getElementsByTagName("*")
-	, fn = Function("_", "return " + sel.split(/\s*,\s*/).map(selectorFnStr).join("||")) // jshint evil:true
+	, fn = selectorFn(sel.split(/\s*,\s*/).map(selectorFnStr).join("||"))
 
 	for (; (el = els[i++]); ) if (fn(el)) {
 		if (first) return el
@@ -219,6 +219,7 @@ var voidElements = {
 }
 , selectorRe = /([.#:[])([-\w]+)(?:=((["'\/])(?:\\?.)*?\4|[-\w]+)]])?/g
 , lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
+, fnCache = {}
 
 function escapeAttributeName(name) {
 	name = name.toLowerCase()
@@ -243,6 +244,12 @@ function selectorFnStr(sel) {
 	return rules.join("&&")
 }
 
+function selectorFn(str) {
+	// jshint evil:true
+	return fnCache[str] ||
+	(fnCache[str] = Function("_", "return " + str))
+}
+
 extend(HTMLElement, Node, {
 	matches: function(sel) {
 		var relation, from
@@ -252,7 +259,7 @@ extend(HTMLElement, Node, {
 			return ""
 		})
 		, next = relation == ">" ? this.parentNode : relation == "+" ? this.previousSibling : this
-		, fn = Function("_", "return " + selectorFnStr(sel.slice(from))) // jshint evil:true
+		, fn = selectorFn(selectorFnStr(sel.slice(from)))
 
 		if (!fn(this)) return false
 
