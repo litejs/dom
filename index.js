@@ -1,7 +1,7 @@
 
 
 /**
- * @version    0.3.5
+ * @version    0.3.6
  * @date       2015-02-02
  * @stability  2 - Unstable
  * @author     Lauri Rooden <lauri@rooden.ee>
@@ -233,15 +233,13 @@ function selectorFnStr(sel) {
 			op == ":" && pseudoClasses[key] ||
 			"(a=_.getAttribute('" + key + "'))" + (!fn && val ? "=='" + val + "'" : "")
 		)
-		if (fn) {
-			rules.push(
-				fn == "^" ? "a.slice(0," + len + ")=='" + val + "'" :
-				fn == "|" ? "a.split('-')[0]=='" + val + "'" :
-				fn == "$" ? "a.slice(-" + len + ")=='" + val + "'" :
-				fn == "~" ? "(' '+a+' ').indexOf(' " + val + " ')>-1" :
-				"a.indexOf('" + val + "')>-1" // fn == "*"
-			)
-		}
+		if (fn) rules.push(
+			fn == "^" ? "a.slice(0," + len + ")=='" + val + "'" :
+			fn == "|" ? "a.split('-')[0]=='" + val + "'" :
+			fn == "$" ? "a.slice(-" + len + ")=='" + val + "'" :
+			fn == "~" ? "(' '+a+' ').indexOf(' " + val + " ')>-1" :
+			"a.indexOf('" + val + "')>-1" // fn == "*"
+		)
 		return ""
 	})
 
