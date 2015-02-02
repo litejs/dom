@@ -60,7 +60,7 @@ Node.prototype = {
 		}).join("") : this.nodeType === 3 ? this.data : ""
 	},
 	set textContent(text) {
-		if (this.nodeType === 3) return this.data = text // jshint boss:true
+		if (this.nodeType === 3) return (this.data = text)
 		for (var node = this; node.firstChild;) node.removeChild(node.firstChild)
 		node.appendChild(node.ownerDocument.createTextNode(text))
 	},
@@ -145,7 +145,7 @@ Node.prototype = {
 		}
 
 		if (deep && node.hasChildNodes()) {
-			node.childNodes.forEach(function(child){
+			node.childNodes.forEach(function(child) {
 				clone.appendChild(child.cloneNode(deep))
 			})
 		}
@@ -314,7 +314,7 @@ extend(HTMLElement, Node, {
 	toString: function() {
 		var attrs = this.attributes.join(" ")
 		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
-		(voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">" )
+		(voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">")
 	}
 })
 
