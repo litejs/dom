@@ -1,7 +1,7 @@
 
 
 /**
- * @version    0.3.3
+ * @version    0.3.4
  * @date       2015-02-02
  * @stability  2 - Unstable
  * @author     Lauri Rooden <lauri@rooden.ee>
@@ -16,7 +16,7 @@ var voidElements = {
 }
 , hasOwn = Object.prototype.hasOwnProperty
 , selectorCache = {}
-, selectorRe = /([.#:[])([-\w]+)(?:=((["'\/])(?:\\?.)*?\4|[-\w]+)])?]?/g
+, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=((["'\/])(?:\\?.)*?\4|[-\w]+)])?]?/g
 , lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
 , pseudoClasses = {
 	"empty": "!_.hasChildNodes()",
@@ -221,14 +221,27 @@ function escapeAttributeName(name) {
 
 function selectorFnStr(sel) {
 	var rules = ["_"]
-	, tag = sel.replace(selectorRe, function(_, op, key, val, quotation) {
+	, tag = sel.replace(selectorRe, function(_, op, key, fn, val, quotation, len) {
 		if (quotation) val = val.slice(1, -1)
+		if (val) {
+			len = val.length
+			val = val.replace(/'/g, "\\'")
+		}
 		rules.push(
 			op == "." ? "(' '+_.className+' ').indexOf(' " + key + " ')>-1" :
 			op == "#" ? "_.id=='" + key + "'" :
 			op == ":" && pseudoClasses[key] ||
-			"_.getAttribute('" + key + "')" + (val ? "=='" + val.replace(/'/g, "\\'") + "'" : "")
+			"(a=_.getAttribute('" + key + "'))" + (!fn && val ? "=='" + val + "'" : "")
 		)
+		if (fn) {
+			rules.push(
+				fn == "^" ? "a.slice(0," + len + ")=='" + val + "'" :
+				fn == "|" ? "a.slice(0," + (len + 1) + ")=='" + val + "-'" :
+				fn == "$" ? "a.slice(-" + len + ")=='" + val + "'" :
+				fn == "~" ? "(' '+a+' ').indexOf(' " + val + " ')>-1" :
+				"a.indexOf('" + val + "')>-1" // fn == "*"
+			)
+		}
 		return ""
 	})
 
@@ -239,7 +252,7 @@ function selectorFnStr(sel) {
 function selectorFn(str) {
 	// jshint evil:true
 	return selectorCache[str] ||
-	(selectorCache[str] = Function("_", "return " + str))
+	(selectorCache[str] = Function("_,a", "return " + str))
 }
 
 function HTMLElement(tag) {
