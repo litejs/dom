@@ -189,26 +189,14 @@ function HTMLElement(tag) {
 	element.childNodes = []
 }
 
-var elRe = /([.#:[])([-\w]+)(?:=([-\w]+)])?]?/g
-
 function findEl(node, sel, first) {
 	var el
 	, i = 0
 	, out = []
-	, rules = ["_"]
-	, tag = sel.replace(elRe, function(_, o, s, v) {
-		rules.push(
-			o == "." ? "(' '+_.className+' ').indexOf(' "+s+" ')>-1" :
-			o == "#" ? "_.id=='"+s+"'" :
-			"_.getAttribute('"+s+"')"+(v?"=='"+v+"'":"")
-		)
-		return ""
-	}) || "*"
-	, els = node.getElementsByTagName(tag)
-	, fn = Function("_", "return " + rules.join("&&")) // jshint evil:true
+	, els = node.getElementsByTagName("*")
+	, fn = Function("_", "return " + sel.split(/\s*,\s*/).map(selectorFnStr).join("||")) // jshint evil:true
 
-	// jshint -W084
-	for (; el = els[i++]; ) if (fn(el)) {
+	for (; (el = els[i++]); ) if (fn(el)) {
 		if (first) return el
 		out.push(el)
 	}
@@ -223,6 +211,14 @@ var voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
+, pseudoClasses = {
+	"empty": "!_.hasChildNodes()",
+	"first-child": "_.parentNode&&_.parentNode.firstChild==_",
+	"last-child" : "_.parentNode&&_.parentNode.lastChild==_",
+	"link": "_.nodeName=='A'&&_.getAttribute('href')"
+}
+, selectorRe = /([.#:[])([-\w]+)(?:=((["'\/])(?:\\?.)*?\4|[-\w]+)]])?/g
+, lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
 
 function escapeAttributeName(name) {
 	name = name.toLowerCase()
@@ -230,7 +226,46 @@ function escapeAttributeName(name) {
 	return name
 }
 
+function selectorFnStr(sel) {
+	var rules = ["_"]
+	, tag = sel.replace(selectorRe, function(_, op, key, val, quotation) {
+		if (quotation) val = val.slice(1, -1)
+		rules.push(
+			op == "." ? "(' '+_.className+' ').indexOf(' " + key + " ')>-1" :
+			op == "#" ? "_.id=='" + key + "'" :
+			op == ":" && pseudoClasses[key] ||
+			"_.getAttribute('" + key + "')" + (val ? "=='" + val.replace(/'/g, "\\'") + "'" : "")
+		)
+		return ""
+	})
+
+	if (tag && tag != "*") rules.unshift("_.nodeName=='" + tag.toUpperCase() + "'")
+	return rules.join("&&")
+}
+
 extend(HTMLElement, Node, {
+	matches: function(sel) {
+		var relation, from
+		, parentSel = sel.replace(lastSelectorRe, function(_, _rel, a, b, start) {
+			from = start + _rel.length
+			relation = _rel.trim()
+			return ""
+		})
+		, next = relation == ">" ? this.parentNode : relation == "+" ? this.previousSibling : this
+		, fn = Function("_", "return " + selectorFnStr(sel.slice(from))) // jshint evil:true
+
+		if (!fn(this)) return false
+
+		if (parentSel) {
+			if (!relation) return !!(next.parentNode && next.parentNode.closest && next.parentNode.closest(parentSel))
+			return next && next.matches && next.matches(parentSel) || false
+		}
+		return true
+	},
+	closest: function(sel) {
+		for (var el = this; el; el = el.parentNode) if (el.matches && el.matches(sel)) return el
+		return null
+	},
 	namespaceURI: "http://www.w3.org/1999/xhtml",
 	nodeType: 1,
 	localName: null,

@@ -274,17 +274,17 @@ test("documentFragment", function (assert) {
 	assert.end()
 })
 
+function append_el(id, parent, tag) {
+	var el = document.createElement(tag || "div")
+	el.id = id
+	parent.appendChild(el)
+	return el
+}
+
 
 test("getElementById, getElementsByTagName, querySelector", function (assert) {
 
 	document = new DOM.Document()
-
-	function append_el(id, parent, tag) {
-		var el = document.createElement(tag || "div")
-		el.id = id
-		parent.appendChild(el)
-		return el
-	}
 
 	var el1   = append_el(1, document.body)
 	var el2   = append_el(2, document.body)
@@ -339,8 +339,63 @@ test("getElementById, getElementsByTagName, querySelector", function (assert) {
 	assert.equal(document.querySelector("html"), document.documentElement)
 	assert.equal(document.querySelector("body"), document.body)
 
+	assert.equal(document.querySelectorAll("span.findme, div.findme").length, 2)
+
 	assert.equal(el1.querySelectorAll("div").length, 2)
 
 	assert.end()
 })
+
+
+test("Element.matches and Element.closest", function (assert) {
+	document = new DOM.Document()
+
+	var el1   = append_el(1, document.body, "div")
+	var el2   = append_el(2, document.body, "span")
+	var el3   = append_el(3, el2, "a")
+	el3.href = "#link"
+
+	assert.equal(el1.matches("div"), true)
+	assert.equal(el1.matches("span"), false)
+	assert.equal(el1.matches("#1"), true)
+	assert.equal(el1.matches("#2"), false)
+	assert.equal(el1.matches("div#1"), true)
+	assert.equal(el1.matches("div#2"), false)
+
+	assert.equal(el1.matches("body > div#1"), true)
+	assert.equal(el1.matches("body > *"), true)
+	assert.equal(el1.matches("*"), true)
+	assert.equal(el1.matches("body > div#2"), false)
+	assert.equal(el1.matches("html > div#1"), false)
+	assert.equal(el1.matches("html > div#2"), false)
+
+	assert.equal(el1.matches("div + div"), false)
+	assert.equal(el2.matches("div + div"), false)
+	assert.equal(el2.matches("div + span"), true)
+
+	assert.equal(el1.matches("body div#1"), true)
+	assert.equal(el1.matches("html div#1"), true)
+
+	assert.equal(el1.matches("div:empty"), true)
+	assert.equal(el2.matches(":empty"), false)
+	assert.equal(el2.matches(":link"), false)
+	assert.equal(el3.matches(":link"), true)
+
+	assert.equal(el1.matches("div:first-child"), true)
+	assert.equal(el1.matches("div:last-child"), false)
+	assert.equal(el2.matches("span:first-child"), false)
+	assert.equal(el2.matches("span:last-child"), true)
+
+
+	assert.equal(el1.closest("div"), el1)
+	assert.equal(el1.closest("body"), document.body)
+	assert.equal(el1.closest("span"), null)
+
+	assert.end()
+})
+
+
+
+
+
 
