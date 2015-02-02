@@ -340,6 +340,7 @@ test("getElementById, getElementsByTagName, querySelector", function (assert) {
 	assert.equal(document.querySelector("body"), document.body)
 
 	assert.equal(document.querySelectorAll("span.findme, div.findme").length, 2)
+	assert.equal(document.querySelectorAll("body span.findme, div.findme").length, 2)
 
 	assert.equal(el1.querySelectorAll("div").length, 2)
 

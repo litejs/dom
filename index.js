@@ -1,7 +1,7 @@
 
 
 /**
- * @version    0.3.1
+ * @version    0.3.2
  * @date       2015-02-02
  * @stability  2 - Unstable
  * @author     Lauri Rooden <lauri@rooden.ee>
@@ -202,7 +202,9 @@ function findEl(node, sel, first) {
 	, i = 0
 	, out = []
 	, els = node.getElementsByTagName("*")
-	, fn = selectorFn(sel.split(/\s*,\s*/).map(selectorFnStr).join("||"))
+	, fn = selectorFn(sel.split(/\s*,\s*/).map(function(sel) {
+		return "_.matches('" + sel + "')"
+	}).join("||"))
 
 	for (; (el = els[i++]); ) if (fn(el)) {
 		if (first) return el
