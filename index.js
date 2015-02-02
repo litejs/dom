@@ -323,6 +323,9 @@ extend(HTMLElement, Node, {
 		}
 		return els
 	},
+	getElementsByClassName: function(sel) {
+		return this.querySelectorAll("." + sel.replace(/\s+/g, "."))
+	},
 	querySelector: function(sel) {
 		return findEl(this, sel, 1)
 	},
@@ -406,6 +409,7 @@ extend(Document, Node, {
 	createDocumentFragment: own(DocumentFragment),
 	getElementById: HTMLElement.prototype.getElementById,
 	getElementsByTagName: HTMLElement.prototype.getElementsByTagName,
+	getElementsByClassName: HTMLElement.prototype.getElementsByClassName,
 	querySelector: HTMLElement.prototype.querySelector,
 	querySelectorAll: HTMLElement.prototype.querySelectorAll
 })

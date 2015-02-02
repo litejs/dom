@@ -282,7 +282,8 @@ function append_el(id, parent, tag) {
 }
 
 
-test("getElementById, getElementsByTagName, querySelector", function (assert) {
+test("getElementById, getElementsByTagName, getElementsByClassName, querySelector", function (assert) {
+	var result
 
 	document = new DOM.Document()
 
@@ -314,7 +315,15 @@ test("getElementById, getElementsByTagName, querySelector", function (assert) {
 	assert.equal(document.getElementById(222),  el222)
 
 	assert.equal(document.getElementsByTagName("div").length,  8)
-	assert.equal(document.getElementsByTagName("span").length,  1)
+
+	result = document.getElementsByTagName("span")
+	assert.equal(result.length,  1)
+	assert.equal(result[0], el221)
+
+	result = document.getElementsByClassName("findme")
+	assert.equal(result.length, 2)
+	assert.equal(result[0], el21)
+	assert.equal(result[1], el221)
 
 	assert.equal(document.querySelector("span"),      el221)
 	assert.equal(document.querySelector("#22"),       el22)
@@ -331,8 +340,15 @@ test("getElementById, getElementsByTagName, querySelector", function (assert) {
 	assert.equal(document.querySelector("div#21.findme"),   el21)
 
 	assert.equal(document.querySelectorAll("div").length,         8)
-	assert.equal(document.querySelectorAll(".findme").length,     2)
-	assert.equal(document.querySelectorAll("span.findme").length, 1)
+
+	result = document.querySelectorAll(".findme")
+	assert.equal(result.length, 2)
+	assert.equal(result[0], el21)
+	assert.equal(result[1], el221)
+
+	result = document.querySelectorAll("span.findme")
+	assert.equal(result.length, 1)
+	assert.equal(result[0], el221)
 
 	assert.equal(document.querySelectorAll("html").length,        1)
 	assert.equal(document.querySelectorAll("body").length,        1)
