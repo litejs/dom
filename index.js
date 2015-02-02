@@ -1,7 +1,7 @@
 
 
 /**
- * @version    0.3.2
+ * @version    0.3.3
  * @date       2015-02-02
  * @stability  2 - Unstable
  * @author     Lauri Rooden <lauri@rooden.ee>
@@ -16,7 +16,7 @@ var voidElements = {
 }
 , hasOwn = Object.prototype.hasOwnProperty
 , selectorCache = {}
-, selectorRe = /([.#:[])([-\w]+)(?:=((["'\/])(?:\\?.)*?\4|[-\w]+)]])?/g
+, selectorRe = /([.#:[])([-\w]+)(?:=((["'\/])(?:\\?.)*?\4|[-\w]+)])?]?/g
 , lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
 , pseudoClasses = {
 	"empty": "!_.hasChildNodes()",

@@ -354,7 +354,7 @@ test("Element.matches and Element.closest", function (assert) {
 	var el1   = append_el(1, document.body, "div")
 	var el2   = append_el(2, document.body, "span")
 	var el3   = append_el(3, el2, "a")
-	el3.href = "#link"
+	el3.href = "#A link 1"
 
 	assert.equal(el1.matches("div"), true)
 	assert.equal(el1.matches("span"), false)
@@ -382,11 +382,16 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.equal(el2.matches(":link"), false)
 	assert.equal(el3.matches(":link"), true)
 
+	assert.equal(el1.matches('[id=1]'), true)
+	assert.equal(el1.matches('[id=true]'), false)
+	assert.equal(el3.matches('[href="#A link 1"]'), true)
+	assert.equal(el3.matches("a[href='#A link 1']"), true)
+	assert.equal(el3.matches('[href="#A"]'), false)
+
 	assert.equal(el1.matches("div:first-child"), true)
 	assert.equal(el1.matches("div:last-child"), false)
 	assert.equal(el2.matches("span:first-child"), false)
 	assert.equal(el2.matches("span:last-child"), true)
-
 
 	assert.equal(el1.closest("div"), el1)
 	assert.equal(el1.closest("body"), document.body)
