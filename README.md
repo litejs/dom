@@ -6,15 +6,16 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.2.1
-    @date       2015-01-31
+    @version    0.3.0
+    @date       2015-02-02
     @stability  2 - Unstable
 
 
 DOM lite &ndash; [![Build][1]][2] [![Coverage][3]][4]
 ========
 
-A minimal DOM implementation
+A small DOM implementation
+where most of DOM attributes and methods are implemented.
 
 
 Examples
@@ -43,88 +44,12 @@ el.innerHTML;
 // hello world
 ```
 
-Implemented features
+Implementation notes
 --------------------
 
-### Node
-
-- nodeName
-- nodeValue
-- parentNode
-- ownerDocument
-- childNodes
-- textContent
-- firstChild
-- lastChild
-- previousSibling
-- nextSibling
-- innerHTML() - Read Only
-- outerHTML() - Read Only
-- hasChildNodes()
-- appendChild()
-- insertBefore()
-- removeChild()
-- replaceChild()
-- cloneNode()
-
-
-### DocumentFragment
-
-Extends Node.
-
-- nodeType
-
-
-### HTMLElement
-
-Extends Node.
-
-- attributes
-- nodeType
-- localName
-- tagName
-- style
-- className
-- hasAttribute()
-- getAttribute()
-- setAttribute()
-- removeAttribute()
-- getElementById()
-- getElementsByTagName()
-- querySelector() - Only simple selectors
-- querySelectorAll() - Only simple selectors
-
-
-### Text
-
-Extends Node.
-
-- nodeType
-- data
-
-
-### Comment
-
-Extends Node.
-
-- nodeType
-- data
-
-
-### Document
-
-Extends Node.
-
-- nodeType
-- createElement()
-- createElementNS()
-- createTextNode()
-- createComment()
-- createDocumentFragment()
-- getElementById()
-- getElementsByTagName()
-- querySelector()
-- querySelectorAll()
+ -  `innerHTML` and `outerHTML` are read only
+ -  `querySelector()`, `querySelectorAll()`, `closest()` and `matches()`
+    does not support CSS3 selectors
 
 
 
@@ -152,7 +77,7 @@ External links
 
 ### Licence
 
-Copyright (c) 2014 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2014-2015 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [The MIT License](http://lauri.rooden.ee/mit-license.txt)
 
 

@@ -1,10 +1,10 @@
 {
   "name": "dom-lite",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "stability": 2,
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
-  "description": "A minimal DOM implementation",
+  "description": "A small DOM implementation",
   "keywords": [
     "dom"
   ],
