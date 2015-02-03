@@ -415,7 +415,9 @@ extend(Document, Node, {
 
 module.exports = {
 	document: new Document(),
-	Document: Document,
-	HTMLElement: HTMLElement
+	StyleMap: StyleMap,
+	Node: Node,
+	HTMLElement: HTMLElement,
+	Document: Document
 }
 
