@@ -1,6 +1,6 @@
 {
   "name": "dom-lite",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "stability": 2,
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -14,7 +14,7 @@
     "build": "node node_modules/buildman/index.js --all",
     "travis-test": "istanbul cover ./tests/index.js && (coveralls < coverage/lcov.info || exit 0)",
     "cover-climate": "istanbul cover ./tests/index.js && (codeclimate < coverage/lcov.info || exit 0)",
-    "test": "jshint --verbose index.js; node tests/index.js"
+    "test": "node tests/index.js; jshint --verbose index.js"
   },
   "repository": "git://github.com/litejs/dom-lite.git",
   "bugs": {
