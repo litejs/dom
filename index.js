@@ -1,8 +1,8 @@
 
 
 /**
- * @version    0.3.6
- * @date       2015-02-02
+ * @version    0.3.7
+ * @date       2015-02-03
  * @stability  2 - Unstable
  * @author     Lauri Rooden <lauri@rooden.ee>
  * @license    MIT License
@@ -16,7 +16,7 @@ var voidElements = {
 }
 , hasOwn = Object.prototype.hasOwnProperty
 , selectorCache = {}
-, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=((["'\/])(?:\\?.)*?\4|[-\w]+)])?]?/g
+, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=((["'\/])(?:\\?.)*?\5|[-\w]+)])?]?/g
 , lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
 , pseudoClasses = {
 	"empty": "!_.hasChildNodes()",
@@ -197,6 +197,12 @@ Attribute.prototype.toString = function() {
 	return this.name + '="' + this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"'
 }
 
+function escapeAttributeName(name) {
+	name = name.toLowerCase()
+	if (name === "constructor" || name === "attributes") return name.toUpperCase()
+	return name
+}
+
 function findEl(node, sel, first) {
 	var el
 	, i = 0
@@ -211,12 +217,6 @@ function findEl(node, sel, first) {
 		out.push(el)
 	}
 	return first ? null : out
-}
-
-function escapeAttributeName(name) {
-	name = name.toLowerCase()
-	if (name === "constructor" || name === "attributes") return name.toUpperCase()
-	return name
 }
 
 function selectorFnStr(sel) {

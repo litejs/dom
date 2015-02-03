@@ -371,6 +371,7 @@ test("Element.matches and Element.closest", function (assert) {
 	var el2   = append_el(2, document.body, "span")
 	var el3   = append_el(3, el2, "a")
 	el2.lang = "en"
+	el2.name = "map[]"
 	el3.href = "#A link 1"
 	el3.lang = "en-US"
 	el3.foo = "en'US"
@@ -402,6 +403,12 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.equal(el3.matches(":link"), true)
 
 	assert.equal(el1.matches('[id=1]'), true)
+	assert.equal(el2.matches('[id=2]'), true)
+	assert.equal(el2.matches('[id=2][lang=en]'), true)
+	assert.equal(el2.matches('[id=2][lang="en"]'), true)
+	assert.equal(el2.matches('[id="2"][lang=en]'), true)
+	assert.equal(el2.matches('[id="2"][lang="en"]'), true)
+	assert.equal(el2.matches('[name="map[]"]'), true)
 	assert.equal(el1.matches('[id=true]'), false)
 	assert.equal(el3.matches('[href="#A link 1"]'), true)
 	assert.equal(el3.matches("a[href='#A link 1']"), true)
