@@ -216,9 +216,7 @@ function findEl(node, sel, first) {
 	, i = 0
 	, out = []
 	, els = node.getElementsByTagName("*")
-	, fn = selectorFn(sel.split(/\s*,\s*/).map(function(sel) {
-		return "_.matches('" + sel + "')"
-	}).join("||"))
+	, fn = selectorFn(sel)
 
 	for (; (el = els[i++]); ) if (fn(el)) {
 		if (first) return el
@@ -227,38 +225,48 @@ function findEl(node, sel, first) {
 	return first ? null : out
 }
 
-function selectorFnStr(sel) {
-	var rules = ["_"]
-	, tag = sel.replace(selectorRe, function(_, op, key, fn, val, quotation, len) {
-		if (quotation) val = val.slice(1, -1)
-		if (val) {
-			len = val.length
-			val = val.replace(/'/g, "\\'")
-		}
-		rules.push(
-			op == "." ? "(' '+_.className+' ').indexOf(' " + key + " ')>-1" :
-			op == "#" ? "_.id=='" + key + "'" :
-			op == ":" && pseudoClasses[key] ||
-			"(a=_.getAttribute('" + key + "'))" + (!fn && val ? "=='" + val + "'" : "")
-		)
-		if (fn) rules.push(
-			fn == "^" ? "a.slice(0," + len + ")=='" + val + "'" :
-			fn == "|" ? "a.split('-')[0]=='" + val + "'" :
-			fn == "$" ? "a.slice(-" + len + ")=='" + val + "'" :
-			fn == "~" ? "(' '+a+' ').indexOf(' " + val + " ')>-1" :
-			"a.indexOf('" + val + "')>-1" // fn == "*"
-		)
-		return ""
-	})
-
-	if (tag && tag != "*") rules.unshift("_.nodeName=='" + tag.toUpperCase() + "'")
-	return rules.join("&&")
-}
-
 function selectorFn(str) {
 	// jshint evil:true
 	return selectorCache[str] ||
-	(selectorCache[str] = Function("_,a", "return " + str))
+	(selectorCache[str] = Function("_,a", "return " +
+		str.split(/\s*,\s*/).map(function(sel) {
+			var relation, from
+			, rules = ["_"]
+			, parentSel = sel.replace(lastSelectorRe, function(_, _rel, a, b, start) {
+				from = start + _rel.length
+				relation = _rel.trim()
+				return ""
+			})
+			, tag = sel.slice(from).replace(selectorRe, function(_, op, key, fn, val, quotation, len) {
+				if (quotation) val = val.slice(1, -1)
+				if (val) {
+					len = val.length
+					val = val.replace(/'/g, "\\'")
+				}
+				rules.push(
+					op == "." ? "(' '+_.className+' ').indexOf(' " + key + " ')>-1" :
+					op == "#" ? "_.id=='" + key + "'" :
+					op == ":" && pseudoClasses[key] ||
+					"(a=_.getAttribute('" + key + "'))" + (!fn && val ? "=='" + val + "'" : "")
+				)
+				if (fn) rules.push(
+					fn == "^" ? "a.slice(0," + len + ")=='" + val + "'" :
+					fn == "|" ? "a.split('-')[0]=='" + val + "'" :
+					fn == "$" ? "a.slice(-" + len + ")=='" + val + "'" :
+					fn == "~" ? "(' '+a+' ').indexOf(' " + val + " ')>-1" :
+					"a.indexOf('" + val + "')>-1" // fn == "*"
+				)
+				return ""
+			})
+
+			if (tag && tag != "*") rules.splice(1, 0, "_.nodeName=='" + tag.toUpperCase() + "'")
+			if (parentSel) rules.push(
+				relation == "+" ? "(a=_.previousSibling)" : "(a=_.parentNode)",
+				( relation ? "a.matches&&a.matches('" : "a.closest&&a.closest('" ) + parentSel + "')"
+			)
+			return rules.join("&&")
+		}).join("||")
+	))
 }
 
 function HTMLElement(tag) {
@@ -270,22 +278,7 @@ function HTMLElement(tag) {
 
 extend(HTMLElement, Node, {
 	matches: function(sel) {
-		var relation, from
-		, parentSel = sel.replace(lastSelectorRe, function(_, _rel, a, b, start) {
-			from = start + _rel.length
-			relation = _rel.trim()
-			return ""
-		})
-		, next = relation == "+" ? this.previousSibling : this.parentNode
-		, fn = selectorFn(selectorFnStr(sel.slice(from)))
-
-		if (!fn(this)) return false
-
-		if (parentSel) {
-			if (!relation) return !!(next && next.closest && next.closest(parentSel))
-			return next && next.matches && next.matches(parentSel) || false
-		}
-		return true
+		return !!selectorFn(sel)(this)
 	},
 	closest: function(sel) {
 		for (var el = this; el; el = el.parentNode) if (el.matches && el.matches(sel)) return el

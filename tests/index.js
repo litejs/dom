@@ -394,6 +394,7 @@ test("Element.matches and Element.closest", function (assert) {
 	el3.foo = "en'US"
 
 	assert.equal(el1.matches("div"), true)
+	assert.equal(el1.matches("div, span"), true)
 	assert.equal(el1.matches("span"), false)
 	assert.equal(el1.matches("#1"), true)
 	assert.equal(el1.matches("#2"), false)
