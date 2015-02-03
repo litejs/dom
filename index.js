@@ -34,18 +34,26 @@ function extend(obj, _super, extras) {
 	obj.prototype.constructor = obj
 }
 
+function camelCase(str) {
+	return str.replace(/[ _-]+([a-z])/g, function(_, a) { return a.toUpperCase() })
+}
+
+function hyphenCase(str) {
+	return str.replace(/[A-Z]/g, function(_) { return "-" + _.toLowerCase() })
+}
+
 function StyleMap(style) {
 	var styleMap = this
 	if (style) style.split(/\s*;\s*/g).map(function(val) {
 		val = val.split(/\s*:\s*/)
-		if(val[1]) styleMap[val[0]] = val[1]
+		if(val[1]) styleMap[val[0] == "float" ? "cssFloat" : camelCase(val[0])] = val[1]
 	})
 }
 
 StyleMap.prototype.valueOf = function() {
 	var styleMap = this
 	return Object.keys(styleMap).map(function(key) {
-		return key + ": " + styleMap[key]
+		return (key == "cssFloat" ? "float: " : hyphenCase(key) + ": ") + styleMap[key]
 	}).join("; ")
 }
 

@@ -100,6 +100,23 @@ test("can clone HTMLElements", function (assert) {
 	assert.end()
 })
 
+test("can set style parameters", function (assert) {
+	var el = document.createElement("div")
+
+	el.style = "top: 1px; background-color: red; float: right"
+	assert.equal(el.style.top, "1px")
+	assert.equal(el.style.cssFloat, "right")
+	assert.equal(el.style.backgroundColor, "red")
+
+	el.style.backgroundColor = "blue"
+	el.style.cssFloat = "left"
+
+	assert.equal(el.style.top, "1px")
+	assert.equal(el.style.backgroundColor, "blue")
+	assert.equal(el.style + "", "top: 1px; background-color: blue; float: left")
+	assert.end()
+})
+
 test("can clone HTMLElements", function (assert) {
 	var el, clone, deepClone
 
