@@ -33,24 +33,13 @@ var voidElements = {
 }
 , elementGetters = {
 	getElementById: function(id) {
-		if (this.id == id) return this
-		for (var el, found, i = 0; !found && (el = this.childNodes[i++]);) {
-			if (el.nodeType == 1) found = el.getElementById(id)
-		}
-		return found || null
+		return findEl(this, "#" + id, 1)
 	},
 	getElementsByTagName: function(tag) {
-		var el, els = [], next = this.firstChild
-		tag = tag === "*" ? 1 : tag.toUpperCase()
-		for (var i = 0, key = tag === 1 ? "nodeType" : "nodeName"; (el = next); ) {
-			if (el[key] === tag) els[i++] = el
-			next = el.firstChild || el.nextSibling
-			while (!next && ((el = el.parentNode) !== this)) next = el.nextSibling
-		}
-		return els
+		return findEl(this, tag)
 	},
 	getElementsByClassName: function(sel) {
-		return this.querySelectorAll("." + sel.replace(/\s+/g, "."))
+		return findEl(this, "." + sel.replace(/\s+/g, "."))
 	},
 	querySelector: function(sel) {
 		return findEl(this, sel, 1)
