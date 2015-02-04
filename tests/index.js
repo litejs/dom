@@ -400,6 +400,8 @@ test("Element.matches and Element.closest", function (assert) {
 	var el3   = append_el(3, el2, "a")
 	el2.lang = "en"
 	el2.name = "map[]"
+	el2.setAttribute("data-space", "a b")
+	el2.setAttribute("data-plus", "a+b")
 	el3.href = "#A link 1"
 	el3.lang = "en-US"
 	el3.foo = "en'US"
@@ -432,18 +434,46 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.equal(el3.matches(":link"), true)
 
 	assert.equal(el1.matches('[id=1]'), true)
+	assert.equal(el1.matches('body [id=1]'), true)
+	assert.equal(el1.matches('[id=true]'), false)
+
 	assert.equal(el2.matches('[id=2]'), true)
 	assert.equal(el2.matches('[id=2][lang=en]'), true)
 	assert.equal(el2.matches('[id=2][lang="en"]'), true)
 	assert.equal(el2.matches('[id="2"][lang=en]'), true)
 	assert.equal(el2.matches('[id="2"][lang="en"]'), true)
 	assert.equal(el2.matches('[name="map[]"]'), true)
-	assert.equal(el1.matches('[id=true]'), false)
+	assert.equal(el2.matches('body [name="map[]"]'), true)
+
+	assert.equal(el2.matches('[data-space]'), true)
+	assert.equal(el2.matches('[data-space][data-plus]'), true)
+	assert.equal(el2.matches('[data-plu]'), false)
+	assert.equal(el2.matches('[data-space="a b"]'), true)
+	assert.equal(el2.matches('[data-plus="a b"]'), false)
+	assert.equal(el2.matches('[data-plus="a+b"]'), true)
+
+	assert.equal(el2.matches('body > [data-space]'), true)
+	assert.equal(el2.matches('body > [data-space][data-plus]'), true)
+	assert.equal(el2.matches('body > [data-plu]'), false)
+	assert.equal(el2.matches('body > [data-space="a b"]'), true)
+	assert.equal(el2.matches('body > [data-plus="a b"]'), false)
+	assert.equal(el2.matches('body > [data-plus="a+b"]'), true)
+
+	assert.equal(el3.matches('[data-space] a'), true)
+	assert.equal(el3.matches('[data-space][data-plus] a'), true)
+	assert.equal(el3.matches('[data-plu] a'), false)
+	assert.equal(el3.matches('[data-space="a b"] a'), true)
+	assert.equal(el3.matches('[data-plus="a b"] a'), false)
+	assert.equal(el3.matches('[data-plus="a+b"] a'), true)
+
 	assert.equal(el3.matches('[href="#A link 1"]'), true)
 	assert.equal(el3.matches("a[href='#A link 1']"), true)
 	assert.equal(el3.matches('[href="#A"]'), false)
 	assert.equal(el3.matches('[href^="#A"]'), true)
+	assert.equal(el3.matches('[href^="A"]'), false)
 	assert.equal(el3.matches('[href^="#Aa"]'), false)
+	assert.equal(el3.matches('[foo^="en"]'), true)
+	assert.equal(el3.matches('[foo^="en\'"]'), true)
 	assert.equal(el3.matches('[href$=" 1"]'), true)
 	assert.equal(el3.matches('[href$="  1"]'), false)
 	assert.equal(el3.matches('[href*="#A"]'), true)
@@ -458,8 +488,6 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.equal(el3.matches('[lang|="en"]'), true)
 	assert.equal(el3.matches('[lang|="e"]'), false)
 	assert.equal(el3.matches('[lang|="en-"]'), false)
-	assert.equal(el3.matches('[foo^="en"]'), true)
-	assert.equal(el3.matches('[foo^="en\'"]'), true)
 
 	assert.equal(el1.matches("div:first-child"), true)
 	assert.equal(el1.matches("div:last-child"), false)

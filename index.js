@@ -16,8 +16,8 @@ var voidElements = {
 }
 , hasOwn = Object.prototype.hasOwnProperty
 , selectorCache = {}
-, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=((["'\/])(?:\\?.)*?\5|[-\w]+)])?]?/g
-, lastSelectorRe = /(\s*[>+]?\s*)((["'\/])(?:\\?.)*?\2|[^\s+>])+$/
+, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\?.)*?\5|[-\w]+)])?]?/g
+, selectorLastRe = /(\s*[>+]?\s*)(?:("|')(?:\\?.)*?\2|[^\s+>])+$/
 , pseudoClasses = {
 	"empty": "!_.hasChildNodes()",
 	"first-child": "_.parentNode&&_.parentNode.firstChild==_",
@@ -232,7 +232,7 @@ function selectorFn(str) {
 		str.split(/\s*,\s*/).map(function(sel) {
 			var relation, from
 			, rules = ["_"]
-			, parentSel = sel.replace(lastSelectorRe, function(_, _rel, a, b, start) {
+			, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
 				from = start + _rel.length
 				relation = _rel.trim()
 				return ""
