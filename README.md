@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.3.8
-    @date       2015-02-03
+    @version    0.3.9
+    @date       2015-02-04
     @stability  2 - Unstable
 
 
@@ -47,9 +47,13 @@ el.innerHTML;
 Implementation notes
 --------------------
 
- -  `innerHTML` and `outerHTML` are read only
- -  `querySelector()`, `querySelectorAll()`, `closest()` and `matches()`
-    does not support CSS3 selectors
+ -  `innerHTML` and `outerHTML` are read only.
+ -  Some CSS3 features have not been currently implemented, eg. `:not()` `:nth-child(n)`
+    You can use `* body > #id.class:checked:first-child + div:last-child`
+-   Supports CSS2 attribute presence and value selectors
+    `[att]` `[att=val]` `[att~=val]` `[att|=val]`
+-   Supports CSS3 substring matching attribute selectors
+    `[att^=val]` `[att$=val]` `[att*=val]`
 
 
 
@@ -71,7 +75,8 @@ External links
 
 -   [GitHub repo][]
 -   [npm package][]
--   [DOM spec](http://dom.spec.whatwg.org/)
+-   [DOM spec](https://dom.spec.whatwg.org/)
+-   [Selectors Level 3](http://www.w3.org/TR/selectors/)
 
 
 
