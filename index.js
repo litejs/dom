@@ -24,13 +24,40 @@ var voidElements = {
 	"last-child" : "_.parentNode&&_.parentNode.lastChild==_",
 	"link": "_.nodeName=='A'&&_.getAttribute('href')"
 }
+, elementGetters = {
+	getElementById: function(id) {
+		if (this.id == id) return this
+		for (var el, found, i = 0; !found && (el = this.childNodes[i++]);) {
+			if (el.nodeType == 1) found = el.getElementById(id)
+		}
+		return found || null
+	},
+	getElementsByTagName: function(tag) {
+		var el, els = [], next = this.firstChild
+		tag = tag === "*" ? 1 : tag.toUpperCase()
+		for (var i = 0, key = tag === 1 ? "nodeType" : "nodeName"; (el = next); ) {
+			if (el[key] === tag) els[i++] = el
+			next = el.firstChild || el.nextSibling
+			while (!next && ((el = el.parentNode) !== this)) next = el.nextSibling
+		}
+		return els
+	},
+	getElementsByClassName: function(sel) {
+		return this.querySelectorAll("." + sel.replace(/\s+/g, "."))
+	},
+	querySelector: function(sel) {
+		return findEl(this, sel, 1)
+	},
+	querySelectorAll: function(sel) {
+		return findEl(this, sel)
+	}
+}
 
 
 function extend(obj, _super, extras) {
 	obj.prototype = Object.create(_super.prototype)
-	for (var key in extras) {
-		obj.prototype[key] = extras[key]
-	}
+	for (var key, i = 2; (extras = arguments[i++]); )
+		for (key in extras) obj.prototype[key] = extras[key]
 	obj.prototype.constructor = obj
 }
 
@@ -276,7 +303,7 @@ function HTMLElement(tag) {
 	element.childNodes = []
 }
 
-extend(HTMLElement, Node, {
+extend(HTMLElement, Node, elementGetters, {
 	matches: function(sel) {
 		return !!selectorFn(sel)(this)
 	},
@@ -305,32 +332,6 @@ extend(HTMLElement, Node, {
 		name = escapeAttributeName(name)
 		this[name] = ""
 		delete this[name]
-	},
-	getElementById: function(id) {
-		if (this.id == id) return this
-		for (var el, found, i = 0; !found && (el = this.childNodes[i++]);) {
-			if (el.nodeType == 1) found = el.getElementById(id)
-		}
-		return found || null
-	},
-	getElementsByTagName: function(tag) {
-		var el, els = [], next = this.firstChild
-		tag = tag === "*" ? 1 : tag.toUpperCase()
-		for (var i = 0, key = tag === 1 ? "nodeType" : "nodeName"; (el = next); ) {
-			if (el[key] === tag) els[i++] = el
-			next = el.firstChild || el.nextSibling
-			while (!next && ((el = el.parentNode) !== this)) next = el.nextSibling
-		}
-		return els
-	},
-	getElementsByClassName: function(sel) {
-		return this.querySelectorAll("." + sel.replace(/\s+/g, "."))
-	},
-	querySelector: function(sel) {
-		return findEl(this, sel, 1)
-	},
-	querySelectorAll: function(sel) {
-		return findEl(this, sel)
 	},
 	toString: function() {
 		var attrs = this.attributes.join(" ")
@@ -399,19 +400,14 @@ function own(Element) {
 	}
 }
 
-extend(Document, Node, {
+extend(Document, Node, elementGetters, {
 	nodeType: 9,
 	nodeName: "#document",
 	createElement: own(HTMLElement),
 	createElementNS: own(ElementNS),
 	createTextNode: own(Text),
 	createComment: own(Comment),
-	createDocumentFragment: own(DocumentFragment),
-	getElementById: HTMLElement.prototype.getElementById,
-	getElementsByTagName: HTMLElement.prototype.getElementsByTagName,
-	getElementsByClassName: HTMLElement.prototype.getElementsByClassName,
-	querySelector: HTMLElement.prototype.querySelector,
-	querySelectorAll: HTMLElement.prototype.querySelectorAll
+	createDocumentFragment: own(DocumentFragment)
 })
 
 module.exports = {
