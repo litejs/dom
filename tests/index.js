@@ -103,7 +103,12 @@ test("can clone HTMLElements", function (assert) {
 test("can set style parameters", function (assert) {
 	var el = document.createElement("div")
 
+	assert.equal(el.hasAttribute("style"), false)
+	assert.equal(el.hasAttribute("Style"), false)
+
 	el.style = "top: 1px; background-color: red; float: right"
+	assert.equal(el.hasAttribute("style"), true)
+	assert.equal(el.hasAttribute("Style"), true)
 	assert.equal(el.style.top, "1px")
 	assert.equal(el.style.cssFloat, "right")
 	assert.equal(el.style.backgroundColor, "red")
@@ -234,8 +239,14 @@ test("HTMLElement.attributes", function (assert) {
 	var h1 = document.createElement("h1")
 	h1.id = "123"
 	h1.setAttribute("id2", "321")
+	assert.equal(h1.hasAttribute("id"), true)
+	assert.equal(h1.hasAttribute("ID"), true)
+	assert.equal(h1.hasAttribute("id2"), true)
+	assert.equal(h1.hasAttribute("Id2"), true)
 	assert.equal(h1.getAttribute("id"), "123")
 	assert.equal(h1.getAttribute("id2"), "321")
+	assert.equal(h1.getAttribute("ID"), "123")
+	assert.equal(h1.getAttribute("ID2"), "321")
 
 	h1.removeAttribute("id2")
 	assert.equal(h1.getAttribute("id"), "123")

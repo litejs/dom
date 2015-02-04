@@ -291,7 +291,8 @@ extend(HTMLElement, Node, {
 	styleMap: null,
 	hasAttribute: function(name) {
 		name = escapeAttributeName(name)
-		return name == "style" && !!this.style.valueOf() || hasOwn.call(this, name)
+		return name != "style" ? hasOwn.call(this, name) :
+		!!(this.styleMap && Object.keys(this.styleMap).length)
 	},
 	getAttribute: function(name) {
 		name = escapeAttributeName(name)
