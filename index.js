@@ -18,11 +18,18 @@ var voidElements = {
 , selectorCache = {}
 , selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\?.)*?\5|[-\w]+)])?]?/g
 , selectorLastRe = /(\s*[>+]?\s*)(?:("|')(?:\\?.)*?\2|[^\s+>])+$/
-, pseudoClasses = {
+, selectorMap = {
 	"empty": "!_.hasChildNodes()",
 	"first-child": "_.parentNode&&_.parentNode.firstChild==_",
 	"last-child" : "_.parentNode&&_.parentNode.lastChild==_",
-	"link": "_.nodeName=='A'&&_.getAttribute('href')"
+	"link": "_.nodeName=='A'&&_.getAttribute('href')",
+	".": "_.className.split(/\\s+/).indexOf(a)>-1",
+	"#": "_.id==a",
+	"^": "a.slice(0,l)==v",
+	"|": "a.split('-')[0]==v",
+	"$": "a.slice(-l)==v",
+	"~": "a.split(/\\s+/).indexOf(v)>-1",
+	"*": "a.indexOf(v)>-1"
 }
 , elementGetters = {
 	getElementById: function(id) {
@@ -255,7 +262,7 @@ function findEl(node, sel, first) {
 function selectorFn(str) {
 	// jshint evil:true
 	return selectorCache[str] ||
-	(selectorCache[str] = Function("_,a", "return " +
+	(selectorCache[str] = Function("_,v,a,l", "return " +
 		str.split(/\s*,\s*/).map(function(sel) {
 			var relation, from
 			, rules = ["_"]
@@ -265,23 +272,17 @@ function selectorFn(str) {
 				return ""
 			})
 			, tag = sel.slice(from).replace(selectorRe, function(_, op, key, fn, val, quotation, len) {
-				if (quotation) val = val.slice(1, -1)
 				if (val) {
+					if (quotation) val = val.slice(1, -1)
 					len = val.length
 					val = val.replace(/'/g, "\\'")
 				}
 				rules.push(
-					op == "." ? "(' '+_.className+' ').indexOf(' " + key + " ')>-1" :
-					op == "#" ? "_.id=='" + key + "'" :
-					op == ":" && pseudoClasses[key] ||
-					"(a=_.getAttribute('" + key + "'))" + (!fn && val ? "=='" + val + "'" : "")
-				)
-				if (fn) rules.push(
-					fn == "^" ? "a.slice(0," + len + ")=='" + val + "'" :
-					fn == "|" ? "a.split('-')[0]=='" + val + "'" :
-					fn == "$" ? "a.slice(-" + len + ")=='" + val + "'" :
-					fn == "~" ? "(' '+a+' ').indexOf(' " + val + " ')>-1" :
-					"a.indexOf('" + val + "')>-1" // fn == "*"
+					"(v='"+val+"')&&(a='"+key+"')",
+					selectorMap[op] ||
+					op == ":" && selectorMap[key] ||
+					"(a=_.getAttribute(a))" +
+						(fn ? "&&(l="+len+")&&"+ selectorMap[fn] : val ? "==v" : "")
 				)
 				return ""
 			})
