@@ -249,12 +249,16 @@ function findEl(node, sel, first) {
 	var el
 	, i = 0
 	, out = []
-	, els = node.getElementsByTagName("*")
+	, next = node.firstChild
 	, fn = selectorFn(sel)
 
-	for (; (el = els[i++]); ) if (fn(el)) {
-		if (first) return el
-		out.push(el)
+	for (; (el = next); ) {
+		if (el.nodeType === 1 && fn(el)) {
+			if (first) return el
+			out.push(el)
+		}
+		next = el.firstChild || el.nextSibling
+		while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
 	}
 	return first ? null : out
 }
