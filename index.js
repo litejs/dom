@@ -242,7 +242,7 @@ function findEl(node, sel, first) {
 	, fn = selectorFn(sel)
 
 	for (; (el = next); ) {
-		if (el.nodeType === 1 && fn(el)) {
+		if (fn(el)) {
 			if (first) return el
 			out.push(el)
 		}
@@ -258,7 +258,7 @@ function selectorFn(str) {
 	(selectorCache[str] = Function("_,v,a,l", "return " +
 		str.split(/\s*,\s*/).map(function(sel) {
 			var relation, from
-			, rules = ["_"]
+			, rules = ["_&&_.nodeType===1"]
 			, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
 				from = start + _rel.length
 				relation = _rel.trim()
