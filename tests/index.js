@@ -504,7 +504,12 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.equal(el3.matches('[lang|="en-"]'), false)
 
 	assert.equal(el1.matches("div:first-child"), true)
+	assert.equal(el1.matches("div:not(:first-child)"), false)
+	assert.equal(el1.matches("div:any(:first-child, :last-child)"), true)
 	assert.equal(el1.matches("div:last-child"), false)
+	assert.equal(el1.matches("div:not(:last-child)"), true)
+	assert.equal(el1.matches("div:any(:first-child, :last-child)"), true)
+	assert.equal(el1.matches("div:any(span, a)"), false)
 	assert.equal(el2.matches("span:first-child"), false)
 	assert.equal(el2.matches("span:last-child"), true)
 	assert.equal(el2.matches(":only-child"), false)
@@ -520,7 +525,71 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.end()
 })
 
+test(":nth-child selector", function (assert) {
+	document = new DOM.Document()
+	var res
+	, el = document.body
+	, p1   = append_el("p1", el, "p")
+	, p2   = append_el("p2", el, "p")
+	, p3   = append_el("p3", el, "p")
+	, p4   = append_el("p4", el, "p")
+	, p5   = append_el("p5", el, "p")
+	, p6   = append_el("p6", el, "p")
+	, p7   = append_el("p7", el, "p")
+	, p8   = append_el("p8", el, "p")
+	, p9   = append_el("p9", el, "p")
 
+	res = el.querySelectorAll(":nth-child(2n+1)")
+	assert.equal(res[0], p1)
+	assert.equal(res[1], p3)
+	assert.equal(res[2], p5)
+	assert.equal(res[3], p7)
+	assert.equal(res[4], p9)
+	assert.equal(res.length, 5)
+
+	res = el.querySelectorAll(":nth-child(3n+3)")
+	assert.equal(res[0], p3)
+	assert.equal(res[1], p6)
+	assert.equal(res[2], p9)
+	assert.equal(res.length, 3)
+
+	res = el.querySelectorAll(":nth-child(4n+1)")
+	assert.equal(res[0], p1)
+	assert.equal(res[1], p5)
+	assert.equal(res[2], p9)
+	assert.equal(res.length, 3)
+
+	res = el.querySelectorAll(":nth-child(4n+4)")
+	assert.equal(res[0], p4)
+	assert.equal(res[1], p8)
+	assert.equal(res.length, 2)
+
+	res = el.querySelectorAll(":nth-child(4n)")
+	assert.equal(res[0], p4)
+	assert.equal(res[1], p8)
+	assert.equal(res.length, 2)
+
+	res = el.querySelectorAll(":nth-child(0n+1)")
+	assert.equal(res[0], p1)
+	assert.equal(res.length, 1)
+
+	res = el.querySelectorAll(":nth-child(1)")
+	assert.equal(res[0], p1)
+	assert.equal(res.length, 1)
+
+	res = el.querySelectorAll(":nth-child(5n-2)")
+	assert.equal(res[0], p3)
+	assert.equal(res[1], p8)
+	assert.equal(res.length, 2)
+
+	res = el.querySelectorAll(":nth-child(-n+3)")
+	assert.equal(res[0], p1)
+	assert.equal(res[1], p2)
+	assert.equal(res[2], p3)
+	assert.equal(res.length, 3)
+
+	assert.end()
+})
 
 
 
