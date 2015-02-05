@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.3.9
-    @date       2015-02-04
+    @version    0.3.10
+    @date       2015-02-05
     @stability  2 - Unstable
 
 
@@ -47,13 +47,7 @@ el.innerHTML;
 Implementation notes
 --------------------
 
- -  `innerHTML` and `outerHTML` are read only.
- -  Some CSS3 features have not been currently implemented, eg. `:not()` `:nth-child(n)`
-    You can use `* body > #id.class:checked:first-child + div:last-child`
--   Supports CSS2 attribute presence and value selectors
-    `[att]` `[att=val]` `[att~=val]` `[att|=val]`
--   Supports CSS3 substring matching attribute selectors
-    `[att^=val]` `[att$=val]` `[att*=val]`
+-   `innerHTML` and `outerHTML` are read only.
 
 
 
