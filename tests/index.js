@@ -396,15 +396,23 @@ test("Element.matches and Element.closest", function (assert) {
 	document = new DOM.Document()
 
 	var el1   = append_el(1, document.body, "div")
+
 	var el2   = append_el(2, document.body, "span")
-	var el3   = append_el(3, el2, "a")
 	el2.lang = "en"
 	el2.name = "map[]"
 	el2.setAttribute("data-space", "a b")
 	el2.setAttribute("data-plus", "a+b")
+
+	var el3   = append_el(3, el2, "a")
 	el3.href = "#A link 1"
 	el3.lang = "en-US"
 	el3.foo = "en'US"
+
+	var in1   = append_el("in1", el1, "input")
+	in1.disabled = true
+
+	var in2   = append_el("in2", el1, "input")
+	in2.required = true
 
 	assert.equal(el1.matches("div"), true)
 	assert.equal(el1.matches("div, span"), true)
@@ -428,10 +436,16 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.equal(el1.matches("body div#1"), true)
 	assert.equal(el1.matches("html div#1"), true)
 
-	assert.equal(el1.matches("div:empty"), true)
 	assert.equal(el2.matches(":empty"), false)
 	assert.equal(el2.matches(":link"), false)
+	assert.equal(el3.matches("a:empty"), true)
+	assert.equal(el3.matches("i:empty"), false)
 	assert.equal(el3.matches(":link"), true)
+
+	assert.equal(in1.matches(":enabled"), false)
+	assert.equal(in2.matches(":enabled"), true)
+	assert.equal(in1.matches(":optional"), true)
+	assert.equal(in2.matches(":optional"), false)
 
 	assert.equal(el1.matches('[id=1]'), true)
 	assert.equal(el1.matches('body [id=1]'), true)
@@ -493,6 +507,11 @@ test("Element.matches and Element.closest", function (assert) {
 	assert.equal(el1.matches("div:last-child"), false)
 	assert.equal(el2.matches("span:first-child"), false)
 	assert.equal(el2.matches("span:last-child"), true)
+	assert.equal(el2.matches(":only-child"), false)
+	assert.equal(el3.matches(":only-child"), true)
+	assert.equal(el3.matches(":root"), false)
+	assert.equal(document.body.matches(":root"), false)
+	assert.equal(document.documentElement.matches(":root"), true)
 
 	assert.equal(el1.closest("div"), el1)
 	assert.equal(el1.closest("body"), document.body)

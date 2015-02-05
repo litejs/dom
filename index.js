@@ -20,9 +20,13 @@ var voidElements = {
 , selectorLastRe = /(\s*[>+]?\s*)(?:("|')(?:\\?.)*?\2|[^\s+>])+$/
 , selectorMap = {
 	"empty": "!_.hasChildNodes()",
+	"enabled": "!_.getAttribute('disabled')",
 	"first-child": "_.parentNode&&_.parentNode.firstChild==_",
 	"last-child" : "_.parentNode&&_.parentNode.lastChild==_",
 	"link": "_.nodeName=='A'&&_.getAttribute('href')",
+	"only-child" : "_.parentNode&&_.parentNode.firstChild==_&&_.parentNode.lastChild==_",
+	"optional": "!_.getAttribute('required')",
+	"root" : "_.parentNode&&!_.parentNode.tagName",
 	".": "_.className.split(/\\s+/).indexOf(a)>-1",
 	"#": "_.id==a",
 	"^": "a.slice(0,l)==v",
