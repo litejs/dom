@@ -15,9 +15,10 @@ var voidElements = {
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
 , hasOwn = Object.prototype.hasOwnProperty
-, selectorCache = {}
 , selectorRe = /([.#:[])([-\w]+)(?:\(([^)]+)\))?(?:([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+)])?]?/g
 , selectorLastRe = /(\s*[>+]?\s*)(?:("|')(?:\\?.)*?\2|\([^\)]+\)|[^\s+>])+$/
+, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))*$)/
+, selectorCache = {}
 , selectorMap = {
 	"any": "_.matches(v)",
 	"empty": "!_.hasChildNodes()",
@@ -263,7 +264,7 @@ function selectorFn(str) {
 	// jshint evil:true
 	return selectorCache[str] ||
 	(selectorCache[str] = Function("_,v,a,b", "return " +
-		str.split(/\s*,\s*(?![^(]+\))/).map(function(sel) {
+		str.split(selectorSplitRe).map(function(sel) {
 			var relation, from
 			, rules = ["_&&_.nodeType===1"]
 			, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
