@@ -311,20 +311,18 @@ function append_el(id, parent, tag) {
 
 
 test("getElementById, getElementsByTagName, getElementsByClassName, querySelector", function (assert) {
-	var result
-
 	document = new DOM.Document()
 
-	var el1   = append_el(1, document.body)
-	var el2   = append_el(2, document.body)
-
-	var el11  = append_el(11,  el1)
-	var el12  = append_el(12,  el1)
-	var el21  = append_el(21,  el2)
-	var el22  = append_el(22,  el2)
-	var el221 = append_el(221, el22, "span")
-	var el222 = append_el(222, el22)
-	var el3   = append_el(3, document.body)
+	var result
+	, el1   = append_el(1, document.body)
+	, el2   = append_el(2, document.body)
+	, el11  = append_el(11,  el1)
+	, el12  = append_el(12,  el1)
+	, el21  = append_el(21,  el2)
+	, el22  = append_el(22,  el2)
+	, el221 = append_el(221, el22, "span")
+	, el222 = append_el(222, el22)
+	, el3   = append_el(3, document.body)
 
 	el21.className = "findme first"
 	el222.setAttribute("type", "text/css")
@@ -348,10 +346,11 @@ test("getElementById, getElementsByTagName, getElementsByClassName, querySelecto
 	assert.equal(result.length,  1)
 	assert.equal(result[0], el221)
 
-	result = document.getElementsByClassName("findme")
-	assert.equal(result.length, 2)
-	assert.equal(result[0], el21)
-	assert.equal(result[1], el221)
+	assert.deepEqual(document.getElementsByClassName("findme")
+	, [el21, el221])
+
+	assert.equal(document.querySelector("html"), document.documentElement)
+	assert.equal(document.querySelector("body"), document.body)
 
 	assert.equal(document.querySelector("span"),      el221)
 	assert.equal(document.querySelector("#22"),       el22)
@@ -367,26 +366,29 @@ test("getElementById, getElementsByTagName, getElementsByClassName, querySelecto
 	assert.equal(document.querySelector("#21.findme"),      el21)
 	assert.equal(document.querySelector("div#21.findme"),   el21)
 
-	assert.equal(document.querySelectorAll("div").length,         8)
+	assert.deepEqual(document.querySelectorAll("div")
+	, [el1, el11, el12, el2, el21, el22, el222, el3])
 
-	result = document.querySelectorAll(".findme")
-	assert.equal(result.length, 2)
-	assert.equal(result[0], el21)
-	assert.equal(result[1], el221)
+	assert.deepEqual(document.querySelectorAll(".findme")
+	, [el21, el221])
 
-	result = document.querySelectorAll("span.findme")
-	assert.equal(result.length, 1)
-	assert.equal(result[0], el221)
+	assert.deepEqual(document.querySelectorAll("span.findme")
+	, [el221])
 
-	assert.equal(document.querySelectorAll("html").length,        1)
-	assert.equal(document.querySelectorAll("body").length,        1)
-	assert.equal(document.querySelector("html"), document.documentElement)
-	assert.equal(document.querySelector("body"), document.body)
+	assert.deepEqual(document.querySelectorAll("html")
+	, [document.documentElement])
 
-	assert.equal(document.querySelectorAll("span.findme, div.findme").length, 2)
-	assert.equal(document.querySelectorAll("body span.findme, div.findme").length, 2)
+	assert.deepEqual(document.querySelectorAll("body")
+	, [document.body])
 
-	assert.equal(el1.querySelectorAll("div").length, 2)
+	assert.deepEqual(document.querySelectorAll("span.findme, div.findme")
+	, [el21, el221])
+
+	assert.deepEqual(document.querySelectorAll("body span.findme, div.findme")
+	, [el21, el221])
+
+	assert.deepEqual(el1.querySelectorAll("div")
+	, [el11, el12])
 
 	assert.end()
 })
@@ -396,8 +398,11 @@ test("Element.matches and Element.closest", function (assert) {
 	document = new DOM.Document()
 
 	var el1   = append_el(1, document.body, "div")
+	, el2   = append_el(2, document.body, "span")
+	, el3   = append_el(3, el2, "a")
+	, in1   = append_el("in1", el1, "input")
+	, in2   = append_el("in2", el1, "input")
 
-	var el2   = append_el(2, document.body, "span")
 	el2.lang = "en"
 	el2.name = "map[]"
 	el2.setAttribute("data-space", "a b")
@@ -408,15 +413,11 @@ test("Element.matches and Element.closest", function (assert) {
 	el2.setAttribute("data-x3", "a,b(")
 	el2.setAttribute("data-x4", "a,b)")
 
-	var el3   = append_el(3, el2, "a")
 	el3.href = "#A link 1"
 	el3.lang = "en-US"
 	el3.foo = "en'US"
 
-	var in1   = append_el("in1", el1, "input")
 	in1.disabled = true
-
-	var in2   = append_el("in2", el1, "input")
 	in2.required = true
 
 	assert.equal(el1.matches("div"), true)
@@ -553,8 +554,7 @@ test("Element.matches and Element.closest", function (assert) {
 
 test(":nth-child selector", function (assert) {
 	document = new DOM.Document()
-	var res
-	, el = document.body
+	var el = document.body
 	, p1   = append_el("p1", el, "p")
 	, p2   = append_el("p2", el, "p")
 	, p3   = append_el("p3", el, "p")
@@ -565,54 +565,32 @@ test(":nth-child selector", function (assert) {
 	, p8   = append_el("p8", el, "p")
 	, p9   = append_el("p9", el, "p")
 
-	res = el.querySelectorAll(":nth-child(2n+1)")
-	assert.equal(res[0], p1)
-	assert.equal(res[1], p3)
-	assert.equal(res[2], p5)
-	assert.equal(res[3], p7)
-	assert.equal(res[4], p9)
-	assert.equal(res.length, 5)
+	assert.deepEqual(el.querySelectorAll(":nth-child(2n+1)")
+	, [p1, p3, p5, p7, p9])
 
-	res = el.querySelectorAll(":nth-child(3n+3)")
-	assert.equal(res[0], p3)
-	assert.equal(res[1], p6)
-	assert.equal(res[2], p9)
-	assert.equal(res.length, 3)
+	assert.deepEqual(el.querySelectorAll(":nth-child(3n+3)")
+	, [p3, p6, p9])
 
-	res = el.querySelectorAll(":nth-child(4n+1)")
-	assert.equal(res[0], p1)
-	assert.equal(res[1], p5)
-	assert.equal(res[2], p9)
-	assert.equal(res.length, 3)
+	assert.deepEqual(el.querySelectorAll(":nth-child(4n+1)")
+	, [p1, p5, p9])
 
-	res = el.querySelectorAll(":nth-child(4n+4)")
-	assert.equal(res[0], p4)
-	assert.equal(res[1], p8)
-	assert.equal(res.length, 2)
+	assert.deepEqual(el.querySelectorAll(":nth-child(4n+4)")
+	, [p4, p8])
 
-	res = el.querySelectorAll(":nth-child(4n)")
-	assert.equal(res[0], p4)
-	assert.equal(res[1], p8)
-	assert.equal(res.length, 2)
+	assert.deepEqual(el.querySelectorAll(":nth-child(4n)")
+	, [p4, p8])
 
-	res = el.querySelectorAll(":nth-child(0n+1)")
-	assert.equal(res[0], p1)
-	assert.equal(res.length, 1)
+	assert.deepEqual(el.querySelectorAll(":nth-child(0n+1)")
+	, [p1])
 
-	res = el.querySelectorAll(":nth-child(1)")
-	assert.equal(res[0], p1)
-	assert.equal(res.length, 1)
+	assert.deepEqual(el.querySelectorAll(":nth-child(1)")
+	, [p1])
 
-	res = el.querySelectorAll(":nth-child(5n-2)")
-	assert.equal(res[0], p3)
-	assert.equal(res[1], p8)
-	assert.equal(res.length, 2)
+	assert.deepEqual(el.querySelectorAll(":nth-child(5n-2)")
+	, [p3, p8])
 
-	res = el.querySelectorAll(":nth-child(-n+3)")
-	assert.equal(res[0], p1)
-	assert.equal(res[1], p2)
-	assert.equal(res[2], p3)
-	assert.equal(res.length, 3)
+	assert.deepEqual(el.querySelectorAll(":nth-child(-n+3)")
+	, [p1, p2, p3])
 
 	assert.end()
 })
