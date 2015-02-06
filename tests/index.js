@@ -1,6 +1,6 @@
-var test = require("tape")
-
-var DOM = require("../")
+var undef
+, test = require("tape")
+, DOM = require("../")
 , document = DOM.document
 
 test("document is a Document", function (assert) {
@@ -12,7 +12,7 @@ test("document is a Document", function (assert) {
 })
 
 test("can create nodes", function (assert) {
-	var el, undef
+	var el
 
 	el = document.createElement("h1")
 	assert.equal(el.nodeType, 1)
@@ -36,10 +36,18 @@ test("can create nodes", function (assert) {
 	assert.equal(el.data, "hello")
 	assert.equal(el.nodeValue, "hello")
 	assert.equal(el.textContent, "hello")
-	assert.equal((el.nodeValue = "value"), "value")
-	assert.equal(el.data, "value")
-	assert.equal(el.nodeValue, "value")
-	assert.equal(el.textContent, "value")
+	assert.equal((el.data = "world"), "world")
+	assert.equal(el.data, "world")
+	assert.equal(el.nodeValue, "world")
+	assert.equal(el.textContent, "world")
+	assert.equal((el.nodeValue = "foo"), "foo")
+	assert.equal(el.data, "foo")
+	assert.equal(el.nodeValue, "foo")
+	assert.equal(el.textContent, "foo")
+	assert.equal((el.textContent = "bar"), "bar")
+	assert.equal(el.data, "bar")
+	assert.equal(el.nodeValue, "bar")
+	assert.equal(el.textContent, "bar")
 
 	el = document.createTextNode(null)
 	assert.equal("" + el, "null")
@@ -211,6 +219,10 @@ function testNode(assert, mask, node) {
 	assert.equal(node.removeChild(h1), h1)
 	assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
 
+	assert.throws(function() {
+		node.removeChild(h1)
+	})
+
 	assert.equal(node.replaceChild(h1, h2), h2)
 	assert.equal(""+node, mask.replace("%s", "<h1>Head</h1>"))
 
@@ -227,6 +239,10 @@ function testNode(assert, mask, node) {
 	assert.equal(p.textContent, "Head")
 	p.textContent = "Hello"
 	assert.equal(""+p, "<p>Hello</p>")
+
+	p.removeChild(p.firstChild)
+	assert.equal(p.firstChild, null)
+	assert.equal(p.lastChild, null)
 }
 
 test("HTMLElement", function (assert) {
