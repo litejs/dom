@@ -11,9 +11,9 @@
 
 
 var undef
-, selectorRe = /([.#:[])([-\w]+)(?:\(([^)]+)\))?(?:([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+)])?]?/g
-, selectorLastRe = /(\s*[>+]?\s*)(?:("|')(?:\\?.)*?\2|\([^\)]+\)|[^\s+>])+$/
-, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))*$)/
+, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\))?(?:([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+)])?]?/g
+, selectorLastRe = /([\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
+, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
 , selectorCache = {}
 , selectorMap = {
 	"any": "_.matches(v)",
@@ -29,9 +29,9 @@ var undef
 	"root" : "_.parentNode&&!_.parentNode.tagName",
 	".": "_.className.split(/\\s+/).indexOf(a)>-1",
 	"#": "_.id==a",
-	"^": "a.slice(0,b)==v",
+	"^": "a.indexOf(v)==0",
 	"|": "a.split('-')[0]==v",
-	"$": "a.slice(-b)==v",
+	"$": "a.slice(-v.length)==v",
 	"~": "a.split(/\\s+/).indexOf(v)>-1",
 	"*": "a.indexOf(v)>-1"
 }
@@ -69,19 +69,18 @@ function selectorFn(str) {
 			, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation, len) {
 				if (val) {
 					if (quotation) val = val.slice(1, -1)
-					len = val.length
 					val = val.replace(/'/g, "\\'")
 				}
 				rules.push(
 					"((v='"+(subSel||val)+"'),(a='"+key+"'),1)",
 					selectorMap[op == ":" ? key : op] ||
 					"(a=_.getAttribute(a))" +
-					(fn ? "&&(b="+len+")&&"+ selectorMap[fn] : val ? "==v" : "")
+					(fn ? "&&"+ selectorMap[fn] : val ? "==v" : "")
 				)
 				return ""
 			})
 
-			if (tag && tag != "*") rules.splice(1, 0, "_.nodeName=='" + tag.toUpperCase() + "'")
+			if (tag && tag != "*") rules[0] += "&&_.nodeName=='" + tag.toUpperCase() + "'"
 			if (parentSel) rules.push(
 				relation == "+" ? "(a=_.previousSibling)" : "(a=_.parentNode)",
 				( relation ? "a.matches&&a.matches('" : "a.closest&&a.closest('" ) + parentSel + "')"
