@@ -24,6 +24,9 @@
     "buildman": "*",
     "tape": "2.12.x"
   },
+  "buildman": {
+    "dist/selector-min.js": "selector.js"
+  },
   "jshintConfig": {
     "asi": true,
     "laxcomma": true,

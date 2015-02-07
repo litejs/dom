@@ -11,7 +11,7 @@
 
 
 var undef
-, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\))?(?:([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+)])?]?/g
+, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
 , selectorLastRe = /([\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
 , selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
 , selectorCache = {}
@@ -19,21 +19,21 @@ var undef
 	"any": "_.matches(v)",
 	"empty": "!_.hasChildNodes()",
 	"enabled": "!_.getAttribute('disabled')",
-	"first-child": "_.parentNode&&_.parentNode.firstChild==_",
-	"last-child" : "_.parentNode&&_.parentNode.lastChild==_",
+	"first-child": "(a=_.parentNode)&&a.firstChild==_",
+	"last-child" : "(a=_.parentNode)&&a.lastChild==_",
 	"link": "_.nodeName=='A'&&_.getAttribute('href')",
 	"not": "!_.matches(v)",
 	"nth-child": "((v=v.split('n')),(a=1 in v?(b=v[1],v[0]):(b=v[0],0)),(v=_.parentNode.childNodes.indexOf(_)+1),a==0?v==b:a=='-'?v<=b:(v-b)%a==0)",
-	"only-child" : "_.parentNode&&_.parentNode.firstChild==_&&_.parentNode.lastChild==_",
+	"only-child" : "(a=_.parentNode)&&a.firstChild==a.lastChild",
 	"optional": "!_.getAttribute('required')",
-	"root" : "_.parentNode&&!_.parentNode.tagName",
-	".": "_.className.split(/\\s+/).indexOf(a)>-1",
+	"root" : "(a=_.parentNode)&&!a.tagName",
+	".": "~_.className.split(/\\s+/).indexOf(a)",
 	"#": "_.id==a",
 	"^": "a.indexOf(v)==0",
 	"|": "a.split('-')[0]==v",
 	"$": "a.slice(-v.length)==v",
-	"~": "a.split(/\\s+/).indexOf(v)>-1",
-	"*": "a.indexOf(v)>-1"
+	"~": "~a.split(/\\s+/).indexOf(v)",
+	"*": "~a.indexOf(v)"
 }
 
 function findEl(node, sel, first) {
@@ -66,16 +66,15 @@ function selectorFn(str) {
 				relation = _rel.trim()
 				return ""
 			})
-			, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation, len) {
-				if (val) {
-					if (quotation) val = val.slice(1, -1)
-					val = val.replace(/'/g, "\\'")
-				}
+			, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
 				rules.push(
-					"((v='"+(subSel||val)+"'),(a='"+key+"'),1)",
+					"((v='" +
+					(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/'/g, "\\'") +
+					"'),(a='" + key + "'),1)"
+					,
 					selectorMap[op == ":" ? key : op] ||
 					"(a=_.getAttribute(a))" +
-					(fn ? "&&"+ selectorMap[fn] : val ? "==v" : "")
+					(fn ? "&&" + selectorMap[fn] : val ? "==v" : "")
 				)
 				return ""
 			})
