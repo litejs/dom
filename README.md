@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.3.10
-    @date       2015-02-05
+    @version    0.3.11
+    @date       2015-02-10
     @stability  2 - Unstable
 
 
@@ -15,7 +15,7 @@ DOM lite &ndash; [![Build][1]][2] [![Coverage][3]][4]
 ========
 
 A small DOM implementation
-where most of DOM attributes and methods are implemented.
+where most of DOM attributes and methods from document are implemented.
 
 
 Examples
