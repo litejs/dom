@@ -267,7 +267,16 @@ test(":nth-child selector", function (assert) {
 	, p8   = append_el("p8", el, "p")
 	, p9   = append_el("p9", el, "p")
 
+	assert.deepEqual(el.querySelectorAll(":nth-child(2n)")
+	, [p2, p4, p6, p8])
+
+	assert.deepEqual(el.querySelectorAll(":nth-child(even)")
+	, [p2, p4, p6, p8])
+
 	assert.deepEqual(el.querySelectorAll(":nth-child(2n+1)")
+	, [p1, p3, p5, p7, p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-child(odd)")
 	, [p1, p3, p5, p7, p9])
 
 	assert.deepEqual(el.querySelectorAll(":nth-child(3n+3)")
@@ -287,6 +296,9 @@ test(":nth-child selector", function (assert) {
 
 	assert.deepEqual(el.querySelectorAll(":nth-child(1)")
 	, [p1])
+
+	assert.deepEqual(el.querySelectorAll(":nth-child(3)")
+	, [p3])
 
 	assert.deepEqual(el.querySelectorAll(":nth-child(5n-2)")
 	, [p3, p8])
