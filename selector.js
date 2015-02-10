@@ -36,6 +36,8 @@ var undef
 	"*": "~a.indexOf(v)"
 }
 
+selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
+
 function findEl(node, sel, first) {
 	var el
 	, i = 0
