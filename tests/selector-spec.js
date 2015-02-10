@@ -309,3 +309,61 @@ test(":nth-child selector", function (assert) {
 	assert.end()
 })
 
+test(":nth-last-child selector", function (assert) {
+	document = new DOM.Document()
+	var el = document.body
+	, p1   = append_el("p1", el, "p")
+	, p2   = append_el("p2", el, "p")
+	, p3   = append_el("p3", el, "p")
+	, p4   = append_el("p4", el, "p")
+	, p5   = append_el("p5", el, "p")
+	, p6   = append_el("p6", el, "p")
+	, p7   = append_el("p7", el, "p")
+	, p8   = append_el("p8", el, "p")
+	, p9   = append_el("p9", el, "p")
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(2n)")
+	, [p2, p4, p6, p8])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(even)")
+	, [p2, p4, p6, p8])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(2n+1)")
+	, [p1, p3, p5, p7, p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(odd)")
+	, [p1, p3, p5, p7, p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(3n+3)")
+	, [p1, p4, p7])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(4n+1)")
+	, [p1, p5, p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(4n+4)")
+	, [p2, p6])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(4n)")
+	, [p2, p6])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(0n+1)")
+	, [p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(0n+3)")
+	, [p7])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(1)")
+	, [p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(3)")
+	, [p7])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(5n-2)")
+	, [p2, p7])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(-n+3)")
+	, [p7, p8, p9])
+
+	assert.end()
+})
+
