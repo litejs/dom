@@ -207,18 +207,20 @@ extend(DocumentFragment, Node, {
 	nodeName: "#document-fragment"
 })
 
-function Attribute(node, name) {
+function Attr(node, name) {
+	this.ownerElement = node
 	this.name = name.toLowerCase()
-
-	Object.defineProperty(this, "value", {
-		get: function() {return node.getAttribute(name)},
-		set: function(val) {node.setAttribute(name, val)}
-	})
 }
-Attribute.prototype.toString = function() {
-	if (!this.value) return this.name
-	// jshint -W108
-	return this.name + '="' + this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"'
+
+Attr.prototype = {
+	get value() { return this.ownerElement.getAttribute(this.name) },
+	set value(val) { this.ownerElement.setAttribute(this.name, val) },
+	toString: function() {
+		var val = this.value
+		return val ?
+		this.name + "=\"" + val.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + "\"" :
+		this.name
+	}
 }
 
 function escapeAttributeName(name) {
@@ -277,7 +279,7 @@ Object.defineProperty(HTMLElement.prototype, "attributes", {
 		, attrs = []
 		, element = this
 		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
-			attrs.push(new Attribute(element, escapeAttributeName(key)))
+			attrs.push(new Attr(element, escapeAttributeName(key)))
 		return attrs
 	}
 })
