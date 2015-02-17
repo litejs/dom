@@ -306,6 +306,12 @@ test(":nth-child selector", function (assert) {
 	assert.deepEqual(el.querySelectorAll(":nth-child(-n+3)")
 	, [p1, p2, p3])
 
+	assert.deepEqual(el.querySelectorAll(":nth-child(-2n+3)")
+	, [p1, p3])
+
+	assert.deepEqual(el.querySelectorAll(":nth-child(-2n+4)")
+	, [p2, p4])
+
 	assert.end()
 })
 
@@ -363,6 +369,12 @@ test(":nth-last-child selector", function (assert) {
 
 	assert.deepEqual(el.querySelectorAll(":nth-last-child(-n+3)")
 	, [p7, p8, p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(-2n+3)")
+	, [p7, p9])
+
+	assert.deepEqual(el.querySelectorAll(":nth-last-child(-2n+4)")
+	, [p6, p8])
 
 	assert.end()
 })
