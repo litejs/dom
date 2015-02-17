@@ -1,12 +1,15 @@
 {
   "name": "dom-lite",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "stability": 2,
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
   "description": "A small DOM implementation",
   "keywords": [
-    "dom"
+    "browser",
+    "document",
+    "dom",
+    "litejs"
   ],
   "main": "index.js",
   "readmeFilename": "README.md",
