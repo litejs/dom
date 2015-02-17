@@ -48,7 +48,7 @@ function camelCase(str) {
 }
 
 function hyphenCase(str) {
-	return str.replace(/[A-Z]/g, function(_) { return "-" + _.toLowerCase() })
+	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
 }
 
 function StyleMap(style) {
