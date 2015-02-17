@@ -20,6 +20,7 @@ var undef
 	"empty": "!_.hasChildNodes()",
 	"enabled": "!_.getAttribute('disabled')",
 	"first-child": "(a=_.parentNode)&&a.firstChild==_",
+	"lang": "_.closest('[lang]').matches('[lang|='+v+']')",
 	"last-child" : "(a=_.parentNode)&&a.lastChild==_",
 	"link": "_.nodeName=='A'&&_.getAttribute('href')",
 	"not": "!_.matches(v)",

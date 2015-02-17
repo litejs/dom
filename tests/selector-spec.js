@@ -367,3 +367,23 @@ test(":nth-last-child selector", function (assert) {
 	assert.end()
 })
 
+test(":lang() selector", function (assert) {
+	document = new DOM.Document()
+	var el = document.body
+	, p1   = append_el("p1", el, "p")
+	, p2   = append_el("p2", el, "p")
+	, p3   = append_el("p3", p1, "p")
+	, p4   = append_el("p4", p2, "p")
+
+	el.lang = "en"
+	p2.lang = "fr-be"
+
+	assert.deepEqual(el.querySelectorAll(":lang(en)")
+	, [p1, p3])
+
+	assert.deepEqual(el.querySelectorAll(":lang(fr)")
+	, [p2, p4])
+
+	assert.end()
+})
+
