@@ -24,7 +24,7 @@ var undef
 	"last-child" : "(a=_.parentNode)&&a.lastChild==_",
 	"link": "_.nodeName=='A'&&_.getAttribute('href')",
 	"not": "!_.matches(v)",
-	"nth-child": "((v=v.replace('odd','2n+1').replace('even','2n').split('n')),(a=1 in v?(b=v[1],v[0]):(b=v[0],0)),(v=_.parentNode.childNodes),(v=1+v.indexOf(_)),a==0?v==b:a=='-'?v<=b:(v-b)%a==0)",
+	"nth-child": "((v=v.replace('odd','2n+1').replace('even','2n').split('n')),(a=1 in v?(b=v[1],v[0]):(b=v[0],0)),(v=_.parentNode.childNodes),(v=1+v.indexOf(_)),a==0?v==b:(a=='-'||(v-b)%a==0)&&(a>0||v<=b))",
 	"only-child" : "(a=_.parentNode)&&a.firstChild==a.lastChild",
 	"optional": "!_.getAttribute('required')",
 	"root" : "(a=_.parentNode)&&!a.tagName",
