@@ -238,11 +238,10 @@ function HTMLElement(tag) {
 
 extend(HTMLElement, Node, elementGetters, {
 	matches: function(sel) {
-		return !!selector.fn(sel)(this)
+		return selector.matches(this, sel)
 	},
 	closest: function(sel) {
-		for (var el = this; el; el = el.parentNode) if (el.matches && el.matches(sel)) return el
-		return null
+		return selector.closest(this, sel)
 	},
 	namespaceURI: "http://www.w3.org/1999/xhtml",
 	nodeType: 1,
