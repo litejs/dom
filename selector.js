@@ -93,7 +93,18 @@ function selectorFn(str) {
 }
 
 
+function matches(el, sel) {
+	return !!selectorFn(sel)(el)
+}
+
+function closest(el, sel, fn) {
+	for (fn = selectorFn(sel); el; el = el.parentNode) if (fn(el)) return el
+	return null
+}
+
 this.find = findEl
 this.fn = selectorFn
+this.matches = matches
+this.closest = closest
 
 
