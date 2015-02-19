@@ -16,28 +16,31 @@ var undef
 , selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
 , selectorCache = {}
 , selectorMap = {
-	"any": "_.matches(v)",
-	"empty": "!_.hasChildNodes()",
-	"enabled": "!_.getAttribute('disabled')",
+	"any": "m(_,v)",
+	"empty": "!_.lastChild",
+	"enabled": "!m(_,':disabled')",
 	"first-child": "(a=_.parentNode)&&a.firstChild==_",
 	"first-of-type": "!p(_,_.tagName)",
-	"lang": "_.closest('[lang]').matches('[lang|='+v+']')",
-	"last-child" : "(a=_.parentNode)&&a.lastChild==_",
-	"link": "_.nodeName=='A'&&_.getAttribute('href')",
-	"not": "!_.matches(v)",
-	"nth-child": "((v=v.replace('odd','2n+1').replace('even','2n').split('n')),(a=1 in v?(b=v[1],v[0]):(b=v[0],0)),(v=_.parentNode.childNodes),(v=1+v.indexOf(_)),a==0?v==b:(a=='-'||(v-b)%a==0)&&(a>0||v<=b))",
-	"only-child" : "(a=_.parentNode)&&a.firstChild==a.lastChild",
-	"optional": "!_.getAttribute('required')",
-	"root" : "(a=_.parentNode)&&!a.tagName",
+	"lang": "m(c(_,'[lang]'),'[lang|='+v+']')",
+	"last-child": "(a=_.parentNode)&&a.lastChild==_",
 	"last-of-type": "!n(_,_.tagName)",
+	"link": "m(_,'a[href]')",
+	"not": "!m(_,v)",
+	"nth-child": "(a=2,'odd'==v?b=1:'even'==v?b=0:a=1 in(v=v.split('n'))?(b=v[1],v[0]):(b=v[0],0),v=_.parentNode.childNodes,v=1+v.indexOf(_),0==a?v==b:('-'==a||0==(v-b)%a)&&(0<a||v<=b))",
+	"only-child": "(a=_.parentNode)&&a.firstChild==a.lastChild",
 	"only-of-type": "!p(_,_.tagName)&&!n(_,_.tagName)",
+	"optional": "!m(_,':required')",
+	"root": "(a=_.parentNode)&&!a.tagName",
 	".": "~_.className.split(/\\s+/).indexOf(a)",
 	"#": "_.id==a",
-	"^": "a.indexOf(v)==0",
+	"^": "!a.indexOf(v)",
 	"|": "a.split('-')[0]==v",
 	"$": "a.slice(-v.length)==v",
 	"~": "~a.split(/\\s+/).indexOf(v)",
-	"*": "~a.indexOf(v)"
+	"*": "~a.indexOf(v)",
+	">>": "m(_.parentNode,v)",
+	"++": "m(_.previousSibling,v)",
+	"": "c(_.parentNode,v)"
 }
 
 selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
@@ -67,11 +70,8 @@ function selectorFn(str) {
 				return ""
 			})
 
-			if (tag && tag != "*") rules[0] += "&&_.nodeName=='" + tag.toUpperCase() + "'"
-			if (parentSel) rules.push(
-				relation == "+" ? "(a=_.previousSibling)" : "(a=_.parentNode)",
-				( relation ? "a.matches&&a.matches('" : "a.closest&&a.closest('" ) + parentSel + "')"
-			)
+			if (tag && tag != "*") rules[0] += "&&_.tagName=='" + tag.toUpperCase() + "'"
+			if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
 			return rules.join("&&")
 		}).join("||") + "}"
 	)(matches, closest, next, prev))
