@@ -39,24 +39,6 @@ var undef
 
 selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
 
-function findEl(node, sel, first) {
-	var el
-	, i = 0
-	, out = []
-	, next = node.firstChild
-	, fn = selectorFn(sel)
-
-	for (; (el = next); ) {
-		if (fn(el)) {
-			if (first) return el
-			out.push(el)
-		}
-		next = el.firstChild || el.nextSibling
-		while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
-	}
-	return first ? null : out
-}
-
 function selectorFn(str) {
 	// jshint evil:true
 	return selectorCache[str] ||
@@ -93,13 +75,30 @@ function selectorFn(str) {
 }
 
 
+function walk(next, el, sel, first, nextFn) {
+	var out = []
+	sel = selectorFn(sel)
+	for (; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
+		if (first) return el
+		out.push(el)
+	}
+	return first ? null : out
+}
+
+function findEl(node, sel, first) {
+	return walk("firstChild", node.firstChild, sel, first, function(el) {
+		var next = el.nextSibling
+		while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+		return next
+	})
+}
+
 function matches(el, sel) {
 	return !!selectorFn(sel)(el)
 }
 
-function closest(el, sel, fn) {
-	for (fn = selectorFn(sel); el; el = el.parentNode) if (fn(el)) return el
-	return null
+function closest(el, sel) {
+	return walk("parentNode", el, sel, 1)
 }
 
 this.find = findEl
