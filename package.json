@@ -23,12 +23,12 @@
   "bugs": {
     "url": "https://github.com/litejs/dom-lite/issues"
   },
+  "dependencies": {
+    "selector-lite": "0.1.*"
+  },
   "devDependencies": {
     "buildman": "*",
     "tape": "2.12.x"
-  },
-  "buildman": {
-    "dist/selector-min.js": "selector.js"
   },
   "jshintConfig": {
     "asi": true,

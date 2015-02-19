@@ -15,23 +15,22 @@ var voidElements = {
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
 , hasOwn = Object.prototype.hasOwnProperty
-, selector = require("./selector.js")
-, findEl = selector.find
+, selector = require("selector-lite")
 , elementGetters = {
 	getElementById: function(id) {
-		return findEl(this, "#" + id, 1)
+		return selector.find(this, "#" + id, 1)
 	},
 	getElementsByTagName: function(tag) {
-		return findEl(this, tag)
+		return selector.find(this, tag)
 	},
 	getElementsByClassName: function(sel) {
-		return findEl(this, "." + sel.replace(/\s+/g, "."))
+		return selector.find(this, "." + sel.replace(/\s+/g, "."))
 	},
 	querySelector: function(sel) {
-		return findEl(this, sel, 1)
+		return selector.find(this, sel, 1)
 	},
 	querySelectorAll: function(sel) {
-		return findEl(this, sel)
+		return selector.find(this, sel)
 	}
 }
 
