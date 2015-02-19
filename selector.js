@@ -12,7 +12,7 @@
 
 var undef
 , selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
-, selectorLastRe = /([\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
+, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
 , selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
 , selectorCache = {}
 , selectorMap = {
@@ -40,6 +40,7 @@ var undef
 	"*": "~a.indexOf(v)",
 	">>": "m(_.parentNode,v)",
 	"++": "m(_.previousSibling,v)",
+	"~~": "p(_,v)",
 	"": "c(_.parentNode,v)"
 }
 
