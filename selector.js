@@ -42,7 +42,7 @@ selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length
 function selectorFn(str) {
 	// jshint evil:true
 	return selectorCache[str] ||
-	(selectorCache[str] = Function("_,v,a,b", "return " +
+	(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
 		str.split(selectorSplitRe).map(function(sel) {
 			var relation, from
 			, rules = ["_&&_.nodeType===1"]
@@ -70,8 +70,8 @@ function selectorFn(str) {
 				( relation ? "a.matches&&a.matches('" : "a.closest&&a.closest('" ) + parentSel + "')"
 			)
 			return rules.join("&&")
-		}).join("||")
-	))
+		}).join("||") + "}"
+	)(matches, closest, next, prev))
 }
 
 
