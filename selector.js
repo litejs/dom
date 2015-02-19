@@ -85,7 +85,7 @@ function walk(next, el, sel, first, nextFn) {
 	return first ? null : out
 }
 
-function findEl(node, sel, first) {
+function find(node, sel, first) {
 	return walk("firstChild", node.firstChild, sel, first, function(el) {
 		var next = el.nextSibling
 		while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
@@ -101,9 +101,21 @@ function closest(el, sel) {
 	return walk("parentNode", el, sel, 1)
 }
 
-this.find = findEl
+function next(el, sel) {
+	return walk("nextSibling", el.nextSibling, sel, 1)
+}
+
+function prev(el, sel) {
+	return walk("previousSibling", el.previousSibling, sel, 1)
+}
+
+
+this.find = find
 this.fn = selectorFn
 this.matches = matches
 this.closest = closest
+this.next = next
+this.prev = prev
+this.selectorMap = selectorMap
 
 
