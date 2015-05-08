@@ -53,7 +53,7 @@
 		(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
 				var relation, from
-				, rules = ["_&&_.nodeType===1"]
+				, rules = ["_&&_.nodeType==1"]
 				, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
 					from = start + _rel.length
 					relation = _rel.trim()
