@@ -17,7 +17,7 @@
     "build": "node node_modules/buildman/index.js --all",
     "travis-test": "istanbul cover ./tests/index.js && (coveralls < coverage/lcov.info || exit 0)",
     "cover-climate": "istanbul cover ./tests/index.js && (codeclimate < coverage/lcov.info || exit 0)",
-    "test": "node_modules/.bin/faucet; node_modules/.bin/jshint --verbose index.js"
+    "test": "node tests/index.js; jshint --verbose index.js"
   },
   "repository": "git://github.com/litejs/dom-lite.git",
   "bugs": {
@@ -28,8 +28,7 @@
   },
   "devDependencies": {
     "buildman": "*",
-    "tape": "2.12.x",
-    "faucet": "*",
+    "tape": "4.0.x",
     "jshint": "*"
   },
   "jshintConfig": {
