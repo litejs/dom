@@ -298,7 +298,7 @@ test("HTMLElement.attributes", function (assert) {
 	assert.equal(h1.getAttribute('GetAttribute'), 'Get me')
 	h1.setAttribute('no-value', '')
 	h1.setAttribute('constructor', 'not the constructor')
-	assert.equal(h1.toString(), '<h1 getattribute="Get me" no-value constructor="not the constructor"></h1>')
+	assert.equal(h1.toString(), '<h1 getattribute="Get me" no-value="" constructor="not the constructor"></h1>')
 	assert.equal(h1.getAttribute('no-value'), '')
 	h1.removeAttribute('no-value')
 	h1.removeAttribute('constructor')

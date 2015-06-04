@@ -215,10 +215,8 @@ Attr.prototype = {
 	get value() { return this.ownerElement.getAttribute(this.name) },
 	set value(val) { this.ownerElement.setAttribute(this.name, val) },
 	toString: function() {
-		var val = this.value
-		return val ?
-		this.name + "=\"" + val.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + "\"" :
-		this.name
+		var val = this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+		return this.name + "=\"" + val + "\""
 	}
 }
 
