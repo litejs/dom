@@ -3,6 +3,8 @@ node_js:
   - "0.10"
 before_script:
   - npm install istanbul coveralls
-  - npm install --dev
-script: npm run travis-test
+script:
+  - istanbul cover ./tests/index.js
+after_success:
+  - coveralls < coverage/lcov.info
 

@@ -15,7 +15,6 @@
   "readmeFilename": "README.md",
   "scripts": {
     "build": "node node_modules/buildman/index.js --all",
-    "travis-test": "istanbul cover ./tests/index.js && (coveralls < coverage/lcov.info || exit 0)",
     "cover-climate": "istanbul cover ./tests/index.js && (codeclimate < coverage/lcov.info || exit 0)",
     "test": "node tests/index.js; jshint --verbose index.js"
   },
