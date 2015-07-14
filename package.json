@@ -26,9 +26,7 @@
     "selector-lite": "0.1.*"
   },
   "devDependencies": {
-    "buildman": "*",
-    "tape": "4.0.x",
-    "jshint": "*"
+    "testman": "0.3.*"
   },
   "jshintConfig": {
     "asi": true,

@@ -1,5 +1,5 @@
 var undef
-, test = require("tape")
+, test = require("../../testman").test
 , DOM = require("../")
 , document = DOM.document
 
