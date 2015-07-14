@@ -196,6 +196,15 @@ test("can do stuff", function (assert) {
 
 	assert.equal(div.innerHTML, "<span>Hello!</span>")
 
+	var str = '<div><span id="1">Hello</span> <span>World!</span></div>'
+
+	div.innerHTML = str
+	assert.equal(div.innerHTML, str)
+	assert.equal(div.firstChild.tagName, "DIV")
+	assert.equal(div.firstChild.firstChild.tagName, "SPAN")
+
+	assert.equal(div.querySelectorAll("span").length, 2)
+
 	assert.end()
 })
 

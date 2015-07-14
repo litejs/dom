@@ -117,6 +117,35 @@ Node.prototype = {
 	get innerHTML() {
 		return Node.prototype.toString.call(this)
 	},
+	set innerHTML(html) {
+		var match, child
+		, node = this
+		, tagRe = /<(\/?)([^ \/>]+)([^>]*)>|[^<]+/mg
+		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\?.)*?)\2|(\S+))/g
+
+		for (; node.firstChild;) node.removeChild(node.firstChild)
+
+		for (; (match = tagRe.exec(html)); ) {
+			if (match[1]) {
+				node = node.parentNode
+			} else if (match[2]) {
+				child = node.ownerDocument.createElement(match[2])
+				if (match[3]) {
+					match[3].replace(attrRe, setAttr)
+				}
+				node.appendChild(child)
+				if (!voidElements[child.tagName]) node = child
+			} else {
+				node.appendChild(node.ownerDocument.createTextNode(match[0]))
+			}
+		}
+
+		return html
+
+		function setAttr(_, name, q, a, b) {
+			child.setAttribute(name, a || b)
+		}
+	},
 	get outerHTML() {
 		return this.toString()
 	},
