@@ -47,7 +47,7 @@ el.innerHTML;
 Implementation notes
 --------------------
 
--   `innerHTML` and `outerHTML` are read only.
+ - `outerHTML` is read only.
 
 
 

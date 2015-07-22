@@ -128,18 +128,20 @@ Node.prototype = {
 	set innerHTML(html) {
 		var match, child
 		, node = this
-		, tagRe = /<(\/?)([^ \/>]+)([^>]*)>|[^<]+/mg
+		, tagRe = /<!--(.*?)-->|<(\/?)([^ \/>]+)([^>]*)>|[^<]+/mg
 		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\?.)*?)\2|(\S+))/g
 
 		for (; node.firstChild;) node.removeChild(node.firstChild)
 
 		for (; (match = tagRe.exec(html)); ) {
 			if (match[1]) {
-				node = node.parentNode
+				node.appendChild(node.ownerDocument.createComment(htmlUnescape(match[1])))
 			} else if (match[2]) {
-				child = node.ownerDocument.createElement(match[2])
-				if (match[3]) {
-					match[3].replace(attrRe, setAttr)
+				node = node.parentNode
+			} else if (match[3]) {
+				child = node.ownerDocument.createElement(match[3])
+				if (match[4]) {
+					match[4].replace(attrRe, setAttr)
 				}
 				node.appendChild(child)
 				if (!voidElements[child.tagName]) node = child
