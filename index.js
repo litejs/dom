@@ -50,6 +50,14 @@ function hyphenCase(str) {
 	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
 }
 
+function htmlEscape(str) {
+	return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
+
+function htmlUnescape(str) {
+	return str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
+}
+
 function StyleMap(style) {
 	var styleMap = this
 	if (style) style.split(/\s*;\s*/g).map(function(val) {
@@ -136,14 +144,14 @@ Node.prototype = {
 				node.appendChild(child)
 				if (!voidElements[child.tagName]) node = child
 			} else {
-				node.appendChild(node.ownerDocument.createTextNode(match[0]))
+				node.appendChild(node.ownerDocument.createTextNode(htmlUnescape(match[0])))
 			}
 		}
 
 		return html
 
 		function setAttr(_, name, q, a, b) {
-			child.setAttribute(name, a || b)
+			child.setAttribute(name, htmlUnescape(a || b || ""))
 		}
 	},
 	get outerHTML() {
@@ -244,8 +252,7 @@ Attr.prototype = {
 	get value() { return this.ownerElement.getAttribute(this.name) },
 	set value(val) { this.ownerElement.setAttribute(this.name, val) },
 	toString: function() {
-		var val = this.value.replace(/&/g, "&amp;").replace(/"/g, "&quot;")
-		return this.name + "=\"" + val + "\""
+		return this.name + "=\"" + htmlEscape(this.value) + "\""
 	}
 }
 
@@ -326,7 +333,7 @@ extend(Text, Node, {
 	nodeType: 3,
 	nodeName: "#text",
 	toString: function() {
-		return ("" + this.data).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+		return htmlEscape("" + this.data)
 	}
 })
 
