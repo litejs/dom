@@ -351,6 +351,17 @@ extend(Comment, Node, {
 	}
 })
 
+function DocumentType(data) {
+	this.data = data
+}
+
+extend(DocumentType, Node, {
+	nodeType: 10,
+	toString: function() {
+		return "<!" + this.data + ">"
+	}
+})
+
 function Document() {
 	this.childNodes = []
 	this.documentElement = this.createElement("html")
@@ -374,6 +385,7 @@ extend(Document, Node, elementGetters, {
 	createElementNS: own(ElementNS),
 	createTextNode: own(Text),
 	createComment: own(Comment),
+	createDocumentType: own(DocumentType), //Should be document.implementation.createDocumentType(name, publicId, systemId)
 	createDocumentFragment: own(DocumentFragment)
 })
 
