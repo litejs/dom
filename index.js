@@ -161,6 +161,12 @@ Node.prototype = {
 	get outerHTML() {
 		return this.toString()
 	},
+	set outerHTML(html) {
+		var frag = this.ownerDocument.createDocumentFragment()
+		frag.innerHTML = html
+		this.parentNode.replaceChild(frag, this)
+		return html
+	},
 	get htmlFor() {
 		return this["for"]
 	},

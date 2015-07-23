@@ -8,8 +8,7 @@ var DOM = require("../")
 
 
 test("replace document", function (assert) {
-	document.documentElement.innerHTML = src
-	document.childNodes = [document.documentElement = document.documentElement.firstChild]
+	document.documentElement.outerHTML = src
 
 	assert.equal("" + document, src)
 
