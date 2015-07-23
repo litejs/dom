@@ -128,23 +128,25 @@ Node.prototype = {
 	set innerHTML(html) {
 		var match, child
 		, node = this
-		, tagRe = /<!--(.*?)-->|<(\/?)([^ \/>]+)([^>]*)>|[^<]+/mg
+		, tagRe = /<!(--([\s\S]*?)--|\[[\s\S]*?\]|[\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*)>|[^<]+/mg
 		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\?.)*?)\2|(\S+))/g
 
-		for (; node.firstChild;) node.removeChild(node.firstChild)
+		for (; node.firstChild; ) node.removeChild(node.firstChild)
 
 		for (; (match = tagRe.exec(html)); ) {
-			if (match[1]) {
-				node.appendChild(node.ownerDocument.createComment(htmlUnescape(match[1])))
-			} else if (match[2]) {
+			if (match[3]) {
 				node = node.parentNode
-			} else if (match[3]) {
-				child = node.ownerDocument.createElement(match[3])
-				if (match[4]) {
-					match[4].replace(attrRe, setAttr)
+			} else if (match[4]) {
+				child = node.ownerDocument.createElement(match[4])
+				if (match[5]) {
+					match[5].replace(attrRe, setAttr)
 				}
 				node.appendChild(child)
 				if (!voidElements[child.tagName]) node = child
+			} else if (match[2]) {
+				node.appendChild(node.ownerDocument.createComment(htmlUnescape(match[2])))
+			} else if (match[1]) {
+				node.appendChild(node.ownerDocument.createDocumentType(match[1]))
 			} else {
 				node.appendChild(node.ownerDocument.createTextNode(htmlUnescape(match[0])))
 			}
