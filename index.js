@@ -73,12 +73,14 @@ var voidElements = {
 	get nextSibling() {
 		return getSibling(this, 1)
 	},
+	// innerHTML and outerHTML should be extensions to the Element interface
 	get innerHTML() {
 		return Node.toString.call(this)
 	},
 	set innerHTML(html) {
 		var match, child
 		, node = this
+		, doc = node.ownerDocument || node
 		, tagRe = /<!(--([\s\S]*?)--|\[[\s\S]*?\]|[\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*)>|[^<]+/mg
 		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\?.)*?)\2|(\S+))/g
 
@@ -88,18 +90,18 @@ var voidElements = {
 			if (match[3]) {
 				node = node.parentNode
 			} else if (match[4]) {
-				child = node.ownerDocument.createElement(match[4])
+				child = doc.createElement(match[4])
 				if (match[5]) {
 					match[5].replace(attrRe, setAttr)
 				}
 				node.appendChild(child)
 				if (!voidElements[child.tagName]) node = child
 			} else if (match[2]) {
-				node.appendChild(node.ownerDocument.createComment(htmlUnescape(match[2])))
+				node.appendChild(doc.createComment(htmlUnescape(match[2])))
 			} else if (match[1]) {
-				node.appendChild(node.ownerDocument.createDocumentType(match[1]))
+				node.appendChild(doc.createDocumentType(match[1]))
 			} else {
-				node.appendChild(node.ownerDocument.createTextNode(htmlUnescape(match[0])))
+				node.appendChild(doc.createTextNode(htmlUnescape(match[0])))
 			}
 		}
 
@@ -154,6 +156,7 @@ var voidElements = {
 
 			// If ref is null, insert el at the end of the list of children.
 			childs.splice(ref ? childs.indexOf(ref) : childs.length, 0, el)
+			// TODO:2015-07-24:lauri:update document.body and document.documentElement
 		}
 		return el
 	},
