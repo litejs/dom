@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.4.0
-    @date       2015-02-19
+    @version    0.5.0
+    @date       2015-07-24
     @stability  2 - Unstable
 
 
@@ -36,19 +36,14 @@ fragment.appendChild(text1);
 fragment.appendChild(text2);
 el.appendChild(fragment);
 
-el.toString();
-// <h1 id="123" class="large">hello world</h1>
-el.outerHTML;
-// <h1 id="123" class="large">hello world</h1>
 el.innerHTML;
 // hello world
+el.innerHTML = "<b>hello world</b>"
+el.outerHTML;
+// <h1 id="123" class="large"><b>hello world</b></h1>
+el.querySelectorAll("b");
+// [ "<b>hello world</b>" ]
 ```
-
-Implementation notes
---------------------
-
- - `outerHTML` is read only.
-
 
 
 Coding Style Guidelines

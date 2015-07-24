@@ -1,6 +1,6 @@
 {
   "name": "dom-lite",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "stability": 2,
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -26,6 +26,7 @@
     "selector-lite": "0.1.*"
   },
   "devDependencies": {
+    "buildman": "*",
     "testman": "0.3.*"
   },
   "jshintConfig": {
