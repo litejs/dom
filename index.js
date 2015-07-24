@@ -33,56 +33,7 @@ var voidElements = {
 		return selector.find(this, sel)
 	}
 }
-
-
-function extend(obj, _super, extras) {
-	obj.prototype = Object.create(_super.prototype)
-	for (var key, i = 2; (extras = arguments[i++]); )
-		for (key in extras) obj.prototype[key] = extras[key]
-	obj.prototype.constructor = obj
-}
-
-function camelCase(str) {
-	return str.replace(/[ _-]+([a-z])/g, function(_, a) { return a.toUpperCase() })
-}
-
-function hyphenCase(str) {
-	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
-}
-
-function htmlEscape(str) {
-	return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-}
-
-function htmlUnescape(str) {
-	return str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
-}
-
-function StyleMap(style) {
-	var styleMap = this
-	if (style) style.split(/\s*;\s*/g).map(function(val) {
-		val = val.split(/\s*:\s*/)
-		if(val[1]) styleMap[val[0] == "float" ? "cssFloat" : camelCase(val[0])] = val[1]
-	})
-}
-
-StyleMap.prototype.valueOf = function() {
-	var styleMap = this
-	return Object.keys(styleMap).map(function(key) {
-		return (key == "cssFloat" ? "float: " : hyphenCase(key) + ": ") + styleMap[key]
-	}).join("; ")
-}
-
-function Node(){}
-
-function getSibling(node, step) {
-	var silbings = node.parentNode && node.parentNode.childNodes
-	, index = silbings && silbings.indexOf(node)
-
-	return silbings && index > -1 && silbings[ index + step ] || null
-}
-
-Node.prototype = {
+, Node = {
 	ELEMENT_NODE:                1,
 	TEXT_NODE:                   3,
 	PROCESSING_INSTRUCTION_NODE: 7,
@@ -123,7 +74,7 @@ Node.prototype = {
 		return getSibling(this, 1)
 	},
 	get innerHTML() {
-		return Node.prototype.toString.call(this)
+		return Node.toString.call(this)
 	},
 	set innerHTML(html) {
 		var match, child
@@ -244,11 +195,59 @@ Node.prototype = {
 }
 
 
+
+function extendNode(obj, extras) {
+	obj.prototype = Object.create(Node)
+	for (var key, i = 1; (extras = arguments[i++]); )
+		for (key in extras) obj.prototype[key] = extras[key]
+	obj.prototype.constructor = obj
+}
+
+function camelCase(str) {
+	return str.replace(/[ _-]+([a-z])/g, function(_, a) { return a.toUpperCase() })
+}
+
+function hyphenCase(str) {
+	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
+}
+
+function htmlEscape(str) {
+	return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
+
+function htmlUnescape(str) {
+	return str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
+}
+
+function StyleMap(style) {
+	var styleMap = this
+	if (style) style.split(/\s*;\s*/g).map(function(val) {
+		val = val.split(/\s*:\s*/)
+		if(val[1]) styleMap[val[0] == "float" ? "cssFloat" : camelCase(val[0])] = val[1]
+	})
+}
+
+StyleMap.prototype.valueOf = function() {
+	var styleMap = this
+	return Object.keys(styleMap).map(function(key) {
+		return (key == "cssFloat" ? "float: " : hyphenCase(key) + ": ") + styleMap[key]
+	}).join("; ")
+}
+
+function getSibling(node, step) {
+	var silbings = node.parentNode && node.parentNode.childNodes
+	, index = silbings && silbings.indexOf(node)
+
+	return silbings && index > -1 && silbings[ index + step ] || null
+}
+
+
+
 function DocumentFragment() {
 	this.childNodes = []
 }
 
-extend(DocumentFragment, Node, {
+extendNode(DocumentFragment, {
 	nodeType: 11,
 	nodeName: "#document-fragment"
 })
@@ -279,7 +278,7 @@ function HTMLElement(tag) {
 	element.childNodes = []
 }
 
-extend(HTMLElement, Node, elementGetters, {
+extendNode(HTMLElement, elementGetters, {
 	matches: function(sel) {
 		return selector.matches(this, sel)
 	},
@@ -339,7 +338,7 @@ function Text(data) {
 	this.data = data
 }
 
-extend(Text, Node, {
+extendNode(Text, {
 	nodeType: 3,
 	nodeName: "#text",
 	toString: function() {
@@ -351,7 +350,7 @@ function Comment(data) {
 	this.data = data
 }
 
-extend(Comment, Node, {
+extendNode(Comment, {
 	nodeType: 8,
 	nodeName: "#comment",
 	toString: function() {
@@ -363,7 +362,7 @@ function DocumentType(data) {
 	this.data = data
 }
 
-extend(DocumentType, Node, {
+extendNode(DocumentType, {
 	nodeType: 10,
 	toString: function() {
 		return "<!" + this.data + ">"
@@ -386,7 +385,7 @@ function own(Element) {
 	}
 }
 
-extend(Document, Node, elementGetters, {
+extendNode(Document, elementGetters, {
 	nodeType: 9,
 	nodeName: "#document",
 	createElement: own(HTMLElement),
