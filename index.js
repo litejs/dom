@@ -81,7 +81,7 @@ var voidElements = {
 		var match, child
 		, node = this
 		, doc = node.ownerDocument || node
-		, tagRe = /<!(--([\s\S]*?)--|\[[\s\S]*?\]|[\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*)>|[^<]+/mg
+		, tagRe = /<(!--([\s\S]*?)--|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/mg
 		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\?.)*?)\2|(\S+))/g
 
 		for (; node.firstChild; ) node.removeChild(node.firstChild)
@@ -95,7 +95,7 @@ var voidElements = {
 					match[5].replace(attrRe, setAttr)
 				}
 				node.appendChild(child)
-				if (!voidElements[child.tagName]) node = child
+				if (!voidElements[child.tagName] && !match[6]) node = child
 			} else if (match[2]) {
 				node.appendChild(doc.createComment(htmlUnescape(match[2])))
 			} else if (match[1]) {
@@ -368,7 +368,7 @@ function DocumentType(data) {
 extendNode(DocumentType, {
 	nodeType: 10,
 	toString: function() {
-		return "<!" + this.data + ">"
+		return "<" + this.data + ">"
 	}
 })
 
