@@ -201,8 +201,12 @@ var voidElements = {
 
 function extendNode(obj, extras) {
 	obj.prototype = Object.create(Node)
-	for (var key, i = 1; (extras = arguments[i++]); )
-		for (key in extras) obj.prototype[key] = extras[key]
+	for (var descriptor, key, i = 1; (extras = arguments[i++]); ) {
+		for (key in extras) {
+			descriptor = Object.getOwnPropertyDescriptor(extras, key)
+			Object.defineProperty(obj.prototype, key, descriptor)
+		}
+	}
 	obj.prototype.constructor = obj
 }
 
@@ -282,6 +286,14 @@ function HTMLElement(tag) {
 }
 
 extendNode(HTMLElement, elementGetters, {
+	get attributes() {
+		var key
+		, attrs = []
+		, element = this
+		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
+			attrs.push(new Attr(element, escapeAttributeName(key)))
+		return attrs
+	},
 	matches: function(sel) {
 		return selector.matches(this, sel)
 	},
@@ -314,17 +326,6 @@ extendNode(HTMLElement, elementGetters, {
 		var attrs = this.attributes.join(" ")
 		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
 		(voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">")
-	}
-})
-
-Object.defineProperty(HTMLElement.prototype, "attributes", {
-	get: function() {
-		var key
-		, attrs = []
-		, element = this
-		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
-			attrs.push(new Attr(element, escapeAttributeName(key)))
-		return attrs
 	}
 })
 
