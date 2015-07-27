@@ -370,6 +370,11 @@ extendNode(DocumentType, {
 	nodeType: 10,
 	toString: function() {
 		return "<" + this.data + ">"
+		// var node = document.doctype
+		// return "<!DOCTYPE " + node.name +
+		// 	(node.publicId ? ' PUBLIC "' + node.publicId + '"' : '') +
+		// 	(!node.publicId && node.systemId ? ' SYSTEM' : '') +
+		// 	(node.systemId ? ' "' + node.systemId + '"' : '') + '>'
 	}
 })
 
