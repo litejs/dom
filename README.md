@@ -6,8 +6,8 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.5.0
-    @date       2015-07-24
+    @version    0.5.1
+    @date       2016-07-26
     @stability  2 - Unstable
 
 
@@ -71,7 +71,7 @@ External links
 
 ### Licence
 
-Copyright (c) 2014-2015 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2014-2016 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [The MIT License](http://lauri.rooden.ee/mit-license.txt)
 
 
