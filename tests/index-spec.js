@@ -140,9 +140,9 @@ test("can clone HTMLElements", function (assert) {
 	clone = el.cloneNode()
 	deepClone = el.cloneNode(true)
 
-	assert.notEqual(el, clone)
-	assert.notEqual(el.style, clone.style)
-	assert.notEqual(el.childNodes, clone.childNodes)
+	assert.notStrictEqual(el, clone)
+	assert.notStrictEqual(el.style, clone.style)
+	assert.notStrictEqual(el.childNodes, clone.childNodes)
 
 	assert.equal(el.nodeName, "H1")
 	assert.equal(el.tagName, "H1")
@@ -154,8 +154,8 @@ test("can clone HTMLElements", function (assert) {
 	assert.equal(clone.localName, "h1")
 	assert.equal(clone.id, 1)
 	assert.equal(clone.style.top, "5px")
-	assert.equal(el.ownerDocument, clone.ownerDocument)
-	assert.equal(el.ownerDocument, deepClone.ownerDocument)
+	assert.strictEqual(el.ownerDocument, clone.ownerDocument)
+	assert.strictEqual(el.ownerDocument, deepClone.ownerDocument)
 
 	assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top: 5px\"><img></h1>")
 
@@ -172,7 +172,7 @@ test("can clone Text", function (assert) {
 	el = document.createTextNode("hello world")
 	clone = el.cloneNode()
 
-	assert.notEqual(el, clone)
+	assert.notStrictEqual(el, clone)
 	assert.equal(""+el, ""+clone)
 
 	assert.end()

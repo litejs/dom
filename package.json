@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "buildman": "*",
-    "testman": "0.3.*"
+    "testman": "0.5.1"
   },
   "jshintConfig": {
     "asi": true,
