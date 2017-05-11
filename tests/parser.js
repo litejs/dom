@@ -12,6 +12,11 @@ test("replace document", function (assert) {
 	document.documentElement.outerHTML = src
 	assert.equal("" + document, src)
 
+	var header = document.getElementById("header")
+	, comment = header.firstChild
+	assert.equal(comment.nodeType, 8)
+	assert.equal(comment.data, "My favorite operators are > and <!")
+
 	document.innerHTML = "<html></html>"
 	assert.equal("" + document, "<html></html>")
 
