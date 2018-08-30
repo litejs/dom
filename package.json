@@ -14,9 +14,9 @@
   "main": "index.js",
   "readmeFilename": "README.md",
   "scripts": {
-    "build": "node node_modules/buildman/index.js --all",
+    "build": "node node_modules/buildman/index.js --all; jshint --verbose index.js",
     "cover-climate": "istanbul cover ./tests/index.js && (codeclimate < coverage/lcov.info || exit 0)",
-    "test": "node tests/index.js; jshint --verbose index.js"
+    "test": "node tests/index.js"
   },
   "repository": "git://github.com/litejs/dom-lite.git",
   "bugs": {

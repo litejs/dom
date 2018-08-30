@@ -1,11 +1,15 @@
 language: node_js
 sudo: false
+git:
+  submodules: false
+  depth: 3
 node_js:
-  - "0.10"
+  - "4"
+  - "8"
 before_script:
-  - npm install istanbul coveralls
+  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then npm install -g nyc coveralls; fi
 script:
-  - istanbul cover ./tests/index.js
+  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then nyc -r lcovonly -r text npm test; else npm test; fi
 after_success:
-  - coveralls < coverage/lcov.info
+  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then coveralls < coverage/lcov.info; fi
 

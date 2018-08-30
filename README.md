@@ -6,11 +6,6 @@
 [GitHub repo]: https://github.com/litejs/dom-lite
 
 
-    @version    0.5.1
-    @date       2016-07-26
-    @stability  2 - Unstable
-
-
 DOM lite &ndash; [![Build][1]][2] [![Coverage][3]][4]
 ========
 
@@ -46,32 +41,20 @@ el.querySelectorAll("b");
 ```
 
 
-Coding Style Guidelines
------------------------
-
--   Use tabs for indentation, align with spaces
--   Use lowerCamelCase for method and variable names
--   Use UpperCamelCase for constructor names
--   Commit files with Unix-style line endings
--   Do not use spaces in file and directory names
-    Consider substituting a dash (-) where you would normally use spaces.
--   Rebase before pushing
--   Fix tests before push or pull request
-
-
 External links
 --------------
 
--   [GitHub repo][]
--   [npm package][]
--   [DOM spec](https://dom.spec.whatwg.org/)
--   [Selectors Level 3](http://www.w3.org/TR/selectors/)
+ - [GitHub repo][]
+ - [npm package][]
+ - [DOM spec](https://dom.spec.whatwg.org/)
+ - [Selectors Level 3](http://www.w3.org/TR/selectors/)
+ - [Coding Style Guidelines](https://github.com/litejs/litejs/wiki/Style-Guidelines)
 
 
 
 ### Licence
 
-Copyright (c) 2014-2016 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2014-2018 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [The MIT License](http://lauri.rooden.ee/mit-license.txt)
 
 
