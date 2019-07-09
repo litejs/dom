@@ -18,6 +18,7 @@
 	, selectorCache = {}
 	, selectorMap = {
 		"any": "m(_,v)",
+		"contains": "_.textContent.indexOf(v)>-1",
 		"empty": "!_.lastChild",
 		"enabled": "!m(_,':disabled')",
 		"first-child": "(a=_.parentNode)&&a.firstChild==_",
@@ -80,9 +81,9 @@
 	}
 
 
-	function walk(next, el, sel, first, nextFn) {
+	function walk(next, first, el, sel, nextFn) {
 		var out = []
-		sel = selectorFn(sel)
+		if (typeof sel !== "function") sel = selectorFn(sel)
 		for (; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
 			if (first) return el
 			out.push(el)
@@ -91,7 +92,7 @@
 	}
 
 	function find(node, sel, first) {
-		return walk("firstChild", node.firstChild, sel, first, function(el) {
+		return walk("firstChild", first, node.firstChild, sel, function(el) {
 			var next = el.nextSibling
 			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
 			return next
@@ -103,15 +104,15 @@
 	}
 
 	function closest(el, sel) {
-		return walk("parentNode", el, sel, 1)
+		return walk("parentNode", 1, el, sel)
 	}
 
 	function next(el, sel) {
-		return walk("nextSibling", el.nextSibling, sel, 1)
+		return walk("nextSibling", 1, el.nextSibling, sel)
 	}
 
 	function prev(el, sel) {
-		return walk("previousSibling", el.previousSibling, sel, 1)
+		return walk("previousSibling", 1, el.previousSibling, sel)
 	}
 
 
