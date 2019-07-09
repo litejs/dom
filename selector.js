@@ -1,9 +1,8 @@
 
 
-/*
- * @version    0.1.1
- * @date       2015-05-10
- * @stability  2 - Unstable
+
+/**
+ * @version    19.11.0
  * @author     Lauri Rooden <lauri@rooden.ee>
  * @license    MIT License
  */
