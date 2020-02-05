@@ -1,5 +1,5 @@
 var undef
-, test = require("testman").test
+, test = require("litejs/test").test
 , DOM = require("../")
 , document = DOM.document
 

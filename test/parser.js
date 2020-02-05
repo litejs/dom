@@ -2,11 +2,11 @@
 var DOM = require("../")
 , fs = require("fs")
 , path = require("path")
-, test = require("testman").test
+, test = require("litejs/test").test
 
 
 test("replace document", function (assert) {
-	var src = readFile("./tests/samp1.html")
+	var src = readFile("./test/samp1.html")
 	, document = new DOM.Document()
 
 	document.documentElement.outerHTML = src
@@ -27,7 +27,7 @@ test("replace document", function (assert) {
 })
 
 test("atom", function (assert) {
-	var src = readFile("./tests/atom.xml")
+	var src = readFile("./test/atom.xml")
 	, document = new DOM.Document()
 
 	document.documentElement.outerHTML = src
@@ -42,7 +42,7 @@ test("atom", function (assert) {
 
 /*
 test("rdf", function (assert) {
-	var src = readFile("./tests/rdf.xml")
+	var src = readFile("./test/rdf.xml")
 	, document = new DOM.Document()
 
 	document.innerHTML = src
@@ -54,7 +54,7 @@ test("rdf", function (assert) {
 })
 
 test("rss", function (assert) {
-	var src = readFile("./tests/rss.xml")
+	var src = readFile("./test/rss.xml")
 	, document = new DOM.Document()
 
 	document.documentElement.outerHTML = src

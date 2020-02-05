@@ -7,9 +7,9 @@ node_js:
   - "4"
   - "8"
 before_script:
-  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then npm install -g nyc coveralls; fi
+  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then npm install -g nyc coveralls litejs; fi
 script:
-  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then nyc -r lcovonly -r text npm test; else npm test; fi
+  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then nyc -r lcovonly -r text lj t; else lj t; fi
 after_success:
   - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then coveralls < coverage/lcov.info; fi
 

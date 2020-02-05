@@ -1,7 +1,6 @@
 {
   "name": "dom-lite",
   "version": "0.5.1",
-  "stability": 2,
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
   "description": "A small DOM implementation",
@@ -13,21 +12,15 @@
   ],
   "main": "index.js",
   "readmeFilename": "README.md",
-  "scripts": {
-    "build": "node node_modules/buildman/index.js --all; jshint --verbose index.js",
-    "cover-climate": "istanbul cover ./tests/index.js && (codeclimate < coverage/lcov.info || exit 0)",
-    "test": "node tests/index.js"
-  },
+  "files": [
+    "index.js"
+  ],
   "repository": "git://github.com/litejs/dom-lite.git",
   "bugs": {
     "url": "https://github.com/litejs/dom-lite/issues"
   },
   "dependencies": {
     "selector-lite": "0.1.*"
-  },
-  "devDependencies": {
-    "buildman": "*",
-    "testman": "0.5.1"
   },
   "jshintConfig": {
     "asi": true,
