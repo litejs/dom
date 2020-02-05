@@ -2,7 +2,7 @@
 [2]: https://travis-ci.org/litejs/dom-lite
 [3]: https://badgen.net/coveralls/c/github/litejs/dom-lite
 [4]: https://coveralls.io/r/litejs/dom-lite
-[5]: https://badgen.net/packagephobia/install/dom-lite@19.11.0
+[5]: https://badgen.net/packagephobia/install/dom-lite
 [6]: https://packagephobia.now.sh/result?p=dom-lite
 [7]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
 [8]: https://www.buymeacoffee.com/lauriro

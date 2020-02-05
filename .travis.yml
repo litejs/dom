@@ -7,7 +7,8 @@ node_js:
   - "4"
   - "8"
 before_script:
-  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then npm install -g nyc coveralls litejs; fi
+  - npm install -g litejs
+  - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then npm install -g nyc coveralls; fi
 script:
   - if [ ${TRAVIS_NODE_VERSION%%.*} = "8" ]; then nyc -r lcovonly -r text lj t; else lj t; fi
 after_success:
