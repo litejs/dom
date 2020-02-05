@@ -16,12 +16,12 @@
 	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
 	, selectorCache = {}
 	, selectorMap = {
-		"any": "m(_,v)",
 		"contains": "_.textContent.indexOf(v)>-1",
 		"empty": "!_.lastChild",
 		"enabled": "!m(_,':disabled')",
 		"first-child": "(a=_.parentNode)&&a.firstChild==_",
 		"first-of-type": "!p(_,_.tagName)",
+		"is": "m(_,v)",
 		"lang": "m(c(_,'[lang]'),'[lang|='+v+']')",
 		"last-child": "(a=_.parentNode)&&a.lastChild==_",
 		"last-of-type": "!n(_,_.tagName)",
