@@ -1,12 +1,14 @@
-[1]: https://secure.travis-ci.org/litejs/dom-lite.png
+[1]: https://badgen.net/travis/litejs/dom-lite
 [2]: https://travis-ci.org/litejs/dom-lite
-[3]: https://coveralls.io/repos/litejs/dom-lite/badge.png
+[3]: https://badgen.net/coveralls/c/github/litejs/dom-lite
 [4]: https://coveralls.io/r/litejs/dom-lite
-[npm package]: https://npmjs.org/package/dom-lite
-[GitHub repo]: https://github.com/litejs/dom-lite
+[5]: https://badgen.net/packagephobia/install/dom-lite@19.11.0
+[6]: https://packagephobia.now.sh/result?p=dom-lite
+[7]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
+[8]: https://www.buymeacoffee.com/lauriro
 
 
-DOM lite &ndash; [![Build][1]][2] [![Coverage][3]][4]
+DOM lite &ndash; [![Build][1]][2] [![Coverage][3]][4] [![Size][5]][6] [![Buy Me A Tea][7]][8]
 ========
 
 A small DOM implementation
@@ -41,20 +43,21 @@ el.querySelectorAll("b");
 ```
 
 
-External links
---------------
+## External links
 
- - [GitHub repo][]
- - [npm package][]
- - [DOM spec](https://dom.spec.whatwg.org/)
- - [Selectors Level 3](http://www.w3.org/TR/selectors/)
- - [Coding Style Guidelines](https://github.com/litejs/litejs/wiki/Style-Guidelines)
+[GitHub repo](https://github.com/litejs/dom-lite) |
+[npm package](https://npmjs.org/package/dom-lite) |
+[DOM spec](https://dom.spec.whatwg.org/) |
+[Selectors Level 3](http://www.w3.org/TR/selectors/) |
+[Travis CI](https://travis-ci.org/litejs/dom-lite) |
+[Coveralls coverage](https://coveralls.io/github/litejs/dom-lite)  
+[Coding Style Guidelines](https://github.com/litejs/litejs/wiki/Style-Guidelines) |
+[Buy Me A Tea][8]
 
 
+## Licence
 
-### Licence
-
-Copyright (c) 2014-2018 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2014-2020 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [The MIT License](http://lauri.rooden.ee/mit-license.txt)
 
 
