@@ -20,7 +20,7 @@
     "url": "https://github.com/litejs/dom-lite/issues"
   },
   "dependencies": {
-    "selector-lite": "0.1.*"
+    "selector-lite": "20.2.0"
   },
   "jshintConfig": {
     "asi": true,
