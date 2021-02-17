@@ -410,6 +410,7 @@ module.exports = {
 	StyleMap: StyleMap,
 	Node: Node,
 	HTMLElement: HTMLElement,
+	DocumentFragment: DocumentFragment,
 	Document: Document
 }
 
