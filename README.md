@@ -1,5 +1,3 @@
-[1]: https://badgen.net/travis/litejs/dom-lite
-[2]: https://travis-ci.org/litejs/dom-lite
 [3]: https://badgen.net/coveralls/c/github/litejs/dom-lite
 [4]: https://coveralls.io/r/litejs/dom-lite
 [5]: https://badgen.net/packagephobia/install/dom-lite
@@ -8,7 +6,7 @@
 [8]: https://www.buymeacoffee.com/lauriro
 
 
-DOM lite &ndash; [![Build][1]][2] [![Coverage][3]][4] [![Size][5]][6] [![Buy Me A Tea][7]][8]
+DOM lite &ndash; [![Coverage][3]][4] [![Size][5]][6] [![Buy Me A Tea][7]][8]
 ========
 
 A small DOM implementation
@@ -42,6 +40,20 @@ el.querySelectorAll("b");
 // [ "<b>hello world</b>" ]
 ```
 
+## Contributing
+
+Follow [Coding Style Guidelines](https://github.com/litejs/litejs/wiki/Style-Guidelines)
+
+Run tests
+
+```
+npm install -g @litejs/cli jshint nyc
+npm install
+lj test
+lj lint
+nyc lj test
+```
+
 
 ## External links
 
@@ -49,15 +61,13 @@ el.querySelectorAll("b");
 [npm package](https://npmjs.org/package/dom-lite) |
 [DOM spec](https://dom.spec.whatwg.org/) |
 [Selectors Level 3](http://www.w3.org/TR/selectors/) |
-[Travis CI](https://travis-ci.org/litejs/dom-lite) |
 [Coveralls coverage](https://coveralls.io/github/litejs/dom-lite)  
-[Coding Style Guidelines](https://github.com/litejs/litejs/wiki/Style-Guidelines) |
 [Buy Me A Tea][8]
 
 
 ## Licence
 
-Copyright (c) 2014-2020 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2014-2021 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [The MIT License](http://lauri.rooden.ee/mit-license.txt)
 
 
