@@ -14,7 +14,9 @@
 	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
 	, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
 	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
-	, selectorCache = {}
+	, selectorCache = {
+		"": function() {}
+	}
 	, selectorMap = {
 		"contains": "_.textContent.indexOf(v)>-1",
 		"empty": "!_.lastChild",
@@ -48,8 +50,9 @@
 	selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
 
 	function selectorFn(str) {
-		// jshint evil:true
-		return selectorCache[str] ||
+		// jshint evil:true, unused:true, eqnull:true
+		if (str != null && typeof str !== "string") throw Error("Invalid selector")
+		return selectorCache[str || ""] ||
 		(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
 				var relation, from
@@ -82,8 +85,7 @@
 
 	function walk(next, first, el, sel, nextFn) {
 		var out = []
-		if (typeof sel !== "function") sel = selectorFn(sel)
-		for (; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
+		for (sel = selectorFn(sel); el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
 			if (first) return el
 			out.push(el)
 		}
@@ -122,5 +124,5 @@
 	exports.next = next
 	exports.prev = prev
 	exports.selectorMap = selectorMap
-}(this)
+}(this) // jshint ignore:line
 
