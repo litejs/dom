@@ -14,7 +14,7 @@ var voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
-, hasOwn = Object.prototype.hasOwnProperty
+, hasOwn = voidElements.hasOwnProperty
 , selector = require("selector-lite")
 , elementGetters = {
 	getElementById: function(id) {
@@ -81,8 +81,8 @@ var voidElements = {
 		var match, child
 		, node = this
 		, doc = node.ownerDocument || node
-		, tagRe = /<(!--([\s\S]*?)--|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/mg
-		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\?.)*?)\2|(\S+))/g
+		, tagRe = /<(!--([\s\S]*?)--|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/g
+		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\\2|.)*?)\2|(\S+))/g
 
 		for (; node.firstChild; ) node.removeChild(node.firstChild)
 
@@ -163,7 +163,7 @@ var voidElements = {
 	removeChild: function(el) {
 		var node = this
 		, index = node.childNodes.indexOf(el)
-		if (index == -1) throw new Error("NOT_FOUND_ERR")
+		if (index == -1) throw Error("NOT_FOUND_ERR")
 
 		node.childNodes.splice(index, 1)
 		el.parentNode = null
