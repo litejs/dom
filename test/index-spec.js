@@ -74,6 +74,14 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
+	it("can set attributes with namespace", function (assert) {
+		var el = document.createElementNS(null, "use")
+		el.setAttributeNS(null, "xlink:ref", "http://localhost")
+		assert.equal("" + el, '<use xlink:ref="http://localhost"></use>')
+
+		assert.end()
+	})
+
 	it("can clone HTMLElements", function (assert) {
 		var el = document.createElement("a")
 
