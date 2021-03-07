@@ -266,7 +266,9 @@ describe("DOM lite", function() {
 	}
 
 	it("has HTMLElement", function (assert) {
-		testNode(assert, "<body>%s</body>", document.body)
+		var div  = document.createElement("div")
+
+		testNode(assert, "<div>%s</div>", div)
 
 		assert.end()
 	})
