@@ -221,6 +221,18 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
+	it("can focus and blur", function (assert) {
+		var div = document.createElement("div")
+
+		div.focus()
+		assert.equal(document.activeElement, div)
+
+		div.blur()
+		assert.equal(document.activeElement, null)
+
+		assert.end()
+	})
+
 
 	function testNode(assert, mask, node) {
 		var p  = document.createElement("p")

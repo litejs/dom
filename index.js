@@ -324,6 +324,12 @@ extendNode(HTMLElement, Element, {
 		this[name] = ""
 		delete this[name]
 	},
+	focus: function() {
+		this.ownerDocument.activeElement = this
+	},
+	blur: function() {
+		this.ownerDocument.activeElement = null
+	},
 	toString: function(minify) {
 		var attrs = (minify ? this.attributes.map(minifyMap) : this.attributes).join(" ")
 		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
