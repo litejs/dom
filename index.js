@@ -248,7 +248,7 @@ StyleMap.prototype.valueOf = function() {
 }
 
 function getElement(childs, index, step, type) {
-	for (; childs[index]; index += step) {
+	if (childs && index > -1) for (; childs[index]; index += step) {
 		if (childs[index].nodeType === type) return childs[index]
 	}
 	return null
@@ -257,7 +257,7 @@ function getElement(childs, index, step, type) {
 function getSibling(node, step, type) {
 	var silbings = node.parentNode && node.parentNode.childNodes
 	, index = silbings ? silbings.indexOf(node) : -1
-	return type > 0 && index > -1 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
+	return type > 0 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
 }
 
 

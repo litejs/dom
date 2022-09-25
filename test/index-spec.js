@@ -175,6 +175,7 @@ describe("DOM lite", function() {
 
 	it("has getters/setters", function (assert) {
 		var div = document.createElement("div")
+
 		div.className = "foo bar"
 
 		var span = document.createElement("span")
@@ -203,6 +204,11 @@ describe("DOM lite", function() {
 		assert.equal(div.lastElementChild.tagName, "P")
 
 		assert.equal(div.querySelectorAll("span").length, 2)
+
+		// Manualy broken dom
+		div.childNodes = null
+		assert.equal(div.nextElementSibling, null)
+		assert.equal(div.firstElementChild, null)
 
 		assert.end()
 	})
