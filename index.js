@@ -158,6 +158,12 @@ var voidElements = {
 			childs.splice(ref ? childs.indexOf(ref) : childs.length, 0, el)
 			// TODO:2015-07-24:lauri:update document.body and document.documentElement
 		}
+		if (node.nodeType == 9) {
+			ref = node.firstChild
+			if (ref && ref.nodeType !== 1) ref = ref.nextElementSibling
+			node.documentElement = ref
+			node.body = ref ? ref.querySelector("body") : null
+		}
 		return el
 	},
 	removeChild: function(el) {
