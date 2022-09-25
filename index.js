@@ -217,7 +217,7 @@ function extendNode(obj, extras) {
 }
 
 function camelCase(str) {
-	return str.replace(/[ _-]+([a-z])/g, function(_, a) { return a.toUpperCase() })
+	return str.replace(/-([a-z])/g, function(_, a) { return a.toUpperCase() })
 }
 
 function hyphenCase(str) {
