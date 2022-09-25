@@ -67,11 +67,11 @@ var voidElements = {
 	get lastChild() {
 		return this.childNodes && this.childNodes[ this.childNodes.length - 1 ] || null
 	},
-	get previousSibling() {
-		return getSibling(this, -1)
-	},
 	get nextSibling() {
-		return getSibling(this, 1)
+		return getSibling(this, 1, 0)
+	},
+	get previousSibling() {
+		return getSibling(this, -1, 0)
 	},
 	// innerHTML and outerHTML should be extensions to the Element interface
 	get innerHTML() {
@@ -241,11 +241,16 @@ StyleMap.prototype.valueOf = function() {
 	}).join("; ")
 }
 
-function getSibling(node, step) {
+function getSibling(node, step, type) {
 	var silbings = node.parentNode && node.parentNode.childNodes
-	, index = silbings && silbings.indexOf(node)
-
-	return silbings && index > -1 && silbings[ index + step ] || null
+	, index = silbings ? silbings.indexOf(node) : -1
+	if (index > -1 && type > 0) {
+		for (; silbings[index + step]; step += step) {
+			if (silbings[index + step].nodeType === type) return silbings[index + step]
+		}
+		return null
+	}
+	return index > -1 && silbings[index + step] || null
 }
 
 
@@ -293,6 +298,12 @@ extendNode(HTMLElement, elementGetters, {
 		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
 			attrs.push(new Attr(element, escapeAttributeName(key)))
 		return attrs
+	},
+	get nextElementSibling() {
+		return getSibling(this, 1, 1)
+	},
+	get previousElementSibling() {
+		return getSibling(this, -1, 1)
 	},
 	matches: function(sel) {
 		return selector.matches(this, sel)

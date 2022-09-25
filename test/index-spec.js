@@ -207,6 +207,7 @@ describe("DOM lite", function() {
 	function testNode(assert, mask, node) {
 		var p  = document.createElement("p")
 		, h1 = document.createElement("h1")
+		, t1 = document.createTextNode("text1")
 		, h2 = document.createElement("h2")
 
 		h1.textContent = "Head"
@@ -230,17 +231,22 @@ describe("DOM lite", function() {
 		assert.equal(node.replaceChild(h1, h2), h2)
 		assert.equal(""+node, mask.replace("%s", "<h1>Head</h1>"))
 
+		assert.equal(node.appendChild(t1), t1)
 		assert.equal(node.appendChild(h2), h2)
 		assert.equal(node.firstChild, h1)
 		assert.equal(node.lastChild, h2)
 		assert.equal(h1.previousSibling, null)
-		assert.equal(h1.nextSibling, h2)
-		assert.equal(h2.previousSibling, h1)
+		assert.equal(h1.nextSibling, t1)
+		assert.equal(h1.previousElementSibling, null)
+		assert.equal(h1.nextElementSibling, h2)
+		assert.equal(h2.previousSibling, t1)
 		assert.equal(h2.nextSibling, null)
+		assert.equal(h2.previousElementSibling, h1)
+		assert.equal(h2.nextElementSibling, null)
 		p.appendChild(node)
-		assert.equal(""+p, "<p>"+mask.replace("%s", "<h1>Head</h1><h2></h2>")+"</p>")
+		assert.equal(""+p, "<p>"+mask.replace("%s", "<h1>Head</h1>text1<h2></h2>")+"</p>")
 
-		assert.equal(p.textContent, "Head")
+		assert.equal(p.textContent, "Headtext1")
 		p.textContent = "Hello"
 		assert.equal(""+p, "<p>Hello</p>")
 
