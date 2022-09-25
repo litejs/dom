@@ -90,7 +90,7 @@ var voidElements = {
 			if (match[3]) {
 				node = node.parentNode
 			} else if (match[4]) {
-				child = doc.createElement(match[4])
+				child = doc.contentType === "text/html" ? doc.createElement(match[4]) : doc.createElementNS(null, match[4])
 				if (match[5]) {
 					match[5].replace(attrRe, setAttr)
 				}
@@ -420,6 +420,7 @@ function own(Element) {
 extendNode(Document, elementGetters, {
 	nodeType: 9,
 	nodeName: "#document",
+	contentType: "text/html",
 	createElement: own(HTMLElement),
 	createElementNS: own(ElementNS),
 	createTextNode: own(Text),
@@ -428,8 +429,23 @@ extendNode(Document, elementGetters, {
 	createDocumentFragment: own(DocumentFragment)
 })
 
+function DOMParser() {}
+function XMLSerializer() {}
+
+DOMParser.prototype.parseFromString = function(str, mime) {
+	var doc = new Document()
+	doc.contentType = mime
+	doc.documentElement.outerHTML = str
+	return doc
+}
+XMLSerializer.prototype.serializeToString = function(doc) {
+	return doc.outerHTML
+}
+
 module.exports = {
 	document: new Document(),
+	DOMParser: DOMParser,
+	XMLSerializer: XMLSerializer,
 	StyleMap: StyleMap,
 	Node: Node,
 	HTMLElement: HTMLElement,
