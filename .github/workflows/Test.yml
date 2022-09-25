@@ -16,11 +16,11 @@ jobs:
       - uses: actions/setup-node@v1
       - name: Install and run
         run: |
-          npm install -g @litejs/cli jshint nyc
+          npm install -g @litejs/cli jshint c8
           npm install
           lj test
           lj lint
-          nyc lj test --brief
+          c8 lj test --brief
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:

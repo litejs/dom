@@ -20,6 +20,9 @@
   "dependencies": {
     "selector-lite": "20.2.0"
   },
+  "devDependencies": {
+    "@litejs/cli": "22.8.0"
+  },
   "litejs": {
     "lint": "jshint *.js"
   },
@@ -29,7 +32,7 @@
     "maxdepth": 6,
     "quotmark": "double"
   },
-  "nyc": {
+  "c8": {
     "check-coverage": true,
     "branches": 100,
     "lines": 100,
