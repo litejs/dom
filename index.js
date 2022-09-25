@@ -241,18 +241,18 @@ StyleMap.prototype.valueOf = function() {
 	}).join("; ")
 }
 
+function getElement(childs, index, step, type) {
+	for (; childs[index]; index += step) {
+		if (childs[index].nodeType === type) return childs[index]
+	}
+	return null
+}
+
 function getSibling(node, step, type) {
 	var silbings = node.parentNode && node.parentNode.childNodes
 	, index = silbings ? silbings.indexOf(node) : -1
-	if (index > -1 && type > 0) {
-		for (; silbings[index + step]; step += step) {
-			if (silbings[index + step].nodeType === type) return silbings[index + step]
-		}
-		return null
-	}
-	return index > -1 && silbings[index + step] || null
+	return type > 0 && index > -1 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
 }
-
 
 
 function DocumentFragment() {
@@ -298,6 +298,12 @@ extendNode(HTMLElement, elementGetters, {
 		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
 			attrs.push(new Attr(element, escapeAttributeName(key)))
 		return attrs
+	},
+	get firstElementChild() {
+		return getElement(this.childNodes, 0, 1, 1)
+	},
+	get lastElementChild() {
+		return getElement(this.childNodes, this.childNodes.length - 1, -1, 1)
 	},
 	get nextElementSibling() {
 		return getSibling(this, 1, 1)

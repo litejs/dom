@@ -173,7 +173,7 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
-	it("can do stuff", function (assert) {
+	it("has getters/setters", function (assert) {
 		var div = document.createElement("div")
 		div.className = "foo bar"
 
@@ -183,20 +183,24 @@ describe("DOM lite", function() {
 
 		var html = String(div)
 
-		assert.equal(html, "<div class=\"foo bar\">" +
-			"<span>Hello!</span></div>")
+		assert.equal(html, "<div class=\"foo bar\"><span>Hello!</span></div>")
 
-		assert.equal(div.outerHTML, "<div class=\"foo bar\">" +
-			"<span>Hello!</span></div>")
+		assert.equal(div.outerHTML, "<div class=\"foo bar\"><span>Hello!</span></div>")
 
 		assert.equal(div.innerHTML, "<span>Hello!</span>")
 
-		var str = '<div><span id="1">Hello</span> <span>World!</span></div>'
+		var str = '<div><span id="1">Hello</span> <span>World!</span></div><p></p>'
+		, t1 = document.createTextNode("text1")
+		, t2 = document.createTextNode("text1")
 
 		div.innerHTML = str
 		assert.equal(div.innerHTML, str)
-		assert.equal(div.firstChild.tagName, "DIV")
-		assert.equal(div.firstChild.firstChild.tagName, "SPAN")
+		div.insertBefore(t1, div.firstChild)
+		div.appendChild(t2)
+		assert.equal(div.firstChild, t1)
+		assert.equal(div.firstElementChild.tagName, "DIV")
+		assert.equal(div.lastChild, t2)
+		assert.equal(div.lastElementChild.tagName, "P")
 
 		assert.equal(div.querySelectorAll("span").length, 2)
 
