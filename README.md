@@ -42,16 +42,16 @@ el.querySelectorAll("b");
 
 ## Contributing
 
-Follow [Coding Style Guidelines](https://github.com/litejs/litejs/wiki/Style-Guidelines)
+Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide)
 
 Run tests
 
 ```
-npm install -g @litejs/cli jshint nyc
+npm install -g @litejs/cli jshint c8
 npm install
 lj test
 lj lint
-nyc lj test
+c8 lj test
 ```
 
 
@@ -67,7 +67,7 @@ nyc lj test
 
 ## Licence
 
-Copyright (c) 2014-2021 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2014-2022 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [The MIT License](http://lauri.rooden.ee/mit-license.txt)
 
 
