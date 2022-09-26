@@ -17,7 +17,7 @@ Examples
 --------
 
 ```javascript
-var document = require("dom-lite").document;
+const { document, DOMParser, XMLSerializer } = require("dom-lite");
 
 var el = document.createElement("h1");
 el.id = 123;
@@ -47,11 +47,10 @@ Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide)
 Run tests
 
 ```
-npm install -g @litejs/cli jshint c8
+npm install -g jshint c8
 npm install
-lj test
-lj lint
-c8 lj test
+npm test
+jshint *.js
 ```
 
 

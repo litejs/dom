@@ -1,6 +1,6 @@
 {
   "name": "dom-lite",
-  "version": "20.2.0",
+  "version": "22.9.0",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
   "description": "A small DOM implementation",
@@ -8,14 +8,15 @@
     "browser",
     "document",
     "dom",
+    "DOMParser",
+    "XMLSerializer",
     "litejs"
   ],
   "main": "index.js",
   "readmeFilename": "README.md",
-  "files": [
-    "index.js"
-  ],
+  "files": [],
   "scripts": {
+    "release": "lj release test/index.js --brief",
     "test": "c8 lj test test/index.js --brief"
   },
   "repository": "git://github.com/litejs/dom-lite.git",
@@ -27,6 +28,7 @@
     "@litejs/cli": "22.8.0"
   },
   "litejs": {
+    "build": "lj build --readme index.js",
     "lint": "jshint *.js"
   },
   "jshintConfig": {
