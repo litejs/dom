@@ -81,7 +81,7 @@ var voidElements = {
 		var match, child
 		, node = this
 		, doc = node.ownerDocument || node
-		, tagRe = /<(!--([\s\S]*?)--|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/g
+		, tagRe = /<(!--([\s\S]*?)--!?|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/g
 		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\\2|.)*?)\2|(\S+))/g
 
 		for (; node.firstChild; ) node.removeChild(node.firstChild)

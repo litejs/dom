@@ -11,18 +11,22 @@ describe("parser", function() {
 		, document = new DOM.Document()
 
 		document.documentElement.outerHTML = src
-		assert.equal("" + document, src)
+		assert.equal(document.toString(), src.replace(/--!>/g, "-->"))
 
 		var header = document.getElementById("header")
+		, table = document.getElementsByTagName("table")[0]
 		, comment = header.firstChild
+		, comment2 = table.firstChild
 		assert.equal(comment.nodeType, 8)
 		assert.equal(comment.data, "My favorite operators are > and <!")
+		assert.equal(comment2.nodeType, 8)
+		assert.equal(comment2.data, " table ")
 
 		document.innerHTML = "<html></html>"
 		assert.equal("" + document, "<html></html>")
 
 		document.innerHTML = src
-		assert.equal("" + document, src)
+		assert.equal("" + document, src.replace(/--!>/g, "-->"))
 
 		assert.end()
 	})
