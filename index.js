@@ -233,9 +233,9 @@ function htmlUnescape(str) {
 
 function StyleMap(style) {
 	var styleMap = this
-	if (style) style.split(/\s*;\s*/g).map(function(val) {
-		val = val.split(/\s*:\s*/)
-		if(val[1]) styleMap[val[0] == "float" ? "cssFloat" : camelCase(val[0])] = val[1]
+	if (style) style.split(/\b\s*;\s*/g).forEach(function(val) {
+		val = val.split(/\b\s*:\s*/)
+		if (val[1]) styleMap[val[0] == "float" ? "cssFloat" : camelCase(val[0])] = val[1]
 	})
 }
 

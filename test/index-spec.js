@@ -109,7 +109,7 @@ describe("DOM lite", function() {
 		assert.equal(el.hasAttribute("style"), false)
 		assert.equal(el.hasAttribute("Style"), false)
 
-		el.style = "top: 1px; background-color: red; float: right"
+		el.style = "top : 1px ; background-color:red;float: right"
 		assert.equal(el.hasAttribute("style"), true)
 		assert.equal(el.hasAttribute("Style"), true)
 		assert.equal(el.style.top, "1px")
