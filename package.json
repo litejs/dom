@@ -15,6 +15,9 @@
   "files": [
     "index.js"
   ],
+  "scripts": {
+    "test": "c8 lj test test/index.js --brief"
+  },
   "repository": "git://github.com/litejs/dom-lite.git",
   "bugs": "https://github.com/litejs/dom-lite/issues",
   "dependencies": {
