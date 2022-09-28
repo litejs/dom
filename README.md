@@ -1,12 +1,13 @@
-[3]: https://badgen.net/coveralls/c/github/litejs/dom-lite
-[4]: https://coveralls.io/r/litejs/dom-lite
-[5]: https://badgen.net/packagephobia/install/dom-lite
-[6]: https://packagephobia.now.sh/result?p=dom-lite
-[7]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
-[8]: https://www.buymeacoffee.com/lauriro
+
+[1]: https://badgen.net/coveralls/c/github/litejs/dom-lite
+[2]: https://coveralls.io/r/litejs/dom-lite
+[3]: https://badgen.net/packagephobia/install/dom-lite
+[4]: https://packagephobia.now.sh/result?p=dom-lite
+[5]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
+[6]: https://www.buymeacoffee.com/lauriro
 
 
-DOM lite &ndash; [![Coverage][3]][4] [![Size][5]][6] [![Buy Me A Tea][7]][8]
+DOM lite &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 ========
 
 A small DOM implementation
@@ -60,8 +61,8 @@ jshint *.js
 [npm package](https://npmjs.org/package/dom-lite) |
 [DOM spec](https://dom.spec.whatwg.org/) |
 [Selectors Level 3](http://www.w3.org/TR/selectors/) |
-[Coveralls coverage](https://coveralls.io/github/litejs/dom-lite)  
-[Buy Me A Tea][8]
+[Coveralls coverage][2]  
+[Buy Me A Tea][6]
 
 
 ## Licence
