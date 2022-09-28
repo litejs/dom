@@ -16,8 +16,7 @@
   "readmeFilename": "README.md",
   "files": [],
   "scripts": {
-    "release": "lj release test/index.js --brief",
-    "test": "c8 lj test test/index.js --brief"
+    "test": "lj test test/index.js --brief"
   },
   "repository": "git://github.com/litejs/dom-lite.git",
   "bugs": "https://github.com/litejs/dom-lite/issues",
@@ -36,17 +35,5 @@
     "laxcomma": true,
     "maxdepth": 6,
     "quotmark": "double"
-  },
-  "c8": {
-    "check-coverage": true,
-    "branches": 100,
-    "lines": 100,
-    "functions": 100,
-    "statements": 100,
-    "reporter": [
-      "lcov",
-      "text",
-      "html"
-    ]
   }
 }
