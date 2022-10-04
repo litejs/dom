@@ -16,7 +16,7 @@
   "readmeFilename": "README.md",
   "files": [],
   "scripts": {
-    "test": "lj test test/index.js --brief"
+    "test": "c8 -r lcov -r text-summary --check-coverage --100 lj test --brief test/index.js"
   },
   "repository": "git://github.com/litejs/dom-lite.git",
   "bugs": "https://github.com/litejs/dom-lite/issues",
@@ -24,7 +24,8 @@
     "selector-lite": "20.2.0"
   },
   "devDependencies": {
-    "@litejs/cli": "22.8.0"
+    "@litejs/cli": "22.8.0",
+    "c8": "7.12.0"
   },
   "litejs": {
     "build": "lj build --readme index.js",
