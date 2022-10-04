@@ -401,10 +401,9 @@ extendNode(DocumentType, {
 
 function Document() {
 	this.childNodes = []
-	this.documentElement = this.createElement("html")
-	this.appendChild(this.documentElement)
-	this.body = this.createElement("body")
-	this.documentElement.appendChild(this.body)
+	this
+	.appendChild(this.createElement("html"))
+	.appendChild(this.body = this.createElement("body"))
 }
 
 function own(Element) {
