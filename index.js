@@ -16,6 +16,18 @@ var voidElements = {
 , hasOwn = voidElements.hasOwnProperty
 , selector = require("selector-lite")
 , elementGetters = {
+	get firstElementChild() {
+		return getElement(this.childNodes, 0, 1, 1)
+	},
+	get lastElementChild() {
+		return getElement(this.childNodes, this.childNodes.length - 1, -1, 1)
+	},
+	get nextElementSibling() {
+		return getSibling(this, 1, 1)
+	},
+	get previousElementSibling() {
+		return getSibling(this, -1, 1)
+	},
 	getElementById: function(id) {
 		return selector.find(this, "#" + id, 1)
 	},
@@ -302,18 +314,6 @@ extendNode(HTMLElement, elementGetters, {
 		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
 			attrs.push(new Attr(element, escapeAttributeName(key)))
 		return attrs
-	},
-	get firstElementChild() {
-		return getElement(this.childNodes, 0, 1, 1)
-	},
-	get lastElementChild() {
-		return getElement(this.childNodes, this.childNodes.length - 1, -1, 1)
-	},
-	get nextElementSibling() {
-		return getSibling(this, 1, 1)
-	},
-	get previousElementSibling() {
-		return getSibling(this, -1, 1)
 	},
 	matches: function(sel) {
 		return selector.matches(this, sel)

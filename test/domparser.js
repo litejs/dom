@@ -18,6 +18,7 @@ describe("DOMParser", function() {
 		//	console.log(doc.documentElement.nodeName)
 		//}
 
+		assert.equal(doc.documentElement, doc.firstElementChild)
 		assert.equal(doc.documentElement.nodeName, "q")
 		assert.equal(doc.documentElement.namespaceURI, null)
 		assert.equal(doc.contentType, "application/xml")
