@@ -15,35 +15,6 @@ var voidElements = {
 }
 , hasOwn = voidElements.hasOwnProperty
 , selector = require("selector-lite")
-, elementGetters = {
-	get firstElementChild() {
-		return getElement(this.childNodes, 0, 1, 1)
-	},
-	get lastElementChild() {
-		return getElement(this.childNodes, this.childNodes.length - 1, -1, 1)
-	},
-	get nextElementSibling() {
-		return getSibling(this, 1, 1)
-	},
-	get previousElementSibling() {
-		return getSibling(this, -1, 1)
-	},
-	getElementById: function(id) {
-		return selector.find(this, "#" + id, 1)
-	},
-	getElementsByTagName: function(tag) {
-		return selector.find(this, tag)
-	},
-	getElementsByClassName: function(sel) {
-		return selector.find(this, "." + sel.replace(/\s+/g, "."))
-	},
-	querySelector: function(sel) {
-		return selector.find(this, sel, 1)
-	},
-	querySelectorAll: function(sel) {
-		return selector.find(this, sel)
-	}
-}
 , Node = {
 	ELEMENT_NODE:                1,
 	TEXT_NODE:                   3,
@@ -212,34 +183,49 @@ var voidElements = {
 		}, "") : ""
 	}
 }
-
-
-
-function extendNode(obj, extras) {
-	obj.prototype = Object.create(Node)
-	for (var descriptor, key, i = 1; (extras = arguments[i++]); ) {
-		for (key in extras) {
-			descriptor = Object.getOwnPropertyDescriptor(extras, key)
-			Object.defineProperty(obj.prototype, key, descriptor)
-		}
+, Element = {
+	get firstElementChild() {
+		return getElement(this.childNodes, 0, 1, 1)
+	},
+	get lastElementChild() {
+		return getElement(this.childNodes, this.childNodes.length - 1, -1, 1)
+	},
+	get nextElementSibling() {
+		return getSibling(this, 1, 1)
+	},
+	get previousElementSibling() {
+		return getSibling(this, -1, 1)
+	},
+	getElementById: function(id) {
+		return selector.find(this, "#" + id, 1)
+	},
+	getElementsByTagName: function(tag) {
+		return selector.find(this, tag)
+	},
+	getElementsByClassName: function(sel) {
+		return selector.find(this, "." + sel.replace(/\s+/g, "."))
+	},
+	querySelector: function(sel) {
+		return selector.find(this, sel, 1)
+	},
+	querySelectorAll: function(sel) {
+		return selector.find(this, sel)
 	}
-	obj.prototype.constructor = obj
 }
 
-function camelCase(str) {
-	return str.replace(/-([a-z])/g, function(_, a) { return a.toUpperCase() })
+
+
+function Attr(node, name) {
+	this.ownerElement = node
+	this.name = name.toLowerCase()
 }
 
-function hyphenCase(str) {
-	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
-}
-
-function htmlEscape(str) {
-	return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-}
-
-function htmlUnescape(str) {
-	return str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
+Attr.prototype = {
+	get value() { return this.ownerElement.getAttribute(this.name) },
+	set value(val) { this.ownerElement.setAttribute(this.name, val) },
+	toString: function() {
+		return this.name + "=\"" + htmlEscape(this.value) + "\""
+	}
 }
 
 function StyleMap(style) {
@@ -257,20 +243,6 @@ StyleMap.prototype.valueOf = function() {
 	}).join("; ")
 }
 
-function getElement(childs, index, step, type) {
-	if (childs && index > -1) for (; childs[index]; index += step) {
-		if (childs[index].nodeType === type) return childs[index]
-	}
-	return null
-}
-
-function getSibling(node, step, type) {
-	var silbings = node.parentNode && node.parentNode.childNodes
-	, index = silbings ? silbings.indexOf(node) : -1
-	return type > 0 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
-}
-
-
 function DocumentFragment() {
 	this.childNodes = []
 }
@@ -280,25 +252,6 @@ extendNode(DocumentFragment, {
 	nodeName: "#document-fragment"
 })
 
-function Attr(node, name) {
-	this.ownerElement = node
-	this.name = name.toLowerCase()
-}
-
-Attr.prototype = {
-	get value() { return this.ownerElement.getAttribute(this.name) },
-	set value(val) { this.ownerElement.setAttribute(this.name, val) },
-	toString: function() {
-		return this.name + "=\"" + htmlEscape(this.value) + "\""
-	}
-}
-
-function escapeAttributeName(name) {
-	name = name.toLowerCase()
-	if (name === "constructor" || name === "attributes") return name.toUpperCase()
-	return name
-}
-
 function HTMLElement(tag) {
 	var element = this
 	element.nodeName = element.tagName = tag.toUpperCase()
@@ -306,7 +259,7 @@ function HTMLElement(tag) {
 	element.childNodes = []
 }
 
-extendNode(HTMLElement, elementGetters, {
+extendNode(HTMLElement, Element, {
 	get attributes() {
 		var key
 		, attrs = []
@@ -406,15 +359,7 @@ function Document() {
 	.appendChild(this.body = this.createElement("body"))
 }
 
-function own(Element) {
-	return function($1, $2) {
-		var node = new Element($1, $2)
-		node.ownerDocument = this
-		return node
-	}
-}
-
-extendNode(Document, elementGetters, {
+extendNode(Document, Element, {
 	nodeType: 9,
 	nodeName: "#document",
 	contentType: "text/html",
@@ -437,6 +382,61 @@ DOMParser.prototype.parseFromString = function(str, mime) {
 }
 XMLSerializer.prototype.serializeToString = function(doc) {
 	return doc.outerHTML
+}
+
+
+function own(Class) {
+	return function($1, $2) {
+		var node = new Class($1, $2)
+		node.ownerDocument = this
+		return node
+	}
+}
+
+function extendNode(obj, extras) {
+	obj.prototype = Object.create(Node)
+	for (var descriptor, key, i = 1; (extras = arguments[i++]); ) {
+		for (key in extras) {
+			descriptor = Object.getOwnPropertyDescriptor(extras, key)
+			Object.defineProperty(obj.prototype, key, descriptor)
+		}
+	}
+	obj.prototype.constructor = obj
+}
+
+function getElement(childs, index, step, type) {
+	if (childs && index > -1) for (; childs[index]; index += step) {
+		if (childs[index].nodeType === type) return childs[index]
+	}
+	return null
+}
+
+function getSibling(node, step, type) {
+	var silbings = node.parentNode && node.parentNode.childNodes
+	, index = silbings ? silbings.indexOf(node) : -1
+	return type > 0 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
+}
+
+function escapeAttributeName(name) {
+	name = name.toLowerCase()
+	if (name === "constructor" || name === "attributes") return name.toUpperCase()
+	return name
+}
+
+function camelCase(str) {
+	return str.replace(/-([a-z])/g, function(_, a) { return a.toUpperCase() })
+}
+
+function hyphenCase(str) {
+	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
+}
+
+function htmlEscape(str) {
+	return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
+
+function htmlUnescape(str) {
+	return str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
 }
 
 module.exports = {
