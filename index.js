@@ -253,19 +253,20 @@ extendNode(DocumentFragment, {
 })
 
 function HTMLElement(tag) {
-	var element = this
-	element.nodeName = element.tagName = tag.toUpperCase()
-	element.localName = tag.toLowerCase()
-	element.childNodes = []
+	var el = this
+	el.nodeName = el.tagName = tag.toUpperCase()
+	el.localName = tag.toLowerCase()
+	el.childNodes = []
 }
 
 extendNode(HTMLElement, Element, {
+	nodeType: 1,
 	get attributes() {
 		var key
 		, attrs = []
-		, element = this
-		for (key in element) if (key === escapeAttributeName(key) && element.hasAttribute(key))
-			attrs.push(new Attr(element, escapeAttributeName(key)))
+		, el = this
+		for (key in el) if (key === escapeAttributeName(key) && el.hasAttribute(key))
+			attrs.push(new Attr(el, escapeAttributeName(key)))
 		return attrs
 	},
 	matches: function(sel) {
@@ -275,7 +276,6 @@ extendNode(HTMLElement, Element, {
 		return selector.closest(this, sel)
 	},
 	namespaceURI: "http://www.w3.org/1999/xhtml",
-	nodeType: 1,
 	localName: null,
 	tagName: null,
 	styleMap: null,
@@ -304,10 +304,10 @@ extendNode(HTMLElement, Element, {
 })
 
 function ElementNS(namespace, tag) {
-	var element = this
-	element.namespaceURI = namespace
-	element.nodeName = element.tagName = element.localName = tag
-	element.childNodes = []
+	var el = this
+	el.namespaceURI = namespace
+	el.nodeName = el.tagName = el.localName = tag
+	el.childNodes = []
 }
 
 ElementNS.prototype = HTMLElement.prototype
