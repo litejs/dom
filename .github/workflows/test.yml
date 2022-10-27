@@ -15,8 +15,8 @@ jobs:
     - uses: actions/setup-node@v3
     - run: npm install
     - run: npm test
-    - name: Upload coverage
-      uses: coverallsapp/github-action@master
+    - uses: coverallsapp/github-action@master
+      name: Upload to coveralls.io
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
