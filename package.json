@@ -1,6 +1,6 @@
 {
   "name": "dom-lite",
-  "version": "22.9.0",
+  "version": "22.10.0",
   "description": "A small DOM implementation for server-side",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
