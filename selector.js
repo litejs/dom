@@ -65,7 +65,7 @@
 				, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
 					rules.push(
 						"((v='" +
-						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/'/g, "\\'") +
+						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/[\\']/g, "\\$&") +
 						"'),(a='" + key + "'),1)"
 						,
 						selectorMap[op == ":" ? key : op] ||
