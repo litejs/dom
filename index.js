@@ -8,8 +8,10 @@
  */
 
 
-// Void elements: http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
-var voidElements = {
+var boolAttrs = {
+	async:1, checked:1, defer:1, disabled:1, multiple:1, readonly:1, selected:1
+}
+, voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
@@ -224,6 +226,7 @@ Attr.prototype = {
 	get value() { return this.ownerElement.getAttribute(this.name) },
 	set value(val) { this.ownerElement.setAttribute(this.name, val) },
 	toString: function() {
+		if (hasOwn.call(boolAttrs, this.name)) return this.name
 		return this.name + "=\"" + htmlEscape(this.value) + "\""
 	}
 }
