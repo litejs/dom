@@ -20,13 +20,13 @@ Examples
 ```javascript
 const { document, DOMParser, XMLSerializer } = require("dom-lite");
 
-var el = document.createElement("h1");
+const el = document.createElement("h1");
 el.id = 123;
 el.className = "large";
 
-var fragment = document.createDocumentFragment();
-var text1 = document.createTextNode("hello");
-var text2 = document.createTextNode(" world");
+const fragment = document.createDocumentFragment();
+const text1 = document.createTextNode("hello");
+const text2 = document.createTextNode(" world");
 
 fragment.appendChild(text1);
 fragment.appendChild(text2);
@@ -34,9 +34,14 @@ el.appendChild(fragment);
 
 el.innerHTML;
 // hello world
-el.innerHTML = "<b>hello world</b>"
-el.outerHTML;
+el.innerHTML = "<b>hello world</b>";
+el.toString();
 // <h1 id="123" class="large"><b>hello world</b></h1>
+
+// minify output
+el.toString(true);
+// <h1 id=123 class=large><b>hello world</b></h1>
+
 el.querySelectorAll("b");
 // [ "<b>hello world</b>" ]
 ```

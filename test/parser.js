@@ -1,17 +1,37 @@
 
 describe("parser", function() {
+	require("@litejs/cli/snapshot")
+
 	var DOM = require("../")
 	, fs = require("fs")
 	, path = require("path")
 	, test = describe.test
 
 
-	test("replace document", function (assert) {
-		var src = readFile("./test/samp1.html")
-		, document = new DOM.Document()
+	test("parse and stringify", function (assert) {
+		assert.matchSnapshot("./test/samp1.html", function(str) {
+			var document = new DOM.Document()
+			document.documentElement.outerHTML = str
+			return document.toString().replace(/--!>/g, "-->").replace(/=""/g, "")
+		})
+		assert.end()
+	})
+	test("minify", function (assert) {
+		assert.matchSnapshot("./test/samp1.html", function(str) {
+			var document = new DOM.Document()
+			document.documentElement.outerHTML = str
+			return document.toString(true)
+		})
+		assert.matchSnapshot("./test/samp2.html", function(str) {
+			var document = new DOM.Document()
+			document.documentElement.outerHTML = str
+			return document.toString(true)
+		})
+		assert.end()
+	})
 
-		document.documentElement.outerHTML = src
-		assert.equal(document.toString(), src.replace(/--!>/g, "-->"))
+	test("replace document", function (assert) {
+		var document = readDom("./test/samp1.html")
 
 		var header = document.getElementById("header")
 		, table = document.getElementsByTagName("table")[0]
@@ -25,17 +45,11 @@ describe("parser", function() {
 		document.innerHTML = "<html></html>"
 		assert.equal("" + document, "<html></html>")
 
-		document.innerHTML = src
-		assert.equal("" + document, src.replace(/--!>/g, "-->"))
-
 		assert.end()
 	})
 
 	test("atom", function (assert) {
-		var src = readFile("./test/atom.xml")
-		, document = new DOM.Document()
-
-		document.documentElement.outerHTML = src
+		var document = readDom("./test/atom.xml")
 
 		assert.equal(document.querySelectorAll("feed").length, 1)
 		assert.equal(document.querySelectorAll("feed>link").length, 2)
@@ -45,12 +59,10 @@ describe("parser", function() {
 		assert.end()
 	})
 
+
 	/*
 	test("rdf", function (assert) {
-		var src = readFile("./test/rdf.xml")
-		, document = new DOM.Document()
-
-		document.innerHTML = src
+		var document = readDom("./test/rdf.xml")
 
 		//assert.equal(document.querySelectorAll("rdf\\:Description").length, 4)
 		//assert.equal("" + document, src)
@@ -59,7 +71,7 @@ describe("parser", function() {
 	})
 
 	test("rss", function (assert) {
-		var src = readFile("./test/rss.xml")
+		var src = readDom("./test/rss.xml")
 		, document = new DOM.Document()
 
 		document.documentElement.outerHTML = src
@@ -74,8 +86,12 @@ describe("parser", function() {
 	*/
 
 
-	function readFile(fileName) {
-		return fs.readFileSync(path.resolve(fileName.split("?")[0]), "utf8").trim()
+	function readDom(fileName) {
+		var src = fs.readFileSync(path.resolve(fileName.split("?")[0]), "utf8").trim()
+		, document = new DOM.Document()
+		document.documentElement.outerHTML = src
+
+		return document
 	}
 
 

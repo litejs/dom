@@ -179,9 +179,9 @@ var boolAttrs = {
 		}
 		return clone
 	},
-	toString: function() {
+	toString: function(minify) {
 		return this.hasChildNodes() ? this.childNodes.reduce(function(memo, node) {
-			return memo + node
+			return memo + node.toString(minify)
 		}, "") : ""
 	}
 }
@@ -214,6 +214,7 @@ var boolAttrs = {
 		return selector.find(this, sel)
 	}
 }
+, quotRe = /[^-.:\w]/
 , escRe = /<|&(?=[a-z#])/gi
 , unescRe = /&\w+;|&#(x|)([\da-f]+);/ig
 , unescMap = {
@@ -241,9 +242,13 @@ function Attr(node, name) {
 Attr.prototype = {
 	get value() { return this.ownerElement.getAttribute(this.name) },
 	set value(val) { this.ownerElement.setAttribute(this.name, val) },
-	toString: function() {
+	toString: function(minify) {
 		if (hasOwn.call(boolAttrs, this.name)) return this.name
 		var value = this.value.replace(escRe, escFn)
+		if (minify) {
+			if (!quotRe.test(value)) return this.name + "=" + this.value
+			if (value.split('"').length > value.split("'").length) return this.name + "='" + value.replace(/'/g, "&#39;") + "'"
+		}
 		return this.name + "=\"" + value.replace(/"/g, "&quot;") + "\""
 	}
 }
@@ -316,10 +321,10 @@ extendNode(HTMLElement, Element, {
 		this[name] = ""
 		delete this[name]
 	},
-	toString: function() {
-		var attrs = this.attributes.join(" ")
+	toString: function(minify) {
+		var attrs = (minify ? this.attributes.map(minifyMap) : this.attributes).join(" ")
 		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
-		(voidElements[this.tagName] ? "" : this.innerHTML + "</" + this.localName + ">")
+		(voidElements[this.tagName] ? "" : Node.toString.call(this, minify) + "</" + this.localName + ">")
 	}
 })
 
@@ -339,8 +344,8 @@ function Text(data) {
 extendNode(Text, {
 	nodeType: 3,
 	nodeName: "#text",
-	toString: function() {
-		return ("" + this.data).replace(escRe, escFn)
+	toString: function(minify) {
+		return (minify ? ("" + this.data).trim() : "" + this.data).replace(escRe, escFn)
 	}
 })
 
@@ -351,8 +356,8 @@ function Comment(data) {
 extendNode(Comment, {
 	nodeType: 8,
 	nodeName: "#comment",
-	toString: function() {
-		return "<!--" + this.data + "-->"
+	toString: function(minify) {
+		return minify ? "" : "<!--" + this.data + "-->"
 	}
 })
 
@@ -401,7 +406,7 @@ DOMParser.prototype.parseFromString = function(str, mime) {
 	return doc
 }
 XMLSerializer.prototype.serializeToString = function(doc) {
-	return doc.outerHTML
+	return doc.toString()
 }
 
 
@@ -449,6 +454,10 @@ function camelCase(str) {
 
 function hyphenCase(str) {
 	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
+}
+
+function minifyMap(item) {
+	return item.toString(true)
 }
 
 module.exports = {
