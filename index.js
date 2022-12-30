@@ -81,18 +81,18 @@ var boolAttrs = {
 				node.appendChild(child)
 				if (!voidElements[child.tagName] && !match[6]) node = child
 			} else if (match[2]) {
-				node.appendChild(doc.createComment(htmlUnescape(match[2])))
+				node.appendChild(doc.createComment(match[2].replace(unescRe, unescFn)))
 			} else if (match[1]) {
 				node.appendChild(doc.createDocumentType(match[1]))
 			} else {
-				node.appendChild(doc.createTextNode(htmlUnescape(match[0])))
+				node.appendChild(doc.createTextNode(match[0].replace(unescRe, unescFn)))
 			}
 		}
 
 		return html
 
 		function setAttr(_, name, q, a, b) {
-			child.setAttribute(name, htmlUnescape(a || b || ""))
+			child.setAttribute(name, (a || b || "").replace(unescRe, unescFn))
 		}
 	},
 	get outerHTML() {
@@ -214,7 +214,23 @@ var boolAttrs = {
 		return selector.find(this, sel)
 	}
 }
+, escRe = /<|&(?=[a-z#])/gi
+, unescRe = /&\w+;|&#(x|)([\da-f]+);/ig
+, unescMap = {
+	"&amp;": "&", "&apos;": "'", "&cent;": "¢", "&copy;": "©", "&curren;": "¤",
+	"&deg;": "°", "&euro;": "€", "&gt;": ">", "&lt;": "<", "&nbsp;": " ",
+	"&plusmn;": "±", "&pound;": "£", "&quot;": '"', "&reg;": "®",
+	"&sect;": "§", "&sup2;": "²", "&sup3;": "³", "&yen;": "¥"
 
+}
+
+function escFn(chr) {
+	return chr === "<" ? "&lt;" : "&amp;"
+}
+
+function unescFn(ent, hex, num) {
+	return num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : unescMap[ent] || ent
+}
 
 
 function Attr(node, name) {
@@ -227,7 +243,8 @@ Attr.prototype = {
 	set value(val) { this.ownerElement.setAttribute(this.name, val) },
 	toString: function() {
 		if (hasOwn.call(boolAttrs, this.name)) return this.name
-		return this.name + "=\"" + htmlEscape(this.value) + "\""
+		var value = this.value.replace(escRe, escFn)
+		return this.name + "=\"" + value.replace(/"/g, "&quot;") + "\""
 	}
 }
 
@@ -323,7 +340,7 @@ extendNode(Text, {
 	nodeType: 3,
 	nodeName: "#text",
 	toString: function() {
-		return htmlEscape("" + this.data)
+		return ("" + this.data).replace(escRe, escFn)
 	}
 })
 
@@ -432,14 +449,6 @@ function camelCase(str) {
 
 function hyphenCase(str) {
 	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
-}
-
-function htmlEscape(str) {
-	return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-}
-
-function htmlUnescape(str) {
-	return str.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
 }
 
 module.exports = {
