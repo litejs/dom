@@ -66,7 +66,7 @@ var boolAttrs = {
 		, node = this
 		, doc = node.ownerDocument || node
 		, tagRe = /<(!--([\s\S]*?)--!?|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/g
-		, attrRe = /([^= ]+)\s*=\s*(?:("|')((?:\\\2|.)*?)\2|(\S+))/g
+		, attrRe = /([^= ]+)(?:\s*=\s*(("|')((?:\\\3|.)*?)\3|[-.:\w]+)|)/g
 
 		for (; node.firstChild; ) node.removeChild(node.firstChild)
 
@@ -91,8 +91,8 @@ var boolAttrs = {
 
 		return html
 
-		function setAttr(_, name, q, a, b) {
-			child.setAttribute(name, (a || b || "").replace(unescRe, unescFn))
+		function setAttr(_, name, value, q, qvalue) {
+			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
 		}
 	},
 	get outerHTML() {
