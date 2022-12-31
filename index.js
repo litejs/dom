@@ -198,6 +198,23 @@ var boolAttrs = {
 	get previousElementSibling() {
 		return getSibling(this, -1, 1)
 	},
+	hasAttribute: function(name) {
+		name = escapeAttributeName(name)
+		return name != "style" ? hasOwn.call(this, name) :
+		!!(this.styleMap && Object.keys(this.styleMap).length)
+	},
+	getAttribute: function(name) {
+		name = escapeAttributeName(name)
+		return this.hasAttribute(name) ? "" + this[name] : null
+	},
+	setAttribute: function(name, value) {
+		this[escapeAttributeName(name)] = "" + value
+	},
+	removeAttribute: function(name) {
+		name = escapeAttributeName(name)
+		this[name] = ""
+		delete this[name]
+	},
 	getElementById: function(id) {
 		return selector.find(this, "#" + id, 1)
 	},
@@ -304,25 +321,8 @@ extendNode(HTMLElement, Element, {
 	localName: null,
 	tagName: null,
 	styleMap: null,
-	hasAttribute: function(name) {
-		name = escapeAttributeName(name)
-		return name != "style" ? hasOwn.call(this, name) :
-		!!(this.styleMap && Object.keys(this.styleMap).length)
-	},
-	getAttribute: function(name) {
-		name = escapeAttributeName(name)
-		return this.hasAttribute(name) ? "" + this[name] : null
-	},
-	setAttribute: function(name, value) {
-		this[escapeAttributeName(name)] = "" + value
-	},
 	setAttributeNS: function (namespace, name, value) {
 		this.setAttribute(name, value)
-	},
-	removeAttribute: function(name) {
-		name = escapeAttributeName(name)
-		this[name] = ""
-		delete this[name]
 	},
 	focus: function() {
 		this.ownerDocument.activeElement = this
