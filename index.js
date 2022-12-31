@@ -220,7 +220,7 @@ var boolAttrs = {
 , unescMap = {
 	"&amp;": "&", "&apos;": "'", "&cent;": "¢", "&copy;": "©", "&curren;": "¤",
 	"&deg;": "°", "&euro;": "€", "&gt;": ">", "&lt;": "<", "&nbsp;": " ",
-	"&plusmn;": "±", "&pound;": "£", "&quot;": '"', "&reg;": "®",
+	"&plusmn;": "±", "&pound;": "£", "&quot;": "\"", "&reg;": "®",
 	"&sect;": "§", "&sup2;": "²", "&sup3;": "³", "&yen;": "¥"
 
 }
@@ -247,7 +247,7 @@ Attr.prototype = {
 		var value = this.value.replace(escRe, escFn)
 		if (minify) {
 			if (!quotRe.test(value)) return this.name + "=" + this.value
-			if (value.split('"').length > value.split("'").length) return this.name + "='" + value.replace(/'/g, "&#39;") + "'"
+			if (value.split("\"").length > value.split("'").length) return this.name + "='" + value.replace(/'/g, "&#39;") + "'"
 		}
 		return this.name + "=\"" + value.replace(/"/g, "&quot;") + "\""
 	}
