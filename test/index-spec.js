@@ -76,8 +76,13 @@ describe("DOM lite", function() {
 
 	it("can set attributes with namespace", function (assert) {
 		var el = document.createElementNS(null, "use")
+		assert.equal(el.getAttributeNS(null, "xlink:ref"), null)
 		el.setAttributeNS(null, "xlink:ref", "http://localhost")
 		assert.equal("" + el, '<use xlink:ref="http://localhost"></use>')
+		assert.equal(el.hasAttributeNS(null, "xlink:ref"), true)
+		el.removeAttributeNS(null, "xlink:ref", "http://localhost")
+		assert.equal("" + el, '<use></use>')
+		assert.equal(el.hasAttributeNS(null, "xlink:ref"), false)
 
 		assert.end()
 	})

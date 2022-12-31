@@ -250,6 +250,12 @@ function unescFn(ent, hex, num) {
 	return num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : unescMap[ent] || ent
 }
 
+;["hasAttribute", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
+	Element[name + "NS"] = function(ns, a, b) {
+		return this[name].call(this, a, b)
+	}
+})
+
 
 function Attr(node, name) {
 	this.ownerElement = node
@@ -321,9 +327,6 @@ extendNode(HTMLElement, Element, {
 	localName: null,
 	tagName: null,
 	styleMap: null,
-	setAttributeNS: function (namespace, name, value) {
-		this.setAttribute(name, value)
-	},
 	focus: function() {
 		this.ownerDocument.activeElement = this
 	},
