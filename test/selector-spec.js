@@ -1,19 +1,19 @@
 describe("Selectors", function() {
 	var undef
-	, test = describe.test
 	, DOM = require("../")
 	, document = DOM.document
 
 
-	function append_el(id, parent, tag) {
+	function append_el(id, parent, tag, content) {
 		var el = document.createElement(tag || "div")
 		el.id = id
+		if (content) el.textContent = content
 		parent.appendChild(el)
 		return el
 	}
 
-
-	test("getElementById, getElementsByTagName, getElementsByClassName, querySelector", function (assert) {
+	this
+	.test("getElementById, getElementsByTagName, getElementsByClassName, querySelector", function (assert) {
 		document = new DOM.Document()
 
 		var result
@@ -96,8 +96,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-
-	test("Element.matches and Element.closest", function (assert) {
+	.test("Element.matches and Element.closest", function (assert) {
 		document = new DOM.Document()
 
 		var el1   = append_el(1, document.body, "div")
@@ -124,6 +123,10 @@ describe("Selectors", function() {
 		in1.disabled = true
 		in2.required = true
 
+		assert.throws(function() { el1.matches({}) })
+		assert.throws(function() { el1.matches([]) })
+
+		assert.equal(el1.matches(null), false)
 		assert.equal(el1.matches("div"), true)
 		assert.equal(el1.matches("div, span"), true)
 		assert.equal(el1.matches("span"), false)
@@ -146,6 +149,8 @@ describe("Selectors", function() {
 
 		assert.equal(el1.matches("div ~ div"), false)
 		assert.equal(s1.matches("div ~ span"), true)
+		assert.equal(s1.matches("div~ span"), true)
+		assert.equal(s1.matches("div ~span"), true)
 		assert.equal(s2.matches("div ~ span"), true)
 		assert.equal(s2.matches("div ~ div"), false)
 
@@ -261,6 +266,7 @@ describe("Selectors", function() {
 		assert.equal(el1.matches("div:not(:only-of-type)"), false)
 
 		assert.equal(el1.matches("div:is(:first-child, :last-child)"), true)
+		assert.equal(el1.matches("div:is(:not(:last-child))"), true)
 		assert.equal(el1.matches("div:last-child"), false)
 		assert.equal(el1.matches("div:not(:last-child)"), true)
 		assert.equal(el1.matches("div:is(:first-child, :last-child)"), true)
@@ -280,7 +286,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	test(":nth-child selector", function (assert) {
+	.test(":nth-child selector", function (assert) {
 		document = new DOM.Document()
 		var el = document.body
 		, p1   = append_el("p1", el, "p")
@@ -341,7 +347,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	test(":nth-last-child selector", function (assert) {
+	.test(":nth-last-child selector", function (assert) {
 		document = new DOM.Document()
 		var el = document.body
 		, p1   = append_el("p1", el, "p")
@@ -405,9 +411,9 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	test(":lang() selector", function (assert) {
-		document = new DOM.Document()
-		var el = document.body
+	.test(":lang() selector", function (assert) {
+		var document = new DOM.Document()
+		, el = document.body
 		, p1   = append_el("p1", el, "p")
 		, p2   = append_el("p2", el, "p")
 		, p3   = append_el("p3", p1, "p")
@@ -425,5 +431,33 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
+	.test(":contains() selector", function (assert) {
+		var document = new DOM.Document()
+		, el = document.body
+		, p1   = append_el(1, el, "p", "ab cd")
+		, p2   = append_el(2, el, "p", "ab")
+		, p3   = append_el(3, el, "a", "cd")
+		, p4   = append_el(4, el, "a", "ef")
 
+		assert.equal(el.querySelectorAll(":contains(ab)")
+		, [p1, p2])
+
+		assert.equal(el.querySelectorAll(":contains(cd)")
+		, [p1, p3])
+
+		assert.equal(el.querySelectorAll("a:contains(cd)")
+		, [p3])
+
+		assert.equal(el.querySelectorAll("a:contains(cd)~a")
+		, [p4])
+
+		assert.equal(el.querySelectorAll("a:contains(cd) ~ a")
+		, [p4])
+
+		assert.equal(el.querySelectorAll(":contains(g)")
+		, [])
+
+		assert.end()
+	})
 })
+
