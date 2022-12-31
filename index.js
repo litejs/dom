@@ -16,7 +16,7 @@ var boolAttrs = {
 	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
 , hasOwn = voidElements.hasOwnProperty
-, selector = require("selector-lite")
+, selector = require("./selector.js")
 , Node = {
 	ELEMENT_NODE:                1,
 	TEXT_NODE:                   3,
