@@ -1,6 +1,5 @@
 describe("Selectors", function() {
-	var undef
-	, DOM = require("../")
+	var DOM = require("../")
 	, document = DOM.document
 
 

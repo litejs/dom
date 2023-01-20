@@ -10,13 +10,12 @@
 
 
 !function(exports) {
-	var undef
+	var selectorCache = {
+		"": function() {}
+	}
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
 	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\.|[^\\"])*?"|'(?:\\.|[^\\'])*?'|\((?:[^()]|\([^()]+\))+?\))+$)/
-	, selectorCache = {
-		"": function() {}
-	}
 	, selectorMap = {
 		"contains": "_.textContent.indexOf(v)>-1",
 		"empty": "!_.lastChild",
