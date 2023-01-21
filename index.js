@@ -37,7 +37,7 @@ var boolAttrs = {
 	},
 	get textContent() {
 		return this.hasChildNodes() ? this.childNodes.map(function(child) {
-			return child[ child.nodeType == 3 ? "data" : "textContent" ]
+			return child[ child.nodeType === 3 ? "data" : "textContent" ]
 		}).join("") : this.nodeType === 3 ? this.data : ""
 	},
 	set textContent(text) {
@@ -67,27 +67,30 @@ var boolAttrs = {
 		, doc = node.ownerDocument || node
 		, tagRe = /<(!--([\s\S]*?)--!?|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/g
 		, attrRe = /([^= ]+)(?:\s*=\s*(("|')((?:\\\3|.)*?)\3|[-.:\w]+)|)/g
+		, frag = doc.createDocumentFragment()
+		, tree = frag
 
 		for (; node.firstChild; ) node.removeChild(node.firstChild)
 
 		for (; (match = tagRe.exec(html)); ) {
 			if (match[3]) {
-				node = node.parentNode
+				tree = tree.parentNode || tree
 			} else if (match[4]) {
 				child = doc.contentType === "text/html" ? doc.createElement(match[4]) : doc.createElementNS(null, match[4])
 				if (match[5]) {
 					match[5].replace(attrRe, setAttr)
 				}
-				node.appendChild(child)
-				if (!voidElements[child.tagName] && !match[6]) node = child
+				tree.appendChild(child)
+				if (!voidElements[child.tagName] && !match[6]) tree = child
 			} else if (match[2]) {
-				node.appendChild(doc.createComment(match[2].replace(unescRe, unescFn)))
+				tree.appendChild(doc.createComment(match[2].replace(unescRe, unescFn)))
 			} else if (match[1]) {
-				node.appendChild(doc.createDocumentType(match[1]))
+				tree.appendChild(doc.createDocumentType(match[1]))
 			} else {
-				node.appendChild(doc.createTextNode(match[0].replace(unescRe, unescFn)))
+				tree.appendChild(doc.createTextNode(match[0].replace(unescRe, unescFn)))
 			}
 		}
+		node.appendChild(frag)
 
 		return html
 
@@ -138,7 +141,7 @@ var boolAttrs = {
 		var node = this
 		, childs = node.childNodes
 
-		if (el.nodeType == 11) {
+		if (el.nodeType === 11) {
 			while (el.firstChild) node.insertBefore(el.firstChild, ref)
 		} else {
 			if (el.parentNode) el.parentNode.removeChild(el)
@@ -146,11 +149,9 @@ var boolAttrs = {
 
 			// If ref is null, insert el at the end of the list of children.
 			childs.splice(ref ? childs.indexOf(ref) : childs.length, 0, el)
-			if (node.nodeType == 9) {
-				ref = node.firstChild
-				if (ref && ref.nodeType !== 1) ref = ref.nextElementSibling
-				node.documentElement = ref
-				node.body = ref ? ref.querySelector("body") : null
+			if (node.nodeType === 9 && el.nodeType === 1) {
+				node.documentElement = el
+				node.body = el.querySelector("body")
 			}
 		}
 		return el
@@ -245,7 +246,6 @@ var boolAttrs = {
 	"&deg;": "°", "&euro;": "€", "&gt;": ">", "&lt;": "<", "&nbsp;": " ",
 	"&plusmn;": "±", "&pound;": "£", "&quot;": "\"", "&reg;": "®",
 	"&sect;": "§", "&sup2;": "²", "&sup3;": "³", "&yen;": "¥"
-
 }
 
 function escFn(chr) {
