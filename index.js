@@ -333,12 +333,6 @@ extendNode(HTMLElement, Element, {
 	localName: null,
 	tagName: null,
 	styleMap: null,
-	focus: function() {
-		this.ownerDocument.activeElement = this
-	},
-	blur: function() {
-		this.ownerDocument.activeElement = null
-	},
 	toString: function(minify) {
 		var attrs = (minify ? this.attributes.map(minifyMap) : this.attributes).join(" ")
 		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
