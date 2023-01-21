@@ -1,0 +1,19 @@
+
+describe("XMLHttpRequest", function() {
+	var XMLHttpRequest = require("../xmlhttprequest.js").XMLHttpRequest
+
+	it("make request", function (assert) {
+		var xhr = new XMLHttpRequest()
+		xhr.open("GET", "https://litejs.com")
+		xhr.responseType = "document"
+		xhr.onload = function() {
+			var doc = xhr.responseXML
+			console.log(xhr.responseText)
+			console.log(doc)
+			assert.equal(doc.documentElement.nodeName, "HTML")
+			assert.end()
+		}
+		xhr.send()
+	})
+})
+
