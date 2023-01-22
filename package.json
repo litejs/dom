@@ -1,6 +1,6 @@
 {
   "name": "dom-lite",
-  "version": "22.10.0",
+  "version": "23.1.0",
   "description": "A small DOM implementation for server-side",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -28,7 +28,8 @@
     "jshint": "2.13.6"
   },
   "litejs": {
-    "build": "lj build --readme index.js"
+    "build": false,
+    "global": false
   },
   "jshintConfig": {
     "esversion": 5,
