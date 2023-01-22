@@ -8,9 +8,8 @@ describe("XMLHttpRequest", function() {
 		xhr.responseType = "document"
 		xhr.onload = function() {
 			var doc = xhr.responseXML
-			console.log(xhr.responseText)
-			console.log(doc)
 			assert.equal(doc.documentElement.nodeName, "HTML")
+			assert.equal(doc.querySelector("title").textContent, "LiteJS")
 			assert.end()
 		}
 		xhr.send()

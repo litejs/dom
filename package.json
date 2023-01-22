@@ -13,10 +13,12 @@
   ],
   "files": [
     "index.js",
-    "selector.js"
+    "interactive.js",
+    "selector.js",
+    "xmlhttprequest.js"
   ],
   "scripts": {
-    "test": "c8 -r lcov -r text-summary --check-coverage --100 lj test --brief test/index.js && lj lint"
+    "test": "c8 -r lcov -r text-summary --check-coverage --100 lj test --brief test/index.js && jshint *.js"
   },
   "repository": "github:litejs/dom-lite",
   "bugs": "https://github.com/litejs/dom-lite/issues",
@@ -26,8 +28,7 @@
     "jshint": "2.13.6"
   },
   "litejs": {
-    "build": "lj build --readme index.js",
-    "lint": "jshint *.js"
+    "build": "lj build --readme index.js"
   },
   "jshintConfig": {
     "esversion": 5,

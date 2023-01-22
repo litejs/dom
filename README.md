@@ -11,7 +11,7 @@ DOM lite &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 ========
 
 A small DOM implementation
-where most of DOM attributes and methods from document are implemented.
+for testing, server-side rendering and working with html files.
 
 
 Examples
@@ -19,7 +19,20 @@ Examples
 
 ```javascript
 const { document, DOMParser, XMLSerializer } = require("dom-lite");
+const { XMLHttpRequest } = require("dom-lite/xmlhttprequest");
 
+// Use XMLHttpRequest in server side
+var xhr = new XMLHttpRequest()
+xhr.open("GET", "https://litejs.com")
+xhr.responseType = "document"
+xhr.onload = function() {
+	var doc = xhr.responseXML
+	// Work with DOM in familiar way
+	console.log(doc.querySelector("title").textContent)
+}
+xhr.send()
+
+// Build DOM manually
 const el = document.createElement("h1");
 el.id = 123;
 el.className = "large";
@@ -53,10 +66,8 @@ Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide)
 Run tests
 
 ```
-npm install -g jshint c8
 npm install
 npm test
-jshint *.js
 ```
 
 
@@ -72,7 +83,7 @@ jshint *.js
 
 ## Licence
 
-Copyright (c) 2014-2022 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2014-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [The MIT License](http://lauri.rooden.ee/mit-license.txt)
 
 
