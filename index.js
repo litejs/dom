@@ -238,7 +238,7 @@ var boolAttrs = {
 		return selector.find(this, sel)
 	}
 }
-, quotRe = /[^-.:\w]/
+, quotedAttrRe = /[\s"'`=<>]/
 , escRe = /<|&(?=[a-z#])/gi
 , unescRe = /&\w+;|&#(x|)([\da-f]+);/ig
 , unescMap = {
@@ -275,7 +275,7 @@ Attr.prototype = {
 		if (hasOwn.call(boolAttrs, this.name)) return this.name
 		var value = this.value.replace(escRe, escFn)
 		if (minify) {
-			if (!quotRe.test(value)) return this.name + "=" + this.value
+			if (!quotedAttrRe.test(value)) return this.name + "=" + this.value
 			if (value.split("\"").length > value.split("'").length) return this.name + "='" + value.replace(/'/g, "&#39;") + "'"
 		}
 		return this.name + "=\"" + value.replace(/"/g, "&quot;") + "\""

@@ -12,6 +12,8 @@ describe("parser", function() {
 		assert.matchSnapshot("./test/samp1.html", function(str) {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
+			assert.equal(document.querySelector("span").textContent, "&<>'\"")
+			assert.equal(document.querySelector("span").name, "&<>'\"")
 			return document.toString().replace(/--!>/g, "-->").replace(/=""/g, "")
 		})
 		assert.end()
