@@ -15,6 +15,7 @@ body { background-image: url("marble.png?width=300&height=300") }
 document.write("<");
 //]]>
 </script>
+<script type="module" src="main.js"></script> <script nomodule src="fallback.js"></script>
 <style type="text/css">.class{position:absolute;}</style></head>
 <body onload="alert('&quot;code&quot;');" class="reset page">
     <ul class="gr">
@@ -27,8 +28,8 @@ document.write("<");
 				<td>B</td>
 		</tr></tbody>
 	</table>
-	<iframe tabindex="-1" style="display:none">
-	</iframe>
-</div>
+	<iframe tabindex="-1" style="display:none"></iframe>
+	</div>
 </body>
 </html>
+

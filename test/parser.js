@@ -3,6 +3,7 @@ describe("parser", function() {
 	require("@litejs/cli/snapshot")
 
 	var DOM = require("../")
+	, parser = new DOM.DOMParser()
 	, fs = require("fs")
 	, path = require("path")
 	, test = describe.test
@@ -28,6 +29,9 @@ describe("parser", function() {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
 			return document.toString(true)
+		})
+		assert.matchSnapshot("./test/atom.xml", function(str) {
+			return parser.parseFromString(str, "application/xml").toString(true)
 		})
 		assert.end()
 	})

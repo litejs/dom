@@ -9,7 +9,11 @@
 
 
 var boolAttrs = {
-	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, selected:1
+	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:1
+}
+, defaultAttrs = {
+	"form method get":1, "input type text":1,
+	"script type text/javascript":1, "style type text/css": 1
 }
 , voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
@@ -272,11 +276,14 @@ Attr.prototype = {
 	get value() { return this.ownerElement.getAttribute(this.name) },
 	set value(val) { this.ownerElement.setAttribute(this.name, val) },
 	toString: function(minify) {
-		if (hasOwn.call(boolAttrs, this.name)) return this.name
 		var value = this.value.replace(escRe, escFn)
-		if (minify) {
-			if (!quotedAttrRe.test(value)) return this.name + "=" + this.value
-			if (value.split("\"").length > value.split("'").length) return this.name + "='" + value.replace(/'/g, "&#39;") + "'"
+		if (this.ownerElement.ownerDocument.contentType !== "application/xml") {
+			if (hasOwn.call(boolAttrs, this.name)) return this.name
+			if (minify) {
+				if (hasOwn.call(defaultAttrs, (this.ownerElement.tagName + " " + this.name + " " + value).toLowerCase())) return
+				if (!quotedAttrRe.test(value)) return this.name + "=" + this.value
+				if (value.split("\"").length > value.split("'").length) return this.name + "='" + value.replace(/'/g, "&#39;") + "'"
+			}
 		}
 		return this.name + "=\"" + value.replace(/"/g, "&quot;") + "\""
 	}
@@ -334,7 +341,7 @@ extendNode(HTMLElement, Element, {
 	tagName: null,
 	styleMap: null,
 	toString: function(minify) {
-		var attrs = (minify ? this.attributes.map(minifyMap) : this.attributes).join(" ")
+		var attrs = (minify ? this.attributes.map(minifyMap).filter(Boolean) : this.attributes).join(" ")
 		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
 		(voidElements[this.tagName] ? "" : Node.toString.call(this, minify) + "</" + this.localName + ">")
 	}
