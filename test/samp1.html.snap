@@ -27,7 +27,7 @@ document.write("<");
 				<td>B</td>
 		</tr></tbody>
 	</table>
-	<iframe tabindex="-1" style="display: none">
+	<iframe tabindex="-1" style="display:none">
 	</iframe>
 </div>
 </body>

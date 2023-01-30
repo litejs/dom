@@ -108,7 +108,7 @@ describe("DOM lite", function() {
 		testAttr("id", "123")
 		testAttr("class", "my-class", "className")
 		testAttr("for", "my-field", "htmlFor")
-		testAttr("style", "top: 1px")
+		testAttr("style", "top:1px")
 		testAttr("title", "Header")
 		testAttr("href", "#123")
 		testAttr("href", "http://example.com")
@@ -134,7 +134,7 @@ describe("DOM lite", function() {
 
 		assert.equal(el.style.top, "1px")
 		assert.equal(el.style.backgroundColor, "blue")
-		assert.equal(el.style + "", "top: 1px; background-color: blue; float: left")
+		assert.equal(el.style + "", "top:1px;background-color:blue;float:left")
 		assert.end()
 	})
 
@@ -165,7 +165,7 @@ describe("DOM lite", function() {
 		assert.strictEqual(el.ownerDocument, clone.ownerDocument)
 		assert.strictEqual(el.ownerDocument, deepClone.ownerDocument)
 
-		assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top: 5px\"><img></h1>")
+		assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top:5px\"><img></h1>")
 
 		clone.id = 2
 		assert.equal(el.id, 1)
@@ -320,13 +320,13 @@ describe("DOM lite", function() {
 
 		h1.style.top = "5px"
 		h1.style.left = "15px"
-		assert.equal(""+h1, '<h1 id="123" class="my-class" style="top: 5px; left: 15px"></h1>')
+		assert.equal(""+h1, '<h1 id="123" class="my-class" style="top:5px;left:15px"></h1>')
 		assert.equal(h1.attributes.length, 3)
 		assert.equal(h1.attributes[2].name, "style")
-		assert.equal(h1.attributes[2].value, "top: 5px; left: 15px")
+		assert.equal(h1.attributes[2].value, "top:5px;left:15px")
 
 		h1.attributes[2].value = "top: 15px;"
-		assert.equal(h1.attributes[2].value, "top: 15px")
+		assert.equal(h1.attributes[2].value, "top:15px")
 
 		h1.removeAttribute('style')
 		h1.removeAttribute('class')

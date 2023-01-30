@@ -293,8 +293,8 @@ function StyleMap(style) {
 StyleMap.prototype.valueOf = function() {
 	var styleMap = this
 	return Object.keys(styleMap).map(function(key) {
-		return (key == "cssFloat" ? "float: " : hyphenCase(key) + ": ") + styleMap[key]
-	}).join("; ")
+		return (key == "cssFloat" ? "float:" : hyphenCase(key) + ":") + styleMap[key]
+	}).join(";")
 }
 
 function DocumentFragment() {
