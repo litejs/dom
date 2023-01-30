@@ -9,7 +9,7 @@
 
 
 var boolAttrs = {
-	async:1, checked:1, defer:1, disabled:1, multiple:1, readonly:1, selected:1
+	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, selected:1
 }
 , voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
