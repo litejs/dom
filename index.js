@@ -16,8 +16,7 @@ var boolAttrs = {
 	"script type text/javascript":1, "style type text/css": 1
 }
 , voidElements = {
-	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1,
-	KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
+	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1, KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
 , hasOwn = voidElements.hasOwnProperty
 , selector = require("./selector.js")
@@ -46,7 +45,7 @@ var boolAttrs = {
 	},
 	set textContent(text) {
 		if (this.nodeType === 3) return (this.data = text)
-		for (var node = this; node.firstChild;) node.removeChild(node.firstChild)
+		for (var node = this; node.firstChild; ) node.removeChild(node.firstChild)
 		node.appendChild(node.ownerDocument.createTextNode(text))
 	},
 	get firstChild() {
@@ -86,12 +85,12 @@ var boolAttrs = {
 				}
 				tree.appendChild(child)
 				if (!voidElements[child.tagName] && !match[6]) tree = child
-			} else if (match[2]) {
-				tree.appendChild(doc.createComment(match[2].replace(unescRe, unescFn)))
-			} else if (match[1]) {
-				tree.appendChild(doc.createDocumentType(match[1]))
 			} else {
-				tree.appendChild(doc.createTextNode(match[0].replace(unescRe, unescFn)))
+				tree.appendChild(
+					match[2] ? doc.createComment(match[2].replace(unescRe, unescFn)) :
+					match[1] ? doc.createDocumentType(match[1]) :
+					doc.createTextNode(match[0].replace(unescRe, unescFn))
+				)
 			}
 		}
 		node.appendChild(frag)
@@ -146,7 +145,7 @@ var boolAttrs = {
 		, childs = node.childNodes
 
 		if (el.nodeType === 11) {
-			while (el.firstChild) node.insertBefore(el.firstChild, ref)
+			for (; el.firstChild; ) node.insertBefore(el.firstChild, ref)
 		} else {
 			if (el.parentNode) el.parentNode.removeChild(el)
 			el.parentNode = node
@@ -163,7 +162,7 @@ var boolAttrs = {
 	removeChild: function(el) {
 		var node = this
 		, index = node.childNodes.indexOf(el)
-		if (index == -1) throw Error("NOT_FOUND_ERR")
+		if (index === -1) throw Error("NOT_FOUND_ERR")
 
 		node.childNodes.splice(index, 1)
 		el.parentNode = null
@@ -211,7 +210,7 @@ var boolAttrs = {
 	},
 	hasAttribute: function(name) {
 		name = escapeAttributeName(name)
-		return name != "style" ? hasOwn.call(this, name) :
+		return name !== "style" ? hasOwn.call(this, name) :
 		!!(this.styleMap && Object.keys(this.styleMap).length)
 	},
 	getAttribute: function(name) {
@@ -266,7 +265,6 @@ function unescFn(ent, hex, num) {
 	}
 })
 
-
 function Attr(node, name) {
 	this.ownerElement = node
 	this.name = name.toLowerCase()
@@ -290,18 +288,16 @@ Attr.prototype = {
 }
 
 function StyleMap(style) {
-	var styleMap = this
 	if (style) style.split(/\b\s*;\s*/g).forEach(function(val) {
 		val = val.split(/\b\s*:\s*/)
-		if (val[1]) styleMap[val[0] == "float" ? "cssFloat" : camelCase(val[0])] = val[1]
-	})
+		if (val[1]) this[val[0] === "float" ? "cssFloat" : camelCase(val[0])] = val[1]
+	}, this)
 }
 
 StyleMap.prototype.valueOf = function() {
-	var styleMap = this
-	return Object.keys(styleMap).map(function(key) {
-		return (key == "cssFloat" ? "float:" : hyphenCase(key) + ":") + styleMap[key]
-	}).join(";")
+	return Object.keys(this).map(function(key) {
+		return (key === "cssFloat" ? "float:" : hyphenCase(key) + ":") + this[key]
+	}, this).join(";")
 }
 
 function DocumentFragment() {
@@ -341,7 +337,7 @@ extendNode(HTMLElement, Element, {
 	tagName: null,
 	styleMap: null,
 	toString: function(minify) {
-		var attrs = (minify ? this.attributes.map(minifyMap).filter(Boolean) : this.attributes).join(" ")
+		var attrs = (minify ? this.attributes.map(toMinString).filter(Boolean) : this.attributes).join(" ")
 		return "<" + this.localName + (attrs ? " " + attrs + (attrs.slice(-1) === "/" ? " >" : ">") : ">") +
 		(voidElements[this.tagName] ? "" : Node.toString.call(this, minify) + "</" + this.localName + ">")
 	}
@@ -475,7 +471,7 @@ function hyphenCase(str) {
 	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
 }
 
-function minifyMap(item) {
+function toMinString(item) {
 	return item.toString(true)
 }
 
