@@ -14,7 +14,7 @@ describe("parser", function() {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
 			assert.equal(document.querySelector("span").textContent, "&<>'\"")
-			assert.equal(document.querySelector("span").name, "&<>'\"")
+			assert.equal(document.querySelector("span").title, "&<>'\"")
 			return document.toString().replace(/--!>/g, "-->").replace(/=""/g, "")
 		})
 		assert.end()
@@ -40,9 +40,9 @@ describe("parser", function() {
 		var document = readDom("./test/samp1.html")
 
 		var header = document.getElementById("header")
-		, table = document.getElementsByTagName("table")[0]
+		, body = document.getElementsByTagName("body")[0]
 		, comment = header.firstChild
-		, comment2 = table.firstChild
+		, comment2 = body.firstChild
 		assert.equal(comment.nodeType, 8)
 		assert.equal(comment.data, "My favorite operators are > and <!")
 		assert.equal(comment2.nodeType, 8)

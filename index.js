@@ -342,7 +342,7 @@ extendNode(HTMLElement, Element, {
 	styleMap: null,
 	toString: function(minify) {
 		var attrs = (minify ? this.attributes.map(minifyMap).filter(Boolean) : this.attributes).join(" ")
-		return "<" + this.localName + (attrs ? " " + attrs : "") + ">" +
+		return "<" + this.localName + (attrs ? " " + attrs + (attrs.slice(-1) === "/" ? " >" : ">") : ">") +
 		(voidElements[this.tagName] ? "" : Node.toString.call(this, minify) + "</" + this.localName + ">")
 	}
 })
