@@ -68,8 +68,8 @@ var boolAttrs = {
 		var match, child
 		, node = this
 		, doc = node.ownerDocument || node
-		, tagRe = /<(!--([\s\S]*?)--!?|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)([^>]*?)(\/?)>|[^<]+/g
-		, attrRe = /([^= ]+)(?:\s*=\s*(("|')((?:\\\3|.)*?)\3|[-.:\w]+)|)/g
+		, tagRe = /<(!--([\s\S]*?)--!?|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)((?:("|')(?:\\\6|.)*?\6|[^>])*?)(\/?)>|[^<]+/g
+		, attrRe = /([^= ]+)(?:\s*=\s*(("|')((?:\\\3|.)*?)\3|[^\s"'`=<>]+)|)/g
 		, frag = doc.createDocumentFragment()
 		, tree = frag
 
@@ -84,7 +84,7 @@ var boolAttrs = {
 					match[5].replace(attrRe, setAttr)
 				}
 				tree.appendChild(child)
-				if (!voidElements[child.tagName] && !match[6]) tree = child
+				if (!voidElements[child.tagName] && !match[7]) tree = child
 			} else {
 				tree.appendChild(
 					match[2] ? doc.createComment(match[2].replace(unescRe, unescFn)) :
@@ -416,7 +416,7 @@ function XMLSerializer() {}
 
 DOMParser.prototype.parseFromString = function(str, mime) {
 	var doc = new Document()
-	doc.contentType = mime
+	doc.contentType = mime || "text/html"
 	doc.documentElement.outerHTML = str
 	return doc
 }

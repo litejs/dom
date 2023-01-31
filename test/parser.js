@@ -20,11 +20,13 @@ describe("parser", function() {
 		assert.end()
 	})
 	test("minify", function (assert) {
+		var minSamp1
 		assert.matchSnapshot("./test/samp1.html", function(str) {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
-			return document.toString(true)
+			return (minSamp1 = document.toString(true))
 		})
+		assert.equal(parser.parseFromString(minSamp1).toString(true), minSamp1)
 		assert.matchSnapshot("./test/samp2.html", function(str) {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
