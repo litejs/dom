@@ -1,8 +1,6 @@
 
 
 /**
- * @version    22.9.0
- * @date       2022-09-26
  * @author     Lauri Rooden <lauri@rooden.ee>
  * @license    MIT License
  */
