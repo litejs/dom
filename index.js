@@ -39,12 +39,12 @@ var boolAttrs = {
 		return this.nodeType === 3 || this.nodeType === 8 ? (this.data = text) : null
 	},
 	get textContent() {
-		return this.hasChildNodes() ? this.childNodes.map(function(child) {
-			return child[ child.nodeType === 3 ? "data" : "textContent" ]
-		}).join("") : this.nodeType === 3 ? this.data : ""
+		return this.nodeType === 3 || this.nodeType === 8 ? this.data : this.childNodes.map(function(child) {
+			return child.textContent
+		}).join("")
 	},
 	set textContent(text) {
-		if (this.nodeType === 3) return (this.data = text)
+		if (this.nodeType === 3 || this.nodeType === 8) return (this.data = text)
 		for (var node = this; node.firstChild; ) node.removeChild(node.firstChild)
 		node.appendChild(node.ownerDocument.createTextNode(
 			rawTextEscape[node.tagName] ? text.replace(rawTextEscape[node.tagName], "<\\") : text
@@ -461,8 +461,7 @@ function getSibling(node, step, type) {
 
 function escAttr(name) {
 	name = name.toLowerCase()
-	if (name === "constructor" || name === "attributes") return name.toUpperCase()
-	return name
+	return name === "constructor" || name === "attributes" ? name.toUpperCase() : name
 }
 
 function camelCase(str) {
