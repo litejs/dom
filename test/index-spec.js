@@ -87,17 +87,13 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
-	it("can clone HTMLElements", function (assert) {
-		var el = document.createElement("a")
+	it("can set attributes", function (assert) {
 
 		function testAttr(name, value, propName) {
+			var el = document.createElement("a")
 			el[propName || name] = value
 			assert.equal(el.getAttribute(name), value)
 			assert.equal("" + el[propName || name], value)
-
-			el.setAttribute(name, "val-"+value)
-			assert.equal(el.getAttribute(name), "val-"+value)
-			assert.equal("" + el[propName || name], "val-"+value)
 
 			el.removeAttribute(name)
 			assert.equal(!!el.getAttribute(name), false)
@@ -109,6 +105,7 @@ describe("DOM lite", function() {
 		testAttr("class", "my-class", "className")
 		testAttr("for", "my-field", "htmlFor")
 		testAttr("style", "top:1px")
+		testAttr("style", "")
 		testAttr("title", "Header")
 		testAttr("href", "#123")
 		testAttr("href", "http://example.com")

@@ -214,21 +214,18 @@ var boolAttrs = {
 		return getSibling(this, -1, 1)
 	},
 	hasAttribute: function(name) {
-		name = escapeAttributeName(name)
-		return name !== "style" ? hasOwn.call(this, name) :
-		!!(this.styleMap && Object.keys(this.styleMap).length)
+		name = escAttr(name)
+		return hasOwn.call(this, name === "style" ? "styleMap" : name)
 	},
 	getAttribute: function(name) {
-		name = escapeAttributeName(name)
-		return this.hasAttribute(name) ? "" + this[name] : null
+		return this.hasAttribute(name) ? "" + this[escAttr(name)] : null
 	},
 	setAttribute: function(name, value) {
-		this[escapeAttributeName(name)] = "" + value
+		this[escAttr(name)] = "" + value
 	},
 	removeAttribute: function(name) {
-		name = escapeAttributeName(name)
-		this[name] = ""
-		delete this[name]
+		name = escAttr(name)
+		delete this[name === "style" ? "styleMap" : name]
 	},
 	getElementById: function(id) {
 		return selector.find(this, "#" + id, 1)
@@ -327,8 +324,8 @@ extendNode(HTMLElement, Element, {
 		var key
 		, attrs = []
 		, el = this
-		for (key in el) if (key === escapeAttributeName(key) && el.hasAttribute(key))
-			attrs.push(new Attr(el, escapeAttributeName(key)))
+		for (key in el) if (key === escAttr(key) && el.hasAttribute(key))
+			attrs.push(new Attr(el, escAttr(key)))
 		return attrs
 	},
 	matches: function(sel) {
@@ -462,7 +459,7 @@ function getSibling(node, step, type) {
 	return type > 0 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
 }
 
-function escapeAttributeName(name) {
+function escAttr(name) {
 	name = name.toLowerCase()
 	if (name === "constructor" || name === "attributes") return name.toUpperCase()
 	return name
