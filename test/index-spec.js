@@ -128,10 +128,12 @@ describe("DOM lite", function() {
 
 		el.style.backgroundColor = "blue"
 		el.style.cssFloat = "left"
+		el.style.border="4px solid black"
 
 		assert.equal(el.style.top, "1px")
 		assert.equal(el.style.backgroundColor, "blue")
-		assert.equal(el.style + "", "top:1px;background-color:blue;float:left")
+		assert.equal(el.style.border, "4px solid black")
+		assert.equal(el.style + "", "top:1px;background-color:blue;float:left;border:4px solid black")
 		assert.end()
 	})
 

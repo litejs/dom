@@ -290,10 +290,9 @@ Attr.prototype = {
 }
 
 function StyleMap(style) {
-	if (style) style.split(/\b\s*;\s*/g).forEach(function(val) {
-		val = val.split(/\b\s*:\s*/)
-		if (val[1]) this[val[0] === "float" ? "cssFloat" : camelCase(val[0])] = val[1]
-	}, this)
+	for (var m, re = /([^;\s]+)\s*:([^;]+)/g; (m = re.exec(style)); ) {
+		this[m[1] === "float" ? "cssFloat" : camelCase(m[1])] = m[2].trim()
+	}
 }
 
 StyleMap.prototype.valueOf = function() {
