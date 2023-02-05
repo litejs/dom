@@ -16,6 +16,8 @@ var boolAttrs = {
 , voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1, KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
+, rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
+, rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
 , selector = require("./selector.js")
 , Node = {
@@ -44,7 +46,9 @@ var boolAttrs = {
 	set textContent(text) {
 		if (this.nodeType === 3) return (this.data = text)
 		for (var node = this; node.firstChild; ) node.removeChild(node.firstChild)
-		node.appendChild(node.ownerDocument.createTextNode(text))
+		node.appendChild(node.ownerDocument.createTextNode(
+			rawTextEscape[node.tagName] ? text.replace(rawTextEscape[node.tagName], "<\\") : text
+		))
 	},
 	get firstChild() {
 		return this.childNodes && this.childNodes[0] || null
@@ -63,31 +67,34 @@ var boolAttrs = {
 		return Node.toString.call(this)
 	},
 	set innerHTML(html) {
-		var match, child
+		var child, m, re, text
 		, node = this
 		, doc = node.ownerDocument || node
-		, tagRe = /<(!--([\s\S]*?)--!?|!\[[\s\S]*?\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)((?:("|')(?:\\\6|[\s\S])*?\6|[^>])*?)(\/?)>|[^<]+/g
+		, tagRe = /<(!--([\s\S]*?)--!?|!\[CDATA\[([\s\S]*?)\]\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)((?:("|')(?:\\\7|[\s\S])*?\7|[^>])*?)(\/?)>|[^<]+|</g
 		, attrRe = /([^= ]+)(?:\s*=\s*(("|')((?:\\\3|[\s\S])*?)\3|[^\s"'`=<>]+)|)/g
 		, frag = doc.createDocumentFragment()
 		, tree = frag
 
 		for (; node.firstChild; ) node.removeChild(node.firstChild)
 
-		for (; (match = tagRe.exec(html)); ) {
-			if (match[3]) {
+		for (; (m = tagRe.exec(html)); ) {
+			if (m[4]) {
 				tree = tree.parentNode || tree
-			} else if (match[4]) {
-				child = doc.contentType === "text/html" ? doc.createElement(match[4]) : doc.createElementNS(null, match[4])
-				if (match[5]) {
-					match[5].replace(attrRe, setAttr)
+			} else if (m[5]) {
+				child = doc.contentType === "text/html" ? doc.createElement(m[5]) : doc.createElementNS(null, m[5])
+				if (m[6]) {
+					m[6].replace(attrRe, setAttr)
 				}
 				tree.appendChild(child)
-				if (!voidElements[child.tagName] && !match[7]) tree = child
+				if ((re = rawTextElements[child.tagName])) {
+					for (text = ""; (m = tagRe.exec(html)) && !re.test(m[0]); text += m[3] || m[2] || m[0]);
+					child.textContent = text.replace(unescRe, unescFn)
+				} else if (!voidElements[child.tagName] && !m[8]) tree = child
 			} else {
 				tree.appendChild(
-					match[2] ? doc.createComment(match[2].replace(unescRe, unescFn)) :
-					match[1] ? doc.createDocumentType(match[1]) :
-					doc.createTextNode(match[0].replace(unescRe, unescFn))
+					m[2] ? doc.createComment(m[2].replace(unescRe, unescFn)) :
+					m[1] ? doc.createDocumentType(m[1]) :
+					doc.createTextNode(m[0].replace(unescRe, unescFn))
 				)
 			}
 		}
@@ -188,7 +195,7 @@ var boolAttrs = {
 		return clone
 	},
 	toString: function(minify) {
-		return this.hasChildNodes() ? this.childNodes.reduce(function(memo, node) {
+		return rawTextElements[this.tagName] ? this.textContent : this.hasChildNodes() ? this.childNodes.reduce(function(memo, node) {
 			return memo + node.toString(minify)
 		}, "") : ""
 	}

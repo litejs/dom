@@ -19,19 +19,39 @@ describe("parser", function() {
 		})
 		assert.end()
 	})
-	test("minify", function (assert) {
-		var minSamp1
+	test("minify samp1.html", function (assert) {
 		assert.matchSnapshot("./test/samp1.html", function(str) {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
-			return (minSamp1 = document.toString(true))
+			var script = document.querySelector("script")
+			, result = document.toString(true)
+			assert.equal(
+				script.textContent,
+				"\ndocument.write('<p>ETAGO delimiter</p><script>console.log(\"A\")<\\/script><script>console.log(\"B\")<\\/script>')\n"
+			)
+			script.textContent = "document.write('<script>alert(\"<!--\")</script><script>alert(\"--!>\")</script>')"
+			assert.equal(
+				script.textContent,
+				"document.write('<script>alert(\"<\\!--\")<\\/script><script>alert(\"--!>\")<\\/script>')"
+			)
+			return result
 		})
-		assert.equal(parser.parseFromString(minSamp1).toString(true), minSamp1)
+		assert.end()
+	})
+	test("parse and reminify samp1.html.snap1", function (assert) {
+		var src = fs.readFileSync(path.resolve("./test/samp1.html.snap1"), "utf8").trim()
+		assert.equal(parser.parseFromString(src).toString(true), src)
+		assert.end()
+	})
+	test("minify samp2.html", function (assert) {
 		assert.matchSnapshot("./test/samp2.html", function(str) {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
 			return document.toString(true)
 		})
+		assert.end()
+	})
+	test("minify atom.xml", function (assert) {
 		assert.matchSnapshot("./test/atom.xml", function(str) {
 			return parser.parseFromString(str, "application/xml").toString(true)
 		})
@@ -42,9 +62,8 @@ describe("parser", function() {
 		var document = readDom("./test/samp1.html")
 
 		var header = document.getElementById("header")
-		, body = document.getElementsByTagName("body")[0]
 		, comment = header.firstChild
-		, comment2 = body.firstChild
+		, comment2 = document.body.firstChild
 		assert.equal(comment.nodeType, 8)
 		assert.equal(comment.data, "My favorite operators are > and <!")
 		assert.equal(comment2.nodeType, 8)

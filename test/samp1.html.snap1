@@ -1,7 +1,14 @@
-<!DOCTYPE html><html lang=en data-a=http://www.w3.org/1999/xhtml data-b=http://opengraphprotocol.org/schema/ ><head><title>1 + 2 = 3</title><meta http-equiv=Content-Type content="text/html; charset=utf-8"><style>/*<![CDATA[*/
-body { background-image: url("marble.png?width=300&height=300") }
-/*]]>*/</style><link rel=stylesheet type=text/css href=styles/a.css?123><script async src=http://www.google-analytics.com/ga.js></script><script>//<![CDATA[
-document.write("<");
-//]]></script><script type=module src=main.js></script><script nomodule src=fallback.js></script><style>.class{position:absolute;}</style></head><body onload="
-	alert('&quot;code&quot;');
+<!DOCTYPE html><html lang=en data-a=http://www.w3.org/1999/xhtml data-b=http://opengraphprotocol.org/schema/ ><head><title>1 + 2 = 3</title><meta http-equiv=Content-Type content="text/html; charset=utf-8"><style>
+/**/
+body { background-image: url("CDATA-in-block-comment.png?width=300&height=300") }
+/**/
+</style><link rel=stylesheet type=text/css href=styles/a.css?123><script>
+document.write('<p>ETAGO delimiter</p><script>console.log("A")<\/script><script>console.log("B")<\/script>')
+</script><script async src=http://www.google-analytics.com/ga.js></script><script>
+//
+document.write("< CDATA with line comment");
+if (a > 12) throw "a <\!---->not <\!-- --> 12"
+//
+</script><script type=module src=main.js></script><script nomodule src=fallback.js></script><style>.class{position:absolute;}</style></head><body onload="
+	console.log('&quot;code&quot;');
 " class="reset page"><ul class=gr><li class=home><span title="&&lt;>'&quot;">&&lt;>'"</span><img src=home.gif alt=Home></li></ul><div id=header class=tpl-header><iframe tabindex=-1 style=display:none></iframe></div></body></html>

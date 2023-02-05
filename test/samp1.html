@@ -4,21 +4,25 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <style type="text/css">
 /*<![CDATA[*/
-body { background-image: url("marble.png?width=300&height=300") }
+body { background-image: url("CDATA-in-block-comment.png?width=300&height=300") }
 /*]]>*/
 </style>
 <link rel="stylesheet" type="text/css" href="styles/a.css?123">
 <!--[if lt IE 8]><link rel="stylesheet" type="text/css" href="styles/ie.css?123"><![endif]-->
+<script>
+document.write('<p>ETAGO delimiter</p><script>console.log("A")<\/script><script>console.log("B")<\/script>')
+</script>
 <script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
 <script type="text/javascript" >
 //<![CDATA[
-document.write("<");
+document.write("< CDATA with line comment");
+if (a > 12) throw "a <!---->not <!-- --> 12"
 //]]>
 </script>
 <script type="module" src="main.js"></script> <script nomodule src="fallback.js"></script>
 <style type="text/css">.class{position:absolute;}</style></head>
 <body onload="
-	alert('&quot;code&quot;');
+	console.log('&quot;code&quot;');
 " class="reset page"><!-- table --!>
     <ul class="gr">
             <li class="home"><span title="&amp;&lt;&gt;&apos;&quot;">&amp;&lt;&gt;&apos;&quot;</span ><img src="home.gif" alt="Home"></li>
