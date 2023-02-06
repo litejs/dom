@@ -286,7 +286,7 @@ Attr.prototype = {
 }
 
 function StyleMap(style) {
-	for (var m, re = /([^;\s]+)\s*:([^;]+)/g; (m = re.exec(style)); ) {
+	for (var m, re = /(?:^|;)\s*([-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)(?=;|$)/ig; (m = re.exec(style)); ) {
 		this[m[1] === "float" ? "cssFloat" : camelCase(m[1])] = m[2].trim()
 	}
 }

@@ -24,6 +24,7 @@ describe("parser", function() {
 			var document = new DOM.Document()
 			document.documentElement.outerHTML = str
 			var script = document.querySelector("script")
+			, ul = document.getElementsByClassName("gr")[0]
 			, result = document.toString(true)
 			assert.equal(
 				script.textContent,
@@ -33,6 +34,10 @@ describe("parser", function() {
 			assert.equal(
 				script.textContent,
 				"document.write('<script>alert(\"<\\!--\")<\\/script><script>alert(\"--!>\")<\\/script>')"
+			)
+			assert.equal(
+				ul.style.backgroundImage,
+				"url('https://1.1.1.1:80/i.png')"
 			)
 			return result
 		})
