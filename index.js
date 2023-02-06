@@ -133,10 +133,8 @@ var boolAttrs = {
 	set style(value) {
 		this.styleMap = new StyleMap(value)
 	},
-	contains: function (targetNode) {
-		for (; targetNode; targetNode = targetNode.parentNode) {
-			if (targetNode === this) return true
-		}
+	contains: function (el) {
+		for (; el; el = el.parentNode) if (el === this) return true
 		return false
 	},
 	hasChildNodes: function() {
