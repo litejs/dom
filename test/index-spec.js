@@ -346,6 +346,27 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
+	it("has replaceChildren", function (assert) {
+		var el = document.createElement("el")
+		, a1 = document.createElement("a")
+		, a2 = document.createElement("b")
+
+		assert.equal(el.childNodes, [])
+
+		el.replaceChildren(a1)
+		assert.equal(el.childNodes, [a1])
+
+		el.replaceChildren(a2)
+		assert.equal(el.childNodes, [a2])
+
+		el.replaceChildren()
+		assert.equal(el.childNodes, [])
+
+		el.replaceChildren(a1, a2)
+		assert.equal(el.childNodes, [a1, a2])
+		assert.end()
+	})
+
 	it("has documentFragment", function (assert) {
 		var frag = document.createDocumentFragment()
 

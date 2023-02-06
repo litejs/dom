@@ -45,9 +45,8 @@ var boolAttrs = {
 	},
 	set textContent(text) {
 		if (this.nodeType === 3 || this.nodeType === 8) return (this.data = text)
-		for (var node = this; node.firstChild; ) node.removeChild(node.firstChild)
-		node.appendChild(node.ownerDocument.createTextNode(
-			rawTextEscape[node.tagName] ? text.replace(rawTextEscape[node.tagName], "<\\") : text
+		replaceChildren.call(this, this.ownerDocument.createTextNode(
+			rawTextEscape[this.tagName] ? text.replace(rawTextEscape[this.tagName], "<\\") : text
 		))
 	},
 	get firstChild() {
@@ -75,8 +74,6 @@ var boolAttrs = {
 		, frag = doc.createDocumentFragment()
 		, tree = frag
 
-		for (; node.firstChild; ) node.removeChild(node.firstChild)
-
 		for (; (m = tagRe.exec(html)); ) {
 			if (m[4]) {
 				tree = tree.parentNode || tree
@@ -98,7 +95,7 @@ var boolAttrs = {
 				)
 			}
 		}
-		node.appendChild(frag)
+		replaceChildren.call(node, frag)
 
 		return html
 
@@ -211,6 +208,7 @@ var boolAttrs = {
 	get previousElementSibling() {
 		return getSibling(this, -1, 1)
 	},
+	replaceChildren: replaceChildren,
 	hasAttribute: function(name) {
 		name = escAttr(name)
 		return hasOwn.call(this, name === "style" ? "styleMap" : name)
@@ -441,6 +439,11 @@ function extendNode(obj, extras) {
 		}
 	}
 	obj.prototype.constructor = obj
+}
+
+function replaceChildren() {
+	for (var arr = this.childNodes, i = 0, l = arr && arr.length; i < l; ) arr[i++].parentNode = null
+	for (i = arr.length = 0, l = arguments.length; i < l; ) this.insertBefore(arguments[i++])
 }
 
 function getElement(childs, index, step, type) {
