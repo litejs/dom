@@ -300,6 +300,13 @@ describe("DOM lite", function() {
 		assert.equal(h1.getAttribute("ID"), "123")
 		assert.equal(h1.getAttribute("ID2"), "321")
 
+		h1.setAttribute("id3", "")
+		assert.equal(h1.hasAttribute("ID3"), true)
+		assert.equal(h1.getAttribute("ID3"), "")
+		assert.equal(h1.matches("[ID3]"), true)
+		assert.equal(h1.matches("[ID3='']"), true)
+		h1.removeAttribute("id3")
+
 		h1.removeAttribute("id2")
 		assert.equal(h1.getAttribute("id"), "123")
 		assert.equal(h1.getAttribute("id2"), null)

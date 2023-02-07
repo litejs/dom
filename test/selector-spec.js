@@ -198,6 +198,16 @@ describe("Selectors", function() {
 		assert.equal(s2.matches('[data-x4="a,b)"]'), true)
 		assert.equal(s2.matches('[data-x4="a,b("]'), false)
 
+		assert.equal(s2.matches('[data-x5]'), false)
+		assert.equal(s2.matches('[data-x5=""]'), false)
+		assert.equal(s2.matches("[data-x5='']"), false)
+		s2.setAttribute("data-x5", "")
+		assert.equal(s2.matches('[data-x5]'), true)
+		assert.equal(s2.matches('[data-x5=""]'), true)
+		assert.equal(s2.matches("[data-x5='']"), true)
+		assert.equal(s2.matches('[data-x5][data-x5=""]'), true)
+		assert.equal(s2.matches("[data-x5][data-x5='']"), true)
+
 		assert.equal(s2.matches('div, [data-x1="a,b]"]'), true)
 		assert.equal(s2.matches('div, [data-x1="a,b["]'), false)
 		assert.equal(s2.matches('div, [data-x2="a,b["]'), true)
