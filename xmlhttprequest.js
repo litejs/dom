@@ -1,7 +1,8 @@
-
+/* global unescape */
 
 var DOM = require(".")
 , parser = new DOM.DOMParser()
+, dataUrlRe = /^data:([^;,]*?)(;[^,]+?|),(.*)$/
 
 function XMLHttpRequest() {}
 
@@ -9,6 +10,7 @@ function setState(xhr, state) {
 	if (xhr.readyState !== state) {
 		xhr.readyState = state
 		if (xhr.onreadystatechange) xhr.onreadystatechange()
+		if (state === xhr.DONE && xhr.onload) xhr.onload()
 	}
 }
 
@@ -69,26 +71,38 @@ XMLHttpRequest.prototype = {
 		}
 
 		if (proto === "http" || proto === "https") {
-			return require(proto).request(url, opts, next).end(data)
+			require(proto).request(url, opts, function(res) {
+				head(res.statusCode, res.statusMessage, res.headers)
+				res.on("data", body)
+				res.on("end", done)
+			}).end(data)
+			return
+		}
+		if (proto === "data") {
+			var match = dataUrlRe.exec(url)
+			if (!match) throw Error("Invalid URL: " + url)
+			setTimeout(function() {
+				head(200, "OK", { "content-type": match[1] || "text/plain" })
+				body(match[2] ? Buffer.from(match[3], "base64") : unescape(match[3]))
+				done()
+			}, 1)
+			return
 		}
 
 		throw Error("Unsuported protocol: " + proto)
-		function next(res) {
-			xhr.status = res.statusCode
-			xhr.statusText = res.statusMessage
-			xhr._headers = res.headers
 
-			res.on("data", function(chunk) {
-				xhr.responseText += chunk.toString("utf8")
-				setState(xhr, xhr.LOADING)
-			})
-
-			res.on("end", function() {
-				setState(xhr, xhr.DONE)
-				if (xhr.onload) xhr.onload()
-			})
-
+		function head(code, text, headers) {
+			xhr.status = code
+			xhr.statusText = text
+			xhr._headers = headers
 			setState(xhr, xhr.HEADERS_RECEIVED)
+		}
+		function body(chunk) {
+			xhr.responseText += chunk.toString("utf8")
+			setState(xhr, xhr.LOADING)
+		}
+		function done() {
+			setState(xhr, xhr.DONE)
 		}
 	}
 }

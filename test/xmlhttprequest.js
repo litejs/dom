@@ -57,6 +57,8 @@ describe("XMLHttpRequest", function() {
 		xhr.open("GET", "https://litejs.com")
 		xhr.onreadystatechange = mock.fn()
 		xhr.onload = function() {
+			assert.equal(xhr.status, 200)
+			assert.equal(xhr.statusText, "OK")
 			assert.equal(xhr.responseXML, null)
 			assert.type(xhr.responseText, "string")
 			assert.type(xhr.getAllResponseHeaders(), "string")
@@ -66,6 +68,37 @@ describe("XMLHttpRequest", function() {
 		assert.equal(xhr.getAllResponseHeaders(), null)
 		assert.equal(xhr.getResponseHeader("content-type"), null)
 		xhr.send()
+	})
+
+	describe("Data URLs", function() {
+		var table = [
+			[ "data:,Hello%2C%20World%21", "text/plain", "Hello, World!" ],
+			[ "data:text/html,%3Ch1%3EHello%2C%20World%21%3C%2Fh1%3E", "text/html", "<h1>Hello, World!</h1>" ],
+			[ "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==", "text/plain", "Hello, World!" ],
+			[ "data:text/javascript,console.log('a')", "text/javascript", "console.log('a')" ]
+		]
+
+		it("throws on invalid Data URL", function(assert) {
+			assert.throws(function() {
+				var xhr = new XMLHttpRequest()
+				xhr.open("GET", "data:Hello")
+				xhr.send()
+			})
+			assert.end()
+		})
+
+		table.forEach(function(data, i) {
+			it("handles data " + i, function(assert) {
+				var xhr = new XMLHttpRequest()
+				xhr.open("GET", data[0])
+				xhr.onload = function() {
+					assert.equal(xhr.getResponseHeader("content-type"), data[1])
+					assert.equal(xhr.responseText, data[2])
+					assert.end()
+				}
+				xhr.send()
+			})
+		})
 	})
 })
 
