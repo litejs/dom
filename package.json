@@ -1,13 +1,14 @@
 {
-  "name": "dom-lite",
+  "name": "@litejs/dom",
   "version": "23.2.1",
-  "description": "A small DOM implementation for server-side",
+  "description": "A small DOM library for server-side testing, rendering, and handling of HTML files",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
   "keywords": [
     "document",
     "dom",
     "DOMParser",
+    "XMLHttpRequest",
     "XMLSerializer",
     "litejs"
   ],
@@ -20,8 +21,8 @@
   "scripts": {
     "test": "c8 -r lcov -r text-summary --check-coverage --100 lj test --brief test/index.js && jshint *.js"
   },
-  "repository": "github:litejs/dom-lite",
-  "bugs": "https://github.com/litejs/dom-lite/issues",
+  "repository": "github:litejs/dom",
+  "bugs": "https://github.com/litejs/dom/issues",
   "devDependencies": {
     "@litejs/cli": "23.2.0",
     "c8": "7.12.0",

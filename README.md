@@ -1,25 +1,24 @@
 
-[1]: https://badgen.net/coveralls/c/github/litejs/dom-lite
-[2]: https://coveralls.io/r/litejs/dom-lite
-[3]: https://badgen.net/packagephobia/install/dom-lite
-[4]: https://packagephobia.now.sh/result?p=dom-lite
+[1]: https://badgen.net/coveralls/c/github/litejs/dom
+[2]: https://coveralls.io/r/litejs/dom
+[3]: https://badgen.net/packagephobia/install/@litejs/dom
+[4]: https://packagephobia.now.sh/result?p=@litejs/dom
 [5]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
 [6]: https://www.buymeacoffee.com/lauriro
 
 
-DOM lite &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
-========
+LiteJS DOM &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
+==========
 
-A small DOM implementation
-for testing, server-side rendering and working with html files.
+A small DOM library for server-side testing, rendering, and handling of HTML files.
 
 
 Examples
 --------
 
 ```javascript
-const { document, DOMParser, XMLSerializer } = require("dom-lite");
-const { XMLHttpRequest } = require("dom-lite/xmlhttprequest");
+const { document, DOMParser, XMLSerializer } = require("@litejs/dom");
+const { XMLHttpRequest } = require("@litejs/dom/xmlhttprequest");
 
 // Use XMLHttpRequest in server side
 var xhr = new XMLHttpRequest()
@@ -73,8 +72,8 @@ npm test
 
 ## External links
 
-[GitHub repo](https://github.com/litejs/dom-lite) |
-[npm package](https://npmjs.org/package/dom-lite) |
+[GitHub repo](https://github.com/litejs/dom) |
+[npm package](https://npmjs.org/package/@litejs/dom) |
 [DOM spec](https://dom.spec.whatwg.org/) |
 [Selectors Level 3](http://www.w3.org/TR/selectors/) |
 [Coveralls coverage][2]  
