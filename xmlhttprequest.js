@@ -28,7 +28,6 @@ XMLHttpRequest.prototype = {
 	get responseXML() {
 		var xhr = this
 		, mime = (xhr.getResponseHeader("Content-Type") || "").split(";")[0]
-		console.log("Mime", mime)
 		return (
 			xhr.readyState !== xhr.DONE ? null :
 			// XMLHttpRequest spec originally supported only XML
@@ -46,9 +45,12 @@ XMLHttpRequest.prototype = {
 		var xhr = this
 		return xhr.readyState >= xhr.HEADERS_RECEIVED && xhr._headers[name.toLowerCase()] || null
 	},
+	abort: function() {
+		throw Error("XMLHttpRequest abort/reuse not implemented")
+	},
 	open: function (method, url, async) {
 		var xhr = this
-		if (async === false) throw Error("Not implemented: async == false")
+		if (async === false) throw Error("XMLHttpRequest sync not implemented")
 
 		if (xhr.readyState > xhr.UNSENT) {
 			xhr.abort()
@@ -60,11 +62,18 @@ XMLHttpRequest.prototype = {
 	},
 	send: function (data) {
 		var xhr = this
-		, proto = xhr.responseURL.split(":")[0]
+		, url = xhr.responseURL
+		, proto = url.split(":", 1)[0]
 		, opts = {
 			method: xhr.method
 		}
-		, req = require(proto).request(xhr.responseURL, opts, function(res) {
+
+		if (proto === "http" || proto === "https") {
+			return require(proto).request(url, opts, next).end(data)
+		}
+
+		throw Error("Unsuported protocol: " + proto)
+		function next(res) {
 			xhr.status = res.statusCode
 			xhr.statusText = res.statusMessage
 			xhr._headers = res.headers
@@ -80,9 +89,7 @@ XMLHttpRequest.prototype = {
 			})
 
 			setState(xhr, xhr.HEADERS_RECEIVED)
-		})
-
-		req.end(data)
+		}
 	}
 }
 
