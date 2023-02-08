@@ -110,8 +110,61 @@ XMLHttpRequest.prototype = {
 	}
 }
 
+function fetch(url, opts_) {
+	return new Promise(function(resolve, reject) {
+		var xhr = new XMLHttpRequest()
+		, opts = Object.assign({ method: "GET", headers: {} }, opts_)
+		xhr.open(opts.method || "GET", url, true)
+		xhr.onload = function() {
+			resolve(new Response(xhr.responseText, {
+				ok: xhr.status >= 200 && xhr.status < 300,
+				url: xhr.responseURL,
+				headers: xhr._headers
+			}))
+		}
+		xhr.onerror = reject
+		for (var key in opts.headers) {
+			xhr.setRequestHeader(key, opts.headers[key])
+		}
+		xhr.send(opts.body || null)
+
+	})
+}
+
+function Headers(init) {
+	this._map = init || {}
+}
+Headers.prototype = {
+	keys: function() {
+		return Object.keys(this._map)
+	},
+	entries: function() {
+		return Object.entries(this._map)
+	},
+	get: function(name) {
+		return this._map[name] || null
+	},
+	has: function(name) {
+		return this.get(name) !== null
+	}
+}
+
+function Response(body, opts) {
+	var response = Object.assign(this, opts)
+	, headers = opts.headers || {}
+
+	if (!(headers instanceof Headers)) response.headers = new Headers(headers)
+	response.text = function() {
+		return Promise.resolve(body)
+	}
+	response.json = function() {
+		return Promise.resolve(JSON.parse(body))
+	}
+}
+
 
 module.exports = {
-	XMLHttpRequest: XMLHttpRequest
+	XMLHttpRequest: XMLHttpRequest,
+	fetch: fetch
 }
 
