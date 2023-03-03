@@ -51,7 +51,6 @@
 	selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
 
 	function selectorFn(str) {
-		// jshint evil:true, unused:true, eqnull:true
 		if (str != null && typeof str !== "string") throw Error("Invalid selector")
 		return selectorCache[str || ""] ||
 		(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
@@ -85,8 +84,8 @@
 
 
 	function walk(next, first, el, sel, nextFn) {
-		var out = []
-		for (sel = selectorFn(sel); el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
+		sel = selectorFn(sel)
+		for (var out = []; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
 			if (first) return el
 			out.push(el)
 		}
@@ -95,8 +94,7 @@
 
 	function find(node, sel, first) {
 		return walk("firstChild", first, node.firstChild, sel, function(el) {
-			var next = el.nextSibling
-			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+			for (var next = el.nextSibling; !next && ((el = el.parentNode) !== node); ) next = el.nextSibling
 			return next
 		})
 	}
