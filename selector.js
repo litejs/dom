@@ -45,6 +45,8 @@
 		"~~": "p(_,v)",
 		"": "c(_.parentNode,v)"
 	}
+	, closest = exports.closest = walk.bind(exports, "parentNode", 1)
+
 
 	selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
 
@@ -103,10 +105,6 @@
 		return !!selectorFn(sel)(el)
 	}
 
-	function closest(el, sel) {
-		return walk("parentNode", 1, el, sel)
-	}
-
 	function next(el, sel) {
 		return walk("nextSibling", 1, el.nextSibling, sel)
 	}
@@ -115,11 +113,9 @@
 		return walk("previousSibling", 1, el.previousSibling, sel)
 	}
 
-
 	exports.find = find
 	exports.fn = selectorFn
 	exports.matches = matches
-	exports.closest = closest
 	exports.next = next
 	exports.prev = prev
 	exports.selectorMap = selectorMap
