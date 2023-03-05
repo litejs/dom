@@ -1,6 +1,6 @@
 
 describe("XMLHttpRequest", function() {
-	var XMLHttpRequest = require("../xmlhttprequest.js").XMLHttpRequest
+	var XMLHttpRequest = require("../net.js").XMLHttpRequest
 
 	it("throws on invalid protocol", function(assert) {
 		assert.throws(function() {

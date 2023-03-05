@@ -18,7 +18,7 @@ Examples
 
 ```javascript
 const { document, DOMParser, XMLSerializer } = require("@litejs/dom");
-const { XMLHttpRequest } = require("@litejs/dom/xmlhttprequest");
+const { XMLHttpRequest } = require("@litejs/dom/net");
 
 // Use XMLHttpRequest in server side
 var xhr = new XMLHttpRequest()
