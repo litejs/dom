@@ -1,9 +1,6 @@
 
 
-/**
- * @author     Lauri Rooden <lauri@rooden.ee>
- * @license    MIT License
- */
+/*! litejs.com/MIT-LICENSE.txt */
 
 
 var boolAttrs = {
@@ -11,7 +8,7 @@ var boolAttrs = {
 }
 , defaultAttrs = {
 	"form method get":1, "input type text":1,
-	"script type text/javascript":1, "style type text/css": 1
+	"script type text/javascript":1, "style type text/css":1
 }
 , voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1, KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1

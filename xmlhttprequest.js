@@ -1,5 +1,8 @@
 /* global unescape */
 
+/*! litejs.com/MIT-LICENSE.txt */
+
+
 var DOM = require(".")
 , parser = new DOM.DOMParser()
 , dataUrlRe = /^data:([^;,]*?)(;[^,]+?|),(.*)$/

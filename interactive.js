@@ -1,5 +1,8 @@
 
 
+/*! litejs.com/MIT-LICENSE.txt */
+
+
 var DOM = module.exports = require(".")
 , HTMLElementExtra = {
 	focus: function() {

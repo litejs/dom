@@ -1,12 +1,6 @@
 
 
-
-/**
- * @version    20.2.0
- * @author     Lauri Rooden <lauri@rooden.ee>
- * @license    MIT License
- */
-
+/*! litejs.com/MIT-LICENSE.txt */
 
 
 !function(exports) {
