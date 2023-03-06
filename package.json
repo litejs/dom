@@ -16,7 +16,8 @@
     "*.js"
   ],
   "scripts": {
-    "test": "lj test --coverage --ignore=xmlhttprequest.js --brief test/index.js && jshint *.js"
+    "test": "lj test --coverage --ignore=net.js --brief test/index.js && jshint *.js",
+    "test-fast": "lj test --brief test/index.js"
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
