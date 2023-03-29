@@ -1,6 +1,6 @@
 {
   "name": "@litejs/dom",
-  "version": "23.2.2",
+  "version": "23.3.0",
   "description": "A small DOM library for server-side testing, rendering, and handling of HTML files",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -21,7 +21,7 @@
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
-    "@litejs/cli": "23.2.6",
+    "@litejs/cli": "23.3.5",
     "jshint": "2.13.6"
   },
   "litejs": {
