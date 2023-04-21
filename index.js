@@ -473,14 +473,12 @@ function toMinString(item) {
 	return item.toString(true)
 }
 
-module.exports = {
-	document: new Document(),
-	DOMParser: DOMParser,
-	XMLSerializer: XMLSerializer,
-	StyleMap: StyleMap,
-	Node: Node,
-	HTMLElement: HTMLElement,
-	DocumentFragment: DocumentFragment,
-	Document: Document
-}
+exports.document = new Document()
+exports.DOMParser = DOMParser
+exports.XMLSerializer = XMLSerializer
+exports.StyleMap = StyleMap
+exports.Node = Node
+exports.HTMLElement = HTMLElement
+exports.DocumentFragment = DocumentFragment
+exports.Document = Document
 
