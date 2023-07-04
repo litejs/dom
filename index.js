@@ -81,7 +81,7 @@ var boolAttrs = {
 				}
 				tree.appendChild(child)
 				if ((re = rawTextElements[child.tagName])) {
-					for (text = ""; (m = tagRe.exec(html)) && !re.test(m[0]); text += m[3] || m[2] || m[0]);
+					for (text = ""; (m = tagRe.exec(html)) && !re.test(m[0]); text += m[3] || m[0]);
 					child.textContent = text.replace(unescRe, unescFn)
 				} else if (!voidElements[child.tagName] && !m[8]) tree = child
 			} else {
