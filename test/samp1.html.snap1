@@ -11,4 +11,4 @@ if (a > 12) throw "a <\!---->not <\!-- --> 12"
 //
 </script><script type=module src=main.js></script><script nomodule src=fallback.js></script><style>.class{position:absolute;}</style></head><body onload="
 	console.log('&quot;code&quot;');
-" class="reset page"><ul class=gr style="background-image:url('https://1.1.1.1:80/i.png');height:365px"><li class=home><span title="&&lt;>'&quot;">&&lt;>'"</span><img src=home.gif alt=Home></li></ul><div id=header class=tpl-header><iframe tabindex=-1 style=display:none></iframe></div></body></html>
+" class="reset page"><ul class=gr style="background-image:url('https://1.1.1.1:80/i.png');height:365px"><li class=home><span title="&&lt;>'&quot;">&&lt;>'"</span><img src=home.gif alt=Home></li></ul><div id=header class=tpl-header><iframe style=display:none tabindex=-1></iframe></div></body></html>

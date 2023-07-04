@@ -117,7 +117,7 @@ describe("Selectors", function() {
 
 		a1.href = "#A link 1"
 		a1.lang = "en-US"
-		a1.foo = "en'US"
+		a1.setAttribute("foo", "en'US")
 
 		in1.disabled = true
 		in2.required = true

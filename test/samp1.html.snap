@@ -28,7 +28,7 @@ if (a > 12) throw "a <\!---->not <\!-- --> 12"
             <li class="home"><span title="&&lt;>'&quot;">&&lt;>'"</span><img src="home.gif" alt="Home"></li>
     </ul>
         <div id="header" class="tpl-header"><!--My favorite operators are > and <!-->
-	<iframe tabindex="-1" style="display:none"></iframe>
+	<iframe style="display:none" tabindex="-1"></iframe>
 	</div>
 </body>
 </html>

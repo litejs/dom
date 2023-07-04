@@ -137,6 +137,43 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
+	it("can set boolean parameters", [
+		[ "input", "disabled" ]
+	], function (tag, prop, assert) {
+		var el = document.createElement(tag)
+		assert.equal(el.hasAttribute(prop), false)
+
+		assert.equal(el[prop], false)
+		el[prop] = true
+		assert.equal(el.hasAttribute(prop), true)
+		assert.end()
+	})
+
+	it("can set number parameters", [
+		[ "input", "maxLength" ]
+	], function (tag, prop, assert) {
+		var el = document.createElement(tag)
+		assert.equal(el.hasAttribute(prop), false)
+		assert.equal(el.hasAttribute(prop.toUpperCase()), false)
+		assert.equal(el.hasAttribute(prop.toLowerCase()), false)
+
+		assert.equal(el[prop], 0)
+		el[prop] = 3
+		assert.equal(el[prop], 3)
+		assert.equal(el.getAttribute(prop), "3")
+		assert.equal(el.getAttribute(prop.toUpperCase()), "3")
+		assert.equal(el.getAttribute(prop.toLowerCase()), "3")
+
+		el.setAttribute(prop, "4")
+		assert.equal(el[prop], 4)
+		assert.equal(el.getAttribute(prop), "4")
+
+		el.setAttribute(prop, 5)
+		assert.equal(el[prop], 5)
+		assert.equal(el.getAttribute(prop), "5")
+		assert.end()
+	})
+
 	it("can clone HTMLElements", function (assert) {
 		var el, clone, deepClone
 
@@ -154,12 +191,12 @@ describe("DOM lite", function() {
 		assert.equal(el.nodeName, "H1")
 		assert.equal(el.tagName, "H1")
 		assert.equal(el.localName, "h1")
-		assert.equal(el.id, 1)
+		assert.equal(el.id, "1")
 		assert.equal(el.style.top, "5px")
 		assert.equal(clone.nodeName, "H1")
 		assert.equal(clone.tagName, "H1")
 		assert.equal(clone.localName, "h1")
-		assert.equal(clone.id, 1)
+		assert.equal(clone.id, "1")
 		assert.equal(clone.style.top, "5px")
 		assert.strictEqual(el.ownerDocument, clone.ownerDocument)
 		assert.strictEqual(el.ownerDocument, deepClone.ownerDocument)
@@ -167,8 +204,8 @@ describe("DOM lite", function() {
 		assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top:5px\"><img></h1>")
 
 		clone.id = 2
-		assert.equal(el.id, 1)
-		assert.equal(clone.id, 2)
+		assert.equal(el.id, "1")
+		assert.equal(clone.id, "2")
 
 		assert.end()
 	})
@@ -311,8 +348,8 @@ describe("DOM lite", function() {
 		assert.equal(h1.getAttribute("id"), "123")
 		assert.equal(h1.getAttribute("id2"), null)
 		assert.equal(h1.attributes.length, 1)
-		assert.equal(h1.attributes[0].name, "id")
-		assert.equal(h1.attributes[0].value, "123")
+		//assert.equal(h1.attributes[0].name, "id")
+		assert.equal(h1.attributes.id.value, "123")
 
 		assert.equal(h1.getAttribute("toString"), null)
 		assert.equal(""+h1, '<h1 id="123"></h1>')
@@ -320,19 +357,19 @@ describe("DOM lite", function() {
 		h1.className = "my-class"
 		assert.equal(""+h1, '<h1 id="123" class="my-class"></h1>')
 		assert.equal(h1.attributes.length, 2)
-		assert.equal(h1.attributes[1].name, "class")
-		assert.equal(h1.attributes[1].value, "my-class")
+		//assert.equal(h1.attributes[1].name, "class")
+		assert.equal(h1.attributes.class.value, "my-class")
 
 
 		h1.style.top = "5px"
 		h1.style.left = "15px"
 		assert.equal(""+h1, '<h1 id="123" class="my-class" style="top:5px;left:15px"></h1>')
 		assert.equal(h1.attributes.length, 3)
-		assert.equal(h1.attributes[2].name, "style")
-		assert.equal(h1.attributes[2].value, "top:5px;left:15px")
+		//assert.equal(h1.attributes[2].name, "style")
+		assert.equal(h1.attributes.style.value, "top:5px;left:15px")
 
-		h1.attributes[2].value = "top: 15px;"
-		assert.equal(h1.attributes[2].value, "top:15px")
+		//h1.attributes.class.value = "top: 15px;"
+		//assert.equal(h1.attributes.class.value, "top:15px")
 
 		h1.removeAttribute('style')
 		h1.removeAttribute('class')

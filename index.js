@@ -6,6 +6,8 @@
 var boolAttrs = {
 	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:1
 }
+, numAttrs = "height maxLength minLength size tabIndex width"
+, strAttrs = "accept accesskey autocapitalize autofocus capture class contenteditable crossorigin dir for hidden href id integrity lang name nonce slot spellcheck src title type translate"
 , defaultAttrs = {
 	"form method get":1, "input type text":1,
 	"script type text/javascript":1, "style type text/css":1
@@ -109,23 +111,11 @@ var boolAttrs = {
 		this.parentNode.replaceChild(frag, this)
 		return html
 	},
-	get htmlFor() {
-		return this["for"]
-	},
-	set htmlFor(value) {
-		this["for"] = value
-	},
-	get className() {
-		return this["class"] || ""
-	},
-	set className(value) {
-		this["class"] = value
-	},
 	get style() {
-		return this.styleMap || (this.styleMap = new StyleMap())
+		return this._style || (this._style = new CSSStyleDeclaration(this.getAttribute("style") || ""))
 	},
 	set style(value) {
-		this.styleMap = new StyleMap(value)
+		this.setAttribute("style", value)
 	},
 	contains: function (el) {
 		for (; el; el = el.parentNode) if (el === this) return true
@@ -216,18 +206,17 @@ var boolAttrs = {
 	},
 	replaceChildren: replaceChildren,
 	hasAttribute: function(name) {
-		name = escAttr(name)
-		return hasOwn.call(this, name === "style" ? "styleMap" : name)
+		return this.attributes.getNamedItem(name) != null
 	},
 	getAttribute: function(name) {
-		return this.hasAttribute(name) ? "" + this[escAttr(name)] : null
+		var attr = this.attributes.getNamedItem(name)
+		return attr ? attr.value : null
 	},
 	setAttribute: function(name, value) {
-		this[escAttr(name)] = "" + value
+		this.attributes.setNamedItem(name, value)
 	},
 	removeAttribute: function(name) {
-		name = escAttr(name)
-		delete this[name === "style" ? "styleMap" : name]
+		this.attributes.removeNamedItem(name)
 	},
 	getElementsByTagName: function(tag) {
 		return selector.find(this, tag)
@@ -246,6 +235,26 @@ var boolAttrs = {
 	"&sect;": "§", "&sup2;": "²", "&sup3;": "³", "&yen;": "¥"
 }
 
+Object.keys(boolAttrs).forEach(addGetter, { isBool: true })
+numAttrs.split(" ").forEach(addGetter, { isNum: true })
+strAttrs.split(" ").forEach(addGetter, { })
+
+function addGetter(key) {
+	var attr = key.toLowerCase()
+	Object.defineProperty(Element, key == "for" ? "htmlFor" : key == "class" ? "className" : key, {
+		configurable: true,
+		enumerable: true,
+		get: (
+			this.isBool ? function() { return this.hasAttribute(attr) } :
+			this.isNum ? function() { return +this.getAttribute(attr) || 0 } :
+			function() { return this.getAttribute(attr) || "" }
+		),
+		set: function(value) {
+			this.setAttribute(attr, value)
+		}
+	})
+}
+
 function escFn(chr) {
 	return chr === "<" ? "&lt;" : "&amp;"
 }
@@ -260,35 +269,73 @@ function unescFn(ent, hex, num) {
 	}
 })
 
-function Attr(node, name) {
+function Attr(node, name, value) {
 	this.ownerElement = node
 	this.name = name.toLowerCase()
+	this.value = "" + value
 }
 
-Attr.prototype = {
-	get value() { return this.ownerElement.getAttribute(this.name) },
-	set value(val) { this.ownerElement.setAttribute(this.name, val) },
-	toString: function(minify) {
-		var value = this.value.replace(escRe, escFn)
-		if (this.ownerElement.ownerDocument.contentType !== "application/xml") {
-			if (hasOwn.call(boolAttrs, this.name)) return this.name
-			if (minify) {
-				if (hasOwn.call(defaultAttrs, (this.ownerElement.tagName + " " + this.name + " " + value).toLowerCase())) return
-				if (!quotedAttrRe.test(value)) return this.name + "=" + this.value
-				if (value.split("\"").length > value.split("'").length) return this.name + "='" + value.replace(/'/g, "&#39;") + "'"
-			}
+function NamedNodeMap(node) {
+	Object.defineProperty(this, "length", { get: function() { return this.names().length } })
+	Object.defineProperty(this, "ownerElement", { value: node })
+}
+
+NamedNodeMap.prototype = {
+	names: function() {
+		this.getNamedItem("style")
+		return Object.keys(this)
+	},
+	getNamedItem: function(name) {
+		var loName = name.toLowerCase()
+		, attr = this[loName] || null
+		if (loName === "style" && this.ownerElement._style) {
+			if (attr === null) attr = this[loName] = new Attr(this.ownerElement, name, "")
+			attr.value = this.ownerElement._style.valueOf()
+			delete this.ownerElement._style
 		}
-		return this.name + "=\"" + value.replace(/"/g, "&quot;") + "\""
+		return attr
+	},
+	removeNamedItem: function(name) {
+		var loName = name.toLowerCase()
+		, attr = this[loName] || null
+		if (loName === "style") delete this.ownerElement._style
+		if (attr !== null) delete this[loName]
+		return attr
+	},
+	setNamedItem: function(name, value) {
+		this.removeNamedItem(name)
+		var loName = name.toLowerCase()
+		if (loName === "style") value = new CSSStyleDeclaration(value).valueOf()
+		this[loName] = new Attr(this.ownerElement, name, value)
+	},
+	toString: function(minify) {
+		var map = this
+		, tagName = map.ownerElement.tagName
+		, isXml = map.ownerElement.ownerDocument.contentType === "application/xml"
+		return map.names().map(function(loName) {
+			var attr = map.getNamedItem(loName)
+			, name = attr.name
+			, value = attr.value.replace(escRe, escFn)
+			if (!isXml) {
+				if (hasOwn.call(boolAttrs, loName)) return name
+				if (minify) {
+					if (hasOwn.call(defaultAttrs, (tagName + " " + name + " " + value).toLowerCase())) return
+					if (!quotedAttrRe.test(value)) return name + "=" + value
+					if (value.split("\"").length > value.split("'").length) return name + "='" + value.replace(/'/g, "&#39;") + "'"
+				}
+			}
+			return name + "=\"" + value.replace(/"/g, "&quot;") + "\""
+		}).filter(Boolean).join(" ")
 	}
 }
 
-function StyleMap(style) {
+function CSSStyleDeclaration(style) {
 	for (var m, re = /(?:^|;)\s*([-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)(?=;|$)/ig; (m = re.exec(style)); ) {
 		this[m[1] === "float" ? "cssFloat" : camelCase(m[1])] = m[2].trim()
 	}
 }
 
-StyleMap.prototype.valueOf = function() {
+CSSStyleDeclaration.prototype.valueOf = function() {
 	return Object.keys(this).map(function(key) {
 		return (key === "cssFloat" ? "float:" : hyphenCase(key) + ":") + this[key]
 	}, this).join(";")
@@ -305,21 +352,14 @@ extendNode(DocumentFragment, Node, {
 
 function HTMLElement(tag) {
 	var el = this
-	el.nodeName = el.tagName = tag.toUpperCase()
-	el.localName = tag.toLowerCase()
+	el.attributes = new NamedNodeMap(el)
 	el.childNodes = []
+	el.localName = tag.toLowerCase()
+	el.nodeName = el.tagName = tag.toUpperCase()
 }
 
 extendNode(HTMLElement, Element, {
 	nodeType: 1,
-	get attributes() {
-		var key
-		, attrs = []
-		, el = this
-		for (key in el) if (key === escAttr(key) && el.hasAttribute(key))
-			attrs.push(new Attr(el, escAttr(key)))
-		return attrs
-	},
 	matches: function(sel) {
 		return selector.matches(this, sel)
 	},
@@ -329,9 +369,8 @@ extendNode(HTMLElement, Element, {
 	namespaceURI: "http://www.w3.org/1999/xhtml",
 	localName: null,
 	tagName: null,
-	styleMap: null,
 	toString: function(minify) {
-		var attrs = (minify ? this.attributes.map(toMinString).filter(Boolean) : this.attributes).join(" ")
+		var attrs = this.attributes.toString(minify)
 		return "<" + this.localName + (attrs ? " " + attrs + (attrs.slice(-1) === "/" ? " >" : ">") : ">") +
 		(voidElements[this.tagName] ? "" : Node.toString.call(this, minify) + "</" + this.localName + ">")
 	}
@@ -339,9 +378,10 @@ extendNode(HTMLElement, Element, {
 
 function ElementNS(namespace, tag) {
 	var el = this
+	el.attributes = new NamedNodeMap(el)
+	el.childNodes = []
 	el.namespaceURI = namespace
 	el.nodeName = el.tagName = el.localName = tag
-	el.childNodes = []
 }
 
 ElementNS.prototype = HTMLElement.prototype
@@ -456,11 +496,6 @@ function getSibling(node, step, type) {
 	return type > 0 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
 }
 
-function escAttr(name) {
-	name = name.toLowerCase()
-	return name === "constructor" || name === "attributes" ? name.toUpperCase() : name
-}
-
 function camelCase(str) {
 	return str.replace(/-([a-z])/g, function(_, a) { return a.toUpperCase() })
 }
@@ -469,14 +504,10 @@ function hyphenCase(str) {
 	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
 }
 
-function toMinString(item) {
-	return item.toString(true)
-}
-
 exports.document = new Document()
 exports.DOMParser = DOMParser
 exports.XMLSerializer = XMLSerializer
-exports.StyleMap = StyleMap
+exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.Node = Node
 exports.HTMLElement = HTMLElement
 exports.DocumentFragment = DocumentFragment
