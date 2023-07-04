@@ -134,6 +134,9 @@ var boolAttrs = {
 	hasChildNodes: function() {
 		return this.childNodes && this.childNodes.length > 0
 	},
+	getElementById: function(id) {
+		return selector.find(this, "#" + id, 1)
+	},
 	appendChild: function(el) {
 		return this.insertBefore(el)
 	},
@@ -186,6 +189,12 @@ var boolAttrs = {
 		}
 		return clone
 	},
+	querySelector: function(sel) {
+		return selector.find(this, sel, 1)
+	},
+	querySelectorAll: function(sel) {
+		return selector.find(this, sel)
+	},
 	toString: function(minify) {
 		return rawTextElements[this.tagName] ? this.textContent : this.hasChildNodes() ? this.childNodes.reduce(function(memo, node) {
 			return memo + node.toString(minify)
@@ -220,20 +229,11 @@ var boolAttrs = {
 		name = escAttr(name)
 		delete this[name === "style" ? "styleMap" : name]
 	},
-	getElementById: function(id) {
-		return selector.find(this, "#" + id, 1)
-	},
 	getElementsByTagName: function(tag) {
 		return selector.find(this, tag)
 	},
 	getElementsByClassName: function(sel) {
 		return selector.find(this, "." + sel.replace(/\s+/g, "."))
-	},
-	querySelector: function(sel) {
-		return selector.find(this, sel, 1)
-	},
-	querySelectorAll: function(sel) {
-		return selector.find(this, sel)
 	}
 }
 , quotedAttrRe = /[\s"'`=<>]/
