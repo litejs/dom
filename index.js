@@ -235,13 +235,13 @@ var boolAttrs = {
 	"&sect;": "§", "&sup2;": "²", "&sup3;": "³", "&yen;": "¥"
 }
 
-Object.keys(boolAttrs).forEach(addGetter, { isBool: true })
+Object.keys(boolAttrs).forEach(addGetter, { isBool: true, readonly: "readOnly" })
 numAttrs.split(" ").forEach(addGetter, { isNum: true })
-strAttrs.split(" ").forEach(addGetter, { })
+strAttrs.split(" ").forEach(addGetter, { "for": "htmlFor", "class": "className" })
 
 function addGetter(key) {
 	var attr = key.toLowerCase()
-	Object.defineProperty(Element, key == "for" ? "htmlFor" : key == "class" ? "className" : key, {
+	Object.defineProperty(Element, this[key] || key, {
 		configurable: true,
 		enumerable: true,
 		get: (

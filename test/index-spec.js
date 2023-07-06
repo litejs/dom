@@ -138,14 +138,15 @@ describe("DOM lite", function() {
 	})
 
 	it("can set boolean parameters", [
-		[ "input", "disabled" ]
-	], function (tag, prop, assert) {
+		[ "input", "disabled", "disabled" ],
+		[ "input", "readonly", "readOnly" ],
+	], function (tag, attr, prop, assert) {
 		var el = document.createElement(tag)
-		assert.equal(el.hasAttribute(prop), false)
-
+		assert.equal(el.hasAttribute(attr), false)
 		assert.equal(el[prop], false)
+
 		el[prop] = true
-		assert.equal(el.hasAttribute(prop), true)
+		assert.equal(el.hasAttribute(attr), true)
 		assert.end()
 	})
 
