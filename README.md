@@ -12,6 +12,9 @@ LiteJS DOM &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 
 A small DOM library for server-side testing, rendering, and handling of HTML files.
 
+[DOM spec](https://dom.spec.whatwg.org/) |
+[Selectors Level 3](http://www.w3.org/TR/selectors/)
+
 
 Examples
 --------
@@ -61,28 +64,20 @@ el.querySelectorAll("b");
 ## Contributing
 
 Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide)
-
-Run tests
+and run tests.
 
 ```
 npm install
 npm test
 ```
 
-
-## External links
-
-[GitHub repo](https://github.com/litejs/dom) |
-[npm package](https://npmjs.org/package/@litejs/dom) |
-[DOM spec](https://dom.spec.whatwg.org/) |
-[Selectors Level 3](http://www.w3.org/TR/selectors/) |
-[Coveralls coverage][2]  
-[Buy Me A Tea][6]
-
-
 ## Licence
 
 Copyright (c) 2014-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  
-[The MIT License](http://lauri.rooden.ee/mit-license.txt)
+[MIT License](https://litejs.com/MIT-LICENSE.txt) |
+[GitHub repo](https://github.com/litejs/dom) |
+[npm package](https://npmjs.org/package/@litejs/dom) |
+[coverage][2] |
+[Buy Me A Tea][6]
 
 
