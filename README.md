@@ -64,11 +64,8 @@ el.querySelectorAll("b");
 
 Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide)
 and run tests.
+`npm install; npm test`
 
-```
-npm install
-npm test
-```
 
 ## Licence
 
