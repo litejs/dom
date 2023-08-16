@@ -10,8 +10,7 @@
 LiteJS DOM &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 ==========
 
-A small DOM library for server-side testing, rendering, and handling of HTML files.
-
+A small DOM library for server-side testing, rendering, and handling of HTML files.  
 [DOM spec](https://dom.spec.whatwg.org/) |
 [Selectors Level 3](http://www.w3.org/TR/selectors/)
 
