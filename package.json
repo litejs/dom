@@ -16,12 +16,12 @@
     "*.js"
   ],
   "scripts": {
-    "test": "lj test --coverage --ignore=net.js --brief test/index.js && jshint --config .github/jshint.json *.js",
+    "test": "lj test --coverage --ignore=net.js --brief test/index.js && node --import=@litejs/cli/test.js test/run.mjs && jshint --config .github/jshint.json *.js",
     "test-fast": "lj test --brief test/index.js"
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
-    "@litejs/cli": "23.8.0",
+    "@litejs/cli": "23.9.0",
     "jshint": "2.13.6"
   },
   "litejs": {
