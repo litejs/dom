@@ -16,7 +16,7 @@
     "*.js"
   ],
   "scripts": {
-    "test": "lj test --coverage --ignore=net.js --brief test/index.js && node --import=@litejs/cli/test.js test/run.mjs && jshint --config .github/jshint.json *.js",
+    "test": "lj test --coverage --brief test/index.js && node --import=@litejs/cli/test.js test/run.mjs && jshint --config .github/jshint.json *.js",
     "test-fast": "lj test --brief test/index.js"
   },
   "repository": "github:litejs/dom",

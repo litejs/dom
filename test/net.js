@@ -100,5 +100,22 @@ describe("XMLHttpRequest", function() {
 			})
 		})
 	})
+	describe("File URLs", function() {
+		it("reads {0}", [
+			[ "./README.md", 200, "text/plain" ],
+			[ "./bad-file.txt", 404, null ]
+		], function(file, statusCode, type, assert, mock) {
+			mock.swap(XMLHttpRequest, "base", "file://" + process.cwd() + "/")
+			var xhr = new XMLHttpRequest()
+			xhr.open("GET", file)
+			xhr.onload = function() {
+				assert.equal(xhr.status, statusCode)
+				assert.equal(xhr.getResponseHeader("content-type"), type)
+				//assert.equal(xhr.responseText, data[2])
+				assert.end()
+			}
+			xhr.send()
+		})
+	})
 })
 

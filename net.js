@@ -4,8 +4,9 @@
 
 
 var DOM = require(".")
+, URL = require("url").URL
 , parser = new DOM.DOMParser()
-, dataUrlRe = /^data:([^;,]*?)(;[^,]+?|),(.*)$/
+, dataUrlRe = /^([^;,]*?)(;[^,]+?|),(.*)$/
 
 function XMLHttpRequest() {}
 
@@ -67,32 +68,42 @@ XMLHttpRequest.prototype = {
 	},
 	send: function (data) {
 		var xhr = this
-		, url = xhr.responseURL
-		, proto = url.split(":", 1)[0]
-		, opts = {
-			method: xhr.method
-		}
+		, url = new URL(xhr.responseURL, XMLHttpRequest.base)
 
-		if (proto === "http" || proto === "https") {
-			require(proto).request(url, opts, function(res) {
+		if (url.protocol === "http:" || url.protocol === "https:") {
+			url.method = xhr.method
+			require(url.protocol.slice(0, -1)).request(url, function(res) {
 				head(res.statusCode, res.statusMessage, res.headers)
-				res.on("data", body)
+				res.on("data", fillBody)
 				res.on("end", done)
 			}).end(data)
 			return
 		}
-		if (proto === "data") {
-			var match = dataUrlRe.exec(url)
+		if (url.protocol === "data:") {
+			var match = dataUrlRe.exec(url.pathname)
 			if (!match) throw Error("Invalid URL: " + url)
-			setTimeout(function() {
+			process.nextTick(function() {
 				head(200, "OK", { "content-type": match[1] || "text/plain" })
-				body(match[2] ? Buffer.from(match[3], "base64") : unescape(match[3]))
+				fillBody(match[2] ? Buffer.from(match[3], "base64") : unescape(match[3]))
 				done()
-			}, 1)
+			})
 			return
 		}
 
-		throw Error("Unsuported protocol: " + proto)
+		if (url.protocol === "file:") {
+			require("fs").readFile(url, function(err, chunk) {
+				if (err) {
+					head(404, "Not Found", {})
+				} else {
+					head(200, "OK", { "content-type": "text/plain" })
+					fillBody(chunk)
+				}
+				done()
+			})
+			return
+		}
+
+		throw Error("Unsuported protocol in: " + url)
 
 		function head(code, text, headers) {
 			xhr.status = code
@@ -100,7 +111,7 @@ XMLHttpRequest.prototype = {
 			xhr._headers = headers
 			setState(xhr, xhr.HEADERS_RECEIVED)
 		}
-		function body(chunk) {
+		function fillBody(chunk) {
 			xhr.responseText += chunk.toString("utf8")
 			setState(xhr, xhr.LOADING)
 		}
