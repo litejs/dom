@@ -292,6 +292,11 @@ describe("DOM lite", function() {
 
 		assert.equal(node.replaceChild(h1, h2), h2)
 		assert.equal(""+node, mask.replace("%s", "<h1>Head</h1>"))
+		assert.equal(h2.parentNode, null)
+		assert.equal(h2.nextSibling, null)
+		assert.equal(h2.previousSibling, null)
+		assert.equal(h2.nextElementSibling, null)
+		assert.equal(h2.previousElementSibling, null)
 
 		assert.equal(node.appendChild(t1), t1)
 		assert.equal(node.appendChild(h2), h2)

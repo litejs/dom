@@ -493,7 +493,7 @@ function getElement(childs, index, step, type) {
 function getSibling(node, step, type) {
 	var silbings = node.parentNode && node.parentNode.childNodes
 	, index = silbings ? silbings.indexOf(node) : -1
-	return type > 0 ? getElement(silbings, index + step, step, type) : silbings[index + step] || null
+	return type > 0 ? getElement(silbings, index + step, step, type) : silbings && silbings[index + step] || null
 }
 
 function camelCase(str) {
