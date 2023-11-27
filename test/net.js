@@ -39,6 +39,7 @@ describe("XMLHttpRequest", function() {
 	it("make request", function (assert) {
 		assert.setTimeout(5000)
 		var xhr = new XMLHttpRequest()
+		xhr.setRequestHeader("Accept", "text/html")
 		xhr.open("GET", "https://litejs.com")
 		xhr.responseType = "document"
 		xhr.onload = function() {

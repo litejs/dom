@@ -8,7 +8,13 @@ var DOM = require(".")
 , parser = new DOM.DOMParser()
 , dataUrlRe = /^([^;,]*?)(;[^,]+?|),(.*)$/
 
-function XMLHttpRequest() {}
+XMLHttpRequest.defaultHeaders = {
+	accept: ["Accept", "*/*"]
+}
+
+function XMLHttpRequest() {
+	this._reqHeaders = Object.assign({}, XMLHttpRequest.defaultHeaders)
+}
 
 function setState(xhr, state) {
 	if (xhr.readyState !== state) {
@@ -51,6 +57,9 @@ XMLHttpRequest.prototype = {
 		var xhr = this
 		return xhr.readyState >= xhr.HEADERS_RECEIVED && xhr._headers[name.toLowerCase()] || null
 	},
+	setRequestHeader: function(name, value) {
+		this._reqHeaders[name.toLowerCase()] = [name, value]
+	},
 	abort: function() {
 		throw Error("XMLHttpRequest abort/reuse not implemented")
 	},
@@ -72,6 +81,11 @@ XMLHttpRequest.prototype = {
 
 		if (url.protocol === "http:" || url.protocol === "https:") {
 			url.method = xhr.method
+			url.headers = Object.keys(xhr._reqHeaders).reduce(function(result, key) {
+				var entrie = xhr._reqHeaders[key]
+				result[entrie[0]] = entrie[1]
+				return result
+			}, {})
 			require(url.protocol.slice(0, -1)).request(url, function(res) {
 				head(res.statusCode, res.statusMessage, res.headers)
 				res.on("data", fillBody)
