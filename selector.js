@@ -69,7 +69,7 @@
 					return ""
 				})
 
-				if (tag && tag != "*") rules[0] += "&&_.tagName=='" + tag.toUpperCase() + "'"
+				if (tag && tag != "*") rules[0] += "&&_.tagName==(_.namespaceURI?'" + tag.toUpperCase() + "':'" + tag + "')"
 				if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
 				return rules.join("&&")
 			}).join("||") + "}"
@@ -106,7 +106,6 @@
 	}
 
 	exports.find = find
-	exports.fn = selectorFn
 	exports.matches = matches
 	exports.next = next
 	exports.prev = prev

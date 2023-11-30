@@ -22,6 +22,8 @@ describe("DOMParser", function() {
 		assert.equal(doc.documentElement.nodeName, "q")
 		assert.equal(doc.documentElement.namespaceURI, null)
 		assert.equal(doc.contentType, "application/xml")
+		assert.equal(doc.querySelector("Span"), null)
+		assert.equal(doc.querySelector("span").textContent, "hey!")
 		assert.equal(serializer.serializeToString(doc), xmlStr)
 
 		assert.end()
