@@ -1,7 +1,5 @@
 
-
 /*! litejs.com/MIT-LICENSE.txt */
-
 
 var boolAttrs = {
 	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:1
@@ -227,8 +225,8 @@ var boolAttrs = {
 }
 , quotedAttrRe = /[\s"'`=<>]/
 , escRe = /<|&(?=[a-z#])/gi
-, unescRe = /&\w+;|&#(x|)([\da-f]+);/ig
-, unescMap = {
+, unescRe = /&[a-z]{1,31};?|&#(x|)([\da-f]+);/ig
+, entities = {
 	"&amp;": "&", "&apos;": "'", "&cent;": "¢", "&copy;": "©", "&curren;": "¤",
 	"&deg;": "°", "&euro;": "€", "&gt;": ">", "&lt;": "<", "&nbsp;": " ",
 	"&plusmn;": "±", "&pound;": "£", "&quot;": "\"", "&reg;": "®",
@@ -260,7 +258,7 @@ function escFn(chr) {
 }
 
 function unescFn(ent, hex, num) {
-	return num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : unescMap[ent] || ent
+	return num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : entities[ent] || ent
 }
 
 ;["hasAttribute", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
@@ -507,6 +505,7 @@ function hyphenCase(str) {
 exports.document = new Document()
 exports.DOMParser = DOMParser
 exports.XMLSerializer = XMLSerializer
+exports.entities = entities
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.Node = Node
 exports.HTMLElement = HTMLElement
