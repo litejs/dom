@@ -33,7 +33,7 @@ var boolAttrs = {
 		return this.nodeType === 3 || this.nodeType === 8 ? this.data : null
 	},
 	set nodeValue(text) {
-		return this.nodeType === 3 || this.nodeType === 8 ? (this.data = text) : null
+		if (this.nodeType === 3 || this.nodeType === 8) this.data = text
 	},
 	get textContent() {
 		return this.nodeType === 3 || this.nodeType === 8 ? this.data : this.childNodes.map(function(child) {
@@ -41,8 +41,8 @@ var boolAttrs = {
 		}).join("")
 	},
 	set textContent(text) {
-		if (this.nodeType === 3 || this.nodeType === 8) return (this.data = text)
-		replaceChildren.call(this, this.ownerDocument.createTextNode(
+		if (this.nodeType === 3 || this.nodeType === 8) this.data = text
+		else replaceChildren.call(this, this.ownerDocument.createTextNode(
 			rawTextEscape[this.tagName] ? text.replace(rawTextEscape[this.tagName], "<\\") : text
 		))
 	},
@@ -94,8 +94,6 @@ var boolAttrs = {
 		}
 		replaceChildren.call(node, frag)
 
-		return html
-
 		function setAttr(_, name, value, q, qvalue) {
 			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
 		}
@@ -107,7 +105,6 @@ var boolAttrs = {
 		var frag = this.ownerDocument.createDocumentFragment()
 		frag.innerHTML = html
 		this.parentNode.replaceChild(frag, this)
-		return html
 	},
 	get style() {
 		return this._style || (this._style = new CSSStyleDeclaration(this.getAttribute("style") || ""))
