@@ -474,7 +474,7 @@ function extendNode(obj, extras) {
 }
 
 function replaceChildren() {
-	for (var arr = this.childNodes, i = 0, l = arr && arr.length; i < l; ) arr[i++].parentNode = null
+	for (var arr = this.childNodes, i = 0, l = arr.length; i < l; ) arr[i++].parentNode = null
 	for (i = arr.length = 0, l = arguments.length; i < l; ) this.insertBefore(arguments[i++])
 }
 
