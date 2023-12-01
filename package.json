@@ -21,10 +21,7 @@
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
-    "@litejs/cli": "23.9.0",
+    "@litejs/cli": "23.11.1",
     "jshint": "2.13.6"
-  },
-  "litejs": {
-    "build": false
   }
 }

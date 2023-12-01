@@ -503,12 +503,12 @@ function hyphenCase(str) {
 }
 
 exports.document = new Document()
-exports.DOMParser = DOMParser
-exports.XMLSerializer = XMLSerializer
 exports.entities = entities
 exports.CSSStyleDeclaration = CSSStyleDeclaration
-exports.Node = Node
-exports.HTMLElement = HTMLElement
-exports.DocumentFragment = DocumentFragment
+exports.DOMParser = DOMParser
 exports.Document = Document
+exports.DocumentFragment = DocumentFragment
+exports.HTMLElement = HTMLElement
+exports.Node = Node
+exports.XMLSerializer = XMLSerializer
 
