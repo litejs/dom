@@ -20,7 +20,7 @@ Examples
 
 ```javascript
 const { document, DOMParser, XMLSerializer } = require("@litejs/dom");
-const { XMLHttpRequest } = require("@litejs/dom/net");
+const { XMLHttpRequest } = require("@litejs/dom/net.js");
 
 // Use XMLHttpRequest in server side
 var xhr = new XMLHttpRequest()
@@ -39,11 +39,8 @@ el.id = 123;
 el.className = "large";
 
 const fragment = document.createDocumentFragment();
-const text1 = document.createTextNode("hello");
-const text2 = document.createTextNode(" world");
-
-fragment.appendChild(text1);
-fragment.appendChild(text2);
+fragment.appendChild(document.createTextNode("hello"));
+fragment.appendChild(document.createTextNode(" world"));
 el.appendChild(fragment);
 
 el.innerHTML;
@@ -62,9 +59,8 @@ el.querySelectorAll("b");
 
 ## Contributing
 
-Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide)
-and run tests.
-`npm install; npm test`
+Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide),
+run tests `npm install; npm test`.
 
 
 > Copyright (c) 2014-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  

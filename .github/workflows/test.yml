@@ -5,43 +5,49 @@ jobs:
     strategy:
       matrix:
         include:
-          - { node: 8,      os: ubuntu-latest,  arch: x86, run: test-fast }
-          - { node: 14,     os: windows-latest, arch: x64, run: test-fast }
-          - { node: latest, os: macos-latest,   arch: x64, run: test }
+          - { node: 8,      os: ubuntu-latest,  arch: x86 }
+          - { node: 14,     os: windows-latest, arch: x64 }
+          - { node: latest, os: macos-latest,   arch: x64 }
     runs-on: ${{ matrix.os }}
-    name: Node ${{ matrix.node }} (${{ matrix.arch }}) on ${{ matrix.os }}
+    name: Test on Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
     - run: git config --global core.autocrlf false
     - uses: actions/checkout@v4
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node }}
         architecture: ${{ matrix.arch }}
     - run: npm install
-    - run: npm run ${{ matrix.run }}
+    - run: npm run ${{ matrix.node == 'latest' && 'test' || 'test-fast' }}
     - uses: coverallsapp/github-action@master
-      if: ${{ matrix.run == 'test' }}
+      if: ${{ matrix.node == 'latest' }}
       name: Upload to coveralls.io
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-    - run: gh run list --json databaseId  -q '.[20:]|.[].databaseId' --limit 30 | xargs -I{} gh run delete "{}"
-      if: ${{ matrix.os != 'windows-latest' }}
-      env:
-        GH_TOKEN: ${{ github.token }}
+        github-token: ${{ github.token }}
+  Analyze:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: github/codeql-action/init@v2
+      with:
+        languages: javascript
+    - uses: github/codeql-action/analyze@v2
+      with:
+        category: /language:javascript
   Release:
-    name: Create GitHub release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [Test]
+    needs: [Analyze, Test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.ref }}
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         registry-url: https://registry.npmjs.org/
     - run: |
         gh release create $TAG --title $TAG --notes "$(git tag -l --format='%(subject)%0a%0a%(body)' $TAG)"
+        gh run list --json databaseId  -q '.[20:]|.[].databaseId' --limit 100 | xargs -I{} gh run delete "{}"
         [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "PUBLISH=true" >> $GITHUB_ENV
       env:
         GH_TOKEN: ${{ github.token }}
@@ -50,16 +56,4 @@ jobs:
       if: env.PUBLISH == 'true'
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-  CodeQL:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: github/codeql-action/init@v2
-      name: Initialize CodeQL
-      with:
-        languages: javascript
-    - uses: github/codeql-action/analyze@v2
-      name: Perform CodeQL Analysis
-      with:
-        category: /language:javascript
 
