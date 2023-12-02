@@ -8,12 +8,13 @@ var DOM = require(".")
 , parser = new DOM.DOMParser()
 , dataUrlRe = /^([^;,]*?)(;[^,]+?|),(.*)$/
 
-XMLHttpRequest.defaultHeaders = {
+exports.XMLHttpRequest = XMLHttpRequest
+exports.defaultHeaders = {
 	accept: ["Accept", "*/*"]
 }
 
 function XMLHttpRequest() {
-	this._reqHeaders = Object.assign({}, XMLHttpRequest.defaultHeaders)
+	this._reqHeaders = Object.assign({}, exports.defaultHeaders)
 }
 
 function setState(xhr, state) {
@@ -135,8 +136,4 @@ XMLHttpRequest.prototype = {
 	}
 }
 
-
-module.exports = {
-	XMLHttpRequest: XMLHttpRequest
-}
 
