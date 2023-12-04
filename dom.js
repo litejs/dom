@@ -16,6 +16,7 @@ var boolAttrs = {
 , rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
+, CSSStyleDeclaration = require("./css.js").CSSStyleDeclaration
 , selector = require("./selector.js")
 , Node = {
 	ELEMENT_NODE:                1,
@@ -326,25 +327,6 @@ NamedNodeMap.prototype = {
 	}
 }
 
-// CSSStyleDeclaration is a single CSS declaration block,
-// accessible via HTMLElement.style for inline styles, document.styleSheets[0].cssRules[0].style, and getComputedStyle()
-function CSSStyleDeclaration(style) {
-	this.cssText = style
-}
-
-CSSStyleDeclaration.prototype = {
-	get cssText() {
-		return Object.keys(this).map(function(key) {
-			return (key === "cssFloat" ? "float:" : hyphenCase(key) + ":") + this[key]
-		}, this).join(";")
-	},
-	set cssText(style) {
-		for (var m, re = /(?:^|;)\s*([-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)(?=;|$)/ig; (m = re.exec(style)); ) {
-			this[m[1] === "float" ? "cssFloat" : camelCase(m[1])] = m[2].trim()
-		}
-	}
-}
-
 function DocumentFragment() {
 	this.childNodes = []
 }
@@ -508,17 +490,8 @@ function getSibling(node, step, type) {
 	return type > 0 ? getElement(silbings, index + step, step, type) : silbings && silbings[index + step] || null
 }
 
-function camelCase(str) {
-	return str.replace(/-([a-z])/g, function(_, a) { return a.toUpperCase() })
-}
-
-function hyphenCase(str) {
-	return str.replace(/[A-Z]/g, "-$&").toLowerCase()
-}
-
 exports.document = new Document()
 exports.entities = entities
-exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.DOMParser = DOMParser
 exports.Document = Document
 exports.DocumentFragment = DocumentFragment

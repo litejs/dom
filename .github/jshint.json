@@ -10,5 +10,8 @@
   "quotmark": "double",
   "shadow": "outer",
   "undef": true,
-  "unused": true
+  "unused": true,
+  "globals": {
+    "Promise": true
+  }
 }
