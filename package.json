@@ -12,6 +12,7 @@
     "XMLSerializer",
     "litejs"
   ],
+  "main": "dom.js",
   "files": [
     "*.js"
   ],

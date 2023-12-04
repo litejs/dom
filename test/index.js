@@ -1,5 +1,5 @@
-require("./index-spec.js")
-require("./selector-spec.js")
+require("./dom.js")
+require("./selector.js")
 require("./parser.js")
 require("./domparser.js")
 require("./interactive.js")

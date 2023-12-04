@@ -1,5 +1,5 @@
 
-import { document } from "../index.js"
+import { document } from "../dom.js"
 
 describe("Run as ESM module", () => {
 	it("should have function document.createElement", assert => {
