@@ -179,6 +179,7 @@ describe("DOM lite", function() {
 		var el, clone, deepClone
 
 		el = document.createElement("h1")
+		el.setAttribute("data-title", "foo")
 		el.appendChild(document.createElement("img"))
 		el.id = 1
 		el.style.top = "5px"
@@ -194,15 +195,17 @@ describe("DOM lite", function() {
 		assert.equal(el.localName, "h1")
 		assert.equal(el.id, "1")
 		assert.equal(el.style.top, "5px")
+
 		assert.equal(clone.nodeName, "H1")
 		assert.equal(clone.tagName, "H1")
 		assert.equal(clone.localName, "h1")
 		assert.equal(clone.id, "1")
 		assert.equal(clone.style.top, "5px")
+		assert.equal(clone.getAttribute("data-title"), "foo")
 		assert.strictEqual(el.ownerDocument, clone.ownerDocument)
 		assert.strictEqual(el.ownerDocument, deepClone.ownerDocument)
 
-		assert.equal(deepClone.outerHTML, "<h1 id=\"1\" style=\"top:5px\"><img></h1>")
+		assert.equal(deepClone.outerHTML, "<h1 data-title=\"foo\" id=\"1\" style=\"top:5px\"><img></h1>")
 
 		clone.id = 2
 		assert.equal(el.id, "1")

@@ -158,13 +158,14 @@ var boolAttrs = {
 		return this.removeChild(ref)
 	},
 	cloneNode: function(deep) {
-		var key
-		, node = this
+		var node = this
 		, clone = new node.constructor(node.tagName || node.data)
 		clone.ownerDocument = node.ownerDocument
 
-		if (node.hasAttribute) {
-			for (key in node) if (node.hasAttribute(key)) clone[key] = node[key].valueOf()
+		if (node.attributes) {
+			node.attributes.names().forEach(function(attr) {
+				clone.setAttribute(attr, node.getAttribute(attr))
+			})
 		}
 
 		if (deep && node.hasChildNodes()) {
