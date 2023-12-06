@@ -1,15 +1,27 @@
 name: Test
 on: [ push, pull_request, workflow_dispatch ]
 jobs:
+  Coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+    - run: npm install && npm i -g c8
+    - run: c8 -r lcov -r text npm test
+    - run: node --import=@litejs/cli/test.js test/run.mjs
+    - run: npm run lint
+    - uses: coverallsapp/github-action@master
+      name: Upload to coveralls.io
+      with:
+        github-token: ${{ github.token }}
   Test:
     strategy:
       matrix:
         include:
-          - { node: 8,      os: ubuntu-latest,  arch: x86 }
-          - { node: 14,     os: windows-latest, arch: x64 }
-          - { node: latest, os: macos-latest,   arch: x64 }
+          - { node: 8,      os: windows-latest,  arch: x86 }
+          - { node: 14,     os: macos-latest,    arch: x64 }
     runs-on: ${{ matrix.os }}
-    name: Test on Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
+    name: Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
     - run: git config --global core.autocrlf false
     - uses: actions/checkout@v4
@@ -18,12 +30,7 @@ jobs:
         node-version: ${{ matrix.node }}
         architecture: ${{ matrix.arch }}
     - run: npm install
-    - run: npm run ${{ matrix.node == 'latest' && 'test' || 'test-fast' }}
-    - uses: coverallsapp/github-action@master
-      if: ${{ matrix.node == 'latest' }}
-      name: Upload to coveralls.io
-      with:
-        github-token: ${{ github.token }}
+    - run: npm test
   Analyze:
     runs-on: ubuntu-latest
     steps:
@@ -36,7 +43,7 @@ jobs:
         category: /language:javascript
   Release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [Analyze, Test]
+    needs: [Analyze, Coverage, Test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4

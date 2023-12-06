@@ -7,6 +7,7 @@
   "keywords": [
     "document",
     "dom",
+    "html",
     "DOMParser",
     "XMLHttpRequest",
     "XMLSerializer",
@@ -17,8 +18,8 @@
     "*.js"
   ],
   "scripts": {
-    "test": "lj test --coverage --brief test/index.js && node --import=@litejs/cli/test.js test/run.mjs && jshint --config .github/jshint.json *.js",
-    "test-fast": "lj test --brief test/index.js"
+    "lint": "jshint --config .github/jshint.json *.js",
+    "test": "lj t test/index.js"
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
