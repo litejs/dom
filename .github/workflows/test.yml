@@ -6,11 +6,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
-    - run: npm install && npm i -g c8
+    - run: npm install && npm i -g c8 jshint
     - run: c8 -r lcov -r text npm test
-    - run: node --import=@litejs/cli/test.js test/run.mjs
     - run: npm run lint
-    - uses: coverallsapp/github-action@master
+    - uses: coverallsapp/github-action@v2
       name: Upload to coveralls.io
       with:
         github-token: ${{ github.token }}
@@ -18,8 +17,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - { node: 8,      os: windows-latest,  arch: x86 }
-          - { node: 14,     os: macos-latest,    arch: x64 }
+          - { node: 8,  os: windows-latest, arch: x86 }
+          - { node: 14, os: macos-latest,   arch: x64 }
+          - { node: 16, os: ubuntu-latest,  arch: x64 }
     runs-on: ${{ matrix.os }}
     name: Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
@@ -35,10 +35,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: github/codeql-action/init@v2
+    - uses: github/codeql-action/init@v3
       with:
         languages: javascript
-    - uses: github/codeql-action/analyze@v2
+    - uses: github/codeql-action/analyze@v3
       with:
         category: /language:javascript
   Release:
@@ -49,18 +49,22 @@ jobs:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.ref }}
+    - run: |
+        git config gpg.ssh.allowedSignersFile ./allowed_signers
+        echo '${{ vars.RELEASE_SIGNERS }}' > ./allowed_signers
+        git verify-tag -v ${{ github.ref_name }}
+      name: Verify release tag signature
     - uses: actions/setup-node@v4
       with:
         registry-url: https://registry.npmjs.org/
     - run: |
         gh release create $TAG --title $TAG --notes "$(git tag -l --format='%(subject)%0a%0a%(body)' $TAG)"
         gh run list --json databaseId  -q '.[20:]|.[].databaseId' --limit 100 | xargs -I{} gh run delete "{}"
-        [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "PUBLISH=true" >> $GITHUB_ENV
+        [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "PUBLISH=latest" >> $GITHUB_ENV || echo "PUBLISH=next" >> $GITHUB_ENV
       env:
         GH_TOKEN: ${{ github.token }}
         TAG: ${{ github.ref_name }}
-    - run: npm publish --access public
-      if: env.PUBLISH == 'true'
+    - run: npm publish --access public --tag $PUBLISH
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
