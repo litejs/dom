@@ -315,6 +315,7 @@ NamedNodeMap.prototype = {
 			if (!isXml) {
 				if (hasOwn.call(boolAttrs, loName)) return name
 				if (minify) {
+					value = loName.slice(0, 2) === "on" ? value.replace(/^[\s\uFEFF\xA0;]+|[\s\uFEFF\xA0;]+$/g, "") : value.replace(/\s+/g, " ").trim()
 					if (hasOwn.call(defaultAttrs, (tagName + " " + name + " " + value).toLowerCase())) return
 					if (!quotedAttrRe.test(value)) return name + "=" + value
 					if (value.split("\"").length > value.split("'").length) return name + "='" + value.replace(/'/g, "&#39;") + "'"
