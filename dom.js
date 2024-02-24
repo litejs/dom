@@ -182,9 +182,9 @@ var boolAttrs = {
 		return selector.find(this, sel)
 	},
 	toString: function(minify) {
-		return rawTextElements[this.tagName] ? this.textContent : this.hasChildNodes() ? this.childNodes.reduce(function(memo, node) {
+		return rawTextElements[this.tagName] ? this.textContent : this.childNodes.reduce(function(memo, node) {
 			return memo + node.toString(minify)
-		}, "") : ""
+		}, "")
 	}
 }
 , Element = {
