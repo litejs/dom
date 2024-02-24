@@ -80,6 +80,16 @@ describe("parser", function() {
 		assert.end()
 	})
 
+	test("document.title", function(assert) {
+		var document = parser.parseFromString("<h1>Hi</h1>")
+		assert.equal(document.querySelector("title"), null)
+		assert.equal(document.title, "")
+		document.title = "Hello"
+		assert.equal(document.querySelector("title").textContent, "Hello")
+		assert.equal(document.title, "Hello")
+		assert.end()
+	})
+
 	test("atom", function (assert) {
 		var document = readDom("./test/atom.xml")
 

@@ -431,6 +431,14 @@ function Document() {
 }
 
 extendNode(Document, Element, {
+	get title() {
+		var el = selector.find(this, "title", 1)
+		return el && el.textContent || ""
+	},
+	set title(text) {
+		var el = selector.find(this, "title", 1) || this.appendChild(this.createElement("title"))
+		el.textContent = text
+	},
 	nodeType: 9,
 	nodeName: "#document",
 	contentType: "text/html",
