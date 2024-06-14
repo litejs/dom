@@ -90,6 +90,12 @@ describe("parser", function() {
 		assert.end()
 	})
 
+	test("unclosed style", function(assert) {
+		var document = parser.parseFromString("<head><style>a<style>b")
+		assert.equal(document.querySelectorAll("style").length, 1)
+		assert.end()
+	})
+
 	test("atom", function (assert) {
 		var document = readDom("./test/atom.xml")
 
