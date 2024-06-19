@@ -10,7 +10,7 @@
 LiteJS DOM &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 ==========
 
-A small DOM library for server-side testing, rendering, and handling of HTML files.  
+Dependency-free DOM library for handling HTML files on server-side.  
 [DOM spec](https://dom.spec.whatwg.org/) |
 [Selectors Level 3](http://www.w3.org/TR/selectors/)
 
@@ -20,18 +20,6 @@ Examples
 
 ```javascript
 const { document, DOMParser, XMLSerializer } = require("@litejs/dom");
-const { XMLHttpRequest } = require("@litejs/dom/net.js");
-
-// Use XMLHttpRequest in server side
-var xhr = new XMLHttpRequest()
-xhr.open("GET", "https://litejs.com")
-xhr.responseType = "document"
-xhr.onload = function() {
-	var doc = xhr.responseXML
-	// Work with DOM in familiar way
-	console.log(doc.querySelector("title").textContent)
-}
-xhr.send()
 
 // Build DOM manually
 const el = document.createElement("h1");
@@ -40,11 +28,9 @@ el.className = "large";
 
 const fragment = document.createDocumentFragment();
 fragment.appendChild(document.createTextNode("hello"));
-fragment.appendChild(document.createTextNode(" world"));
 el.appendChild(fragment);
 
-el.innerHTML;
-// hello world
+// Replace the DOM tree with parsed HTML
 el.innerHTML = "<b>hello world</b>";
 el.toString();
 // <h1 id="123" class="large"><b>hello world</b></h1>
@@ -55,6 +41,18 @@ el.toString(true);
 
 el.querySelectorAll("b");
 // [ "<b>hello world</b>" ]
+
+// Use XMLHttpRequest in server side
+const { XMLHttpRequest } = require("@litejs/dom/net.js");
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "https://litejs.com");
+xhr.responseType = "document";
+xhr.onload = function() {
+	const document = xhr.responseXML;
+	// Work with DOM in familiar way
+	console.log(document.querySelector("title").textContent);
+}
+xhr.send();
 ```
 
 ## Contributing
