@@ -18,12 +18,11 @@
     "*.js"
   ],
   "scripts": {
-    "lint": "jshint --config .github/jshint.json *.js",
+    "lint": "npx jshint -c .github/jshint.json *.js",
     "test": "lj t test/index.js"
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
-    "@litejs/cli": "23.11.1",
-    "jshint": "2.13.6"
+    "@litejs/cli": "23.11.1"
   }
 }

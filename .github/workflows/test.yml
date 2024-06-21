@@ -6,8 +6,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
-    - run: npm install && npm i -g c8 jshint
-    - run: c8 -r lcovonly -r text npm test
+    - run: npm install --no-audit
+    - run: npm audit --audit-level=low
+    - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
     - run: npm run lint
     - uses: coverallsapp/github-action@v2
       name: Upload to coveralls.io
@@ -17,9 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - { node: 8,  os: windows-latest, arch: x86 }
-          - { node: 14, os: macos-latest,   arch: x64 }
-          - { node: 18, os: ubuntu-latest,  arch: x64 }
+        - { node: 8,  os: windows-latest, arch: x86 }
+        - { node: 12, os: macos-latest,   arch: x64 }
+        - { node: 16, os: ubuntu-latest,  arch: x64 }
     runs-on: ${{ matrix.os }}
     name: Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
@@ -29,7 +30,7 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
         architecture: ${{ matrix.arch }}
-    - run: npm install
+    - run: npm install --no-audit
     - run: npm test
   Analyze:
     runs-on: ubuntu-latest
