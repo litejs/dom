@@ -111,7 +111,7 @@ var boolAttrs = {
 		return this._style || (this._style = new CSSStyleDeclaration(this.getAttribute("style") || ""))
 	},
 	set style(value) {
-		this.setAttribute("style", value)
+		this.style.cssText = value
 	},
 	contains: function (el) {
 		for (; el; el = el.parentNode) if (el === this) return true
@@ -288,7 +288,6 @@ NamedNodeMap.prototype = {
 		if (loName === "style" && this.ownerElement._style) {
 			if (attr === null) attr = this[loName] = new Attr(this.ownerElement, name, "")
 			attr.value = this.ownerElement._style.cssText
-			delete this.ownerElement._style
 		}
 		return attr
 	},
