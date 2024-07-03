@@ -93,11 +93,11 @@ describe("DOM lite", function() {
 			var el = document.createElement("a")
 			el[propName || name] = value
 			assert.equal(el.getAttribute(name), value)
-			assert.equal("" + el[propName || name], value)
+			assert.equal(name === "style" ? el.style.cssText : "" + el[propName || name], value)
 
 			el.removeAttribute(name)
 			assert.equal(!!el.getAttribute(name), false)
-			value = el[propName || name]
+			value = name === "style" ? el.style.cssText : el[propName || name]
 			assert.equal(!!(value && ("" + value)), false)
 		}
 
@@ -133,7 +133,7 @@ describe("DOM lite", function() {
 		assert.equal(el.style.top, "1px")
 		assert.equal(el.style.backgroundColor, "blue")
 		assert.equal(el.style.border, "4px solid black")
-		assert.equal(el.style + "", "top:1px;background-color:blue;float:left;border:4px solid black")
+		assert.equal(el.style.cssText, "top:1px;background-color:blue;float:left;border:4px solid black")
 		assert.end()
 	})
 

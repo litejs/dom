@@ -287,7 +287,7 @@ NamedNodeMap.prototype = {
 		, attr = this[loName] || null
 		if (loName === "style" && this.ownerElement._style) {
 			if (attr === null) attr = this[loName] = new Attr(this.ownerElement, name, "")
-			attr.value = this.ownerElement._style.valueOf()
+			attr.value = this.ownerElement._style.cssText
 			delete this.ownerElement._style
 		}
 		return attr
@@ -302,7 +302,7 @@ NamedNodeMap.prototype = {
 	setNamedItem: function(name, value) {
 		this.removeNamedItem(name)
 		var loName = name.toLowerCase()
-		if (loName === "style") value = new CSSStyleDeclaration(value).valueOf()
+		if (loName === "style") value = new CSSStyleDeclaration(value).cssText
 		this[loName] = new Attr(this.ownerElement, name, value)
 	},
 	toString: function(minify) {
@@ -327,16 +327,23 @@ NamedNodeMap.prototype = {
 	}
 }
 
+// CSSStyleDeclaration is a single CSS declaration block,
+// accessible via HTMLElement.style for inline styles, document.styleSheets[0].cssRules[0].style, and getComputedStyle()
 function CSSStyleDeclaration(style) {
-	for (var m, re = /(?:^|;)\s*([-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)(?=;|$)/ig; (m = re.exec(style)); ) {
-		this[m[1] === "float" ? "cssFloat" : camelCase(m[1])] = m[2].trim()
-	}
+	this.cssText = style
 }
 
-CSSStyleDeclaration.prototype.valueOf = function() {
-	return Object.keys(this).map(function(key) {
-		return (key === "cssFloat" ? "float:" : hyphenCase(key) + ":") + this[key]
-	}, this).join(";")
+CSSStyleDeclaration.prototype = {
+	get cssText() {
+		return Object.keys(this).map(function(key) {
+			return (key === "cssFloat" ? "float:" : hyphenCase(key) + ":") + this[key]
+		}, this).join(";")
+	},
+	set cssText(style) {
+		for (var m, re = /(?:^|;)\s*([-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)(?=;|$)/ig; (m = re.exec(style)); ) {
+			this[m[1] === "float" ? "cssFloat" : camelCase(m[1])] = m[2].trim()
+		}
+	}
 }
 
 function DocumentFragment() {
