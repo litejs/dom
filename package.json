@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "lint": "npx jshint -c .github/jshint.json *.js",
-    "test": "lj t test/index.js"
+    "test": "lj t test/*.js"
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
