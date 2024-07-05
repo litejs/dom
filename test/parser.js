@@ -4,10 +4,25 @@ describe("parser", function() {
 
 	var DOM = require("../")
 	, parser = new DOM.DOMParser()
+	, serializer = new DOM.XMLSerializer()
 	, fs = require("fs")
 	, path = require("path")
 	, test = describe.test
 
+	test("MDN DOMParser example", function (assert) {
+		var xmlStr = '<q id="a"><span id="b">hey!</span></q>'
+		, doc = parser.parseFromString(xmlStr, "application/xml")
+
+		assert.equal(doc.documentElement, doc.firstElementChild)
+		assert.equal(doc.documentElement.nodeName, "q")
+		assert.equal(doc.documentElement.namespaceURI, null)
+		assert.equal(doc.contentType, "application/xml")
+		assert.equal(doc.querySelector("Span"), null)
+		assert.equal(doc.querySelector("span").textContent, "hey!")
+		assert.equal(serializer.serializeToString(doc), xmlStr)
+
+		assert.end()
+	})
 
 	test("parse and stringify", function (assert) {
 		assert.matchSnapshot("./test/samp1.html", function(str) {
