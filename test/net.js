@@ -71,6 +71,20 @@ describe("XMLHttpRequest", function() {
 		xhr.send()
 	})
 
+	it("calls onerror", function (assert, mock) {
+		assert.setTimeout(5000)
+		var xhr = new XMLHttpRequest()
+		xhr.open("GET", "http://0.0.0.0:0")
+		xhr.onerror = function() {
+			assert.equal(xhr.status, 0)
+			assert.equal(xhr.statusText, "")
+			assert.equal(xhr.responseXML, null)
+			assert.equal(xhr.responseText, "")
+			assert.end()
+		}
+		xhr.send()
+	})
+
 	describe("Data URLs", function() {
 		var table = [
 			[ "data:,Hello%2C%20World%21", "text/plain", "Hello, World!" ],

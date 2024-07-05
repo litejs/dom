@@ -87,11 +87,13 @@ XMLHttpRequest.prototype = {
 				result[entrie[0]] = entrie[1]
 				return result
 			}, {})
-			require(url.protocol.slice(0, -1)).request(url, function(res) {
+			var req = require(url.protocol.slice(0, -1)).request(url, function(res) {
 				head(res.statusCode, res.statusMessage, res.headers)
 				res.on("data", fillBody)
 				res.on("end", done)
-			}).end(data)
+			})
+			if (xhr.onerror) req.on("error", xhr.onerror)
+			req.end(data)
 			return
 		}
 		if (url.protocol === "data:") {
