@@ -211,7 +211,7 @@ var boolAttrs = {
 		return attr ? attr.value : null
 	},
 	setAttribute: function(name, value) {
-		this.attributes.setNamedItem(name, value)
+		this.attributes.setNamedItem(new Attr(this, name, value))
 	},
 	removeAttribute: function(name) {
 		this.attributes.removeNamedItem(name)
@@ -299,11 +299,11 @@ NamedNodeMap.prototype = {
 		if (attr !== null) delete this[loName]
 		return attr
 	},
-	setNamedItem: function(name, value) {
-		this.removeNamedItem(name)
-		var loName = name.toLowerCase()
-		if (loName === "style") value = new CSSStyleDeclaration(value).cssText
-		this[loName] = new Attr(this.ownerElement, name, value)
+	setNamedItem: function(attr) {
+		var oldAttr = this.getNamedItem(attr.name)
+		if (attr.name === "style") attr.value = new CSSStyleDeclaration(attr.value).cssText
+		this[attr.name] = attr
+		return oldAttr
 	},
 	toString: function(minify) {
 		var map = this

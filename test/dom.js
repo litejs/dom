@@ -353,7 +353,8 @@ describe("DOM lite", function() {
 		assert.equal(h1.matches("[ID3='']"), true)
 		h1.removeAttribute("id3")
 
-		h1.removeAttribute("id2")
+		assert.own(h1.attributes.removeNamedItem("id2"), {name: "id2", value: "321"})
+		assert.equal(h1.attributes.removeNamedItem("id2"), null)
 		assert.equal(h1.getAttribute("id"), "123")
 		assert.equal(h1.getAttribute("id2"), null)
 		assert.equal(h1.attributes.length, 1)
