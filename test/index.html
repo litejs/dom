@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head>
+	<title>LiteJS DOM test</title>
+	<link rel="icon" href="data:image/x-icon;,">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+</head><body>
+<p id=i></p>
+<pre id=r></pre>
+<p id=d></p>
+<script src="data/lib.js"></script>
+<script>
+i.innerHTML = "# " + [
+	"userAgent: " + navigator.userAgent,
+	"patched: " + xhr._p.length + " " + xhr._p.join(", ")
+].join("<br># ")
+
+describe.env = "browser"
+describe.onend = function() {
+	r.innerHTML = describe.output
+}
+var exports = {}
+, native = {
+	CSSStyleDeclaration: function(str) {
+		d.style = str
+		return d.style
+	}
+}
+xhr.load(
+	["../css.js", "css.js"],
+	res => res.forEach(s => Function("exports", s).call(exports, exports)),
+	true
+)
+</script>
+<noscript>This application requires JavaScript</noscript></body></html>
