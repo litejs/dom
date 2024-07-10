@@ -15,6 +15,7 @@ describe("XMLHttpRequest", function() {
 		assert.throws(function() {
 			var xhr = new XMLHttpRequest()
 			xhr.open("GET", "https://litejs.com", false)
+			xhr.send()
 		})
 		assert.end()
 	})
@@ -93,26 +94,40 @@ describe("XMLHttpRequest", function() {
 			[ "data:text/javascript,console.log('a')", "text/javascript", "console.log('a')" ]
 		]
 
-		it("throws on invalid Data URL", function(assert) {
+		it("handles invalid Data URL", function(assert) {
+			assert.plan(2)
 			assert.throws(function() {
 				var xhr = new XMLHttpRequest()
 				xhr.open("GET", "data:Hello")
 				xhr.send()
 			})
-			assert.end()
+			var xhr = new XMLHttpRequest()
+			xhr.onerror = function(err) {
+				assert.ok(err)
+			}
+			xhr.open("GET", "data:Hello")
+			xhr.send()
 		})
 
-		table.forEach(function(data, i) {
-			it("handles data " + i, function(assert) {
-				var xhr = new XMLHttpRequest()
-				xhr.open("GET", data[0])
-				xhr.onload = function() {
-					assert.equal(xhr.getResponseHeader("content-type"), data[1])
-					assert.equal(xhr.responseText, data[2])
-					assert.end()
-				}
-				xhr.send()
-			})
+		it("handles async request {i}", table, function(url, mime, body, assert) {
+			var xhr = new XMLHttpRequest()
+			xhr.open("GET", url)
+			assert.equal(xhr.responseText, "")
+			xhr.onload = function() {
+				assert.equal(xhr.getResponseHeader("content-type"), mime)
+				assert.equal(xhr.responseText, body)
+				assert.end()
+			}
+			xhr.send()
+		})
+		it("handles sync request {i}", table, function(url, mime, body, assert) {
+			var xhr = new XMLHttpRequest()
+			xhr.open("GET", url, false)
+			xhr.send()
+			assert.equal(xhr.getResponseHeader("content-type"), mime)
+			assert.equal(xhr.responseText, body)
+			assert.equal(xhr.readyState, 4)
+			assert.end()
 		})
 	})
 	describe("File URLs", function() {

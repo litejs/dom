@@ -64,9 +64,9 @@ XMLHttpRequest.prototype = {
 	abort: function() {
 		throw Error("XMLHttpRequest abort/reuse not implemented")
 	},
-	open: function (method, url, async) {
+	open: function (method, url, isAsync) {
 		var xhr = this
-		if (async === false) throw Error("XMLHttpRequest sync not implemented")
+		xhr._sync = isAsync === false
 
 		if (xhr.readyState > xhr.UNSENT) {
 			xhr.abort()
@@ -82,6 +82,7 @@ XMLHttpRequest.prototype = {
 		, proto = url.protocol.slice(0, -1)
 
 		if (proto === "http" || proto === "https") {
+			if (xhr._sync) throw Error("XMLHttpRequest sync not implemented")
 			url.method = xhr.method
 			url.headers = Object.keys(xhr._reqHeaders).reduce(function(result, key) {
 				var entrie = xhr._reqHeaders[key]
@@ -137,6 +138,7 @@ XMLHttpRequest.prototype = {
 				if (xhr.onerror) xhr.onerror(err)
 				else throw err
 			}
+			else if (xhr._sync) setState(xhr, xhr.DONE)
 			else process.nextTick(setState, xhr, xhr.DONE)
 		}
 	}
