@@ -79,15 +79,16 @@ XMLHttpRequest.prototype = {
 	send: function (data) {
 		var xhr = this
 		, url = new URL(xhr.responseURL, XMLHttpRequest.base)
+		, proto = url.protocol.slice(0, -1)
 
-		if (url.protocol === "http:" || url.protocol === "https:") {
+		if (proto === "http" || proto === "https") {
 			url.method = xhr.method
 			url.headers = Object.keys(xhr._reqHeaders).reduce(function(result, key) {
 				var entrie = xhr._reqHeaders[key]
 				result[entrie[0]] = entrie[1]
 				return result
 			}, {})
-			var req = require(url.protocol.slice(0, -1)).request(url, function(res) {
+			var req = require(proto).request(url, function(res) {
 				head(res.statusCode, res.statusMessage, res.headers)
 				res.on("data", fillBody)
 				res.on("end", done)
@@ -96,7 +97,7 @@ XMLHttpRequest.prototype = {
 			req.end(data)
 			return
 		}
-		if (url.protocol === "data:") {
+		if (proto === "data") {
 			var match = dataUrlRe.exec(url.pathname)
 			if (!match) throw Error("Invalid URL: " + url)
 			process.nextTick(function() {
@@ -107,7 +108,7 @@ XMLHttpRequest.prototype = {
 			return
 		}
 
-		if (url.protocol === "file:") {
+		if (proto === "file") {
 			require("fs").readFile(url, function(err, chunk) {
 				if (err) {
 					head(404, "Not Found", {})
