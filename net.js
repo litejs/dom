@@ -12,6 +12,7 @@ exports.XMLHttpRequest = XMLHttpRequest
 exports.defaultHeaders = {
 	accept: ["Accept", "*/*"]
 }
+exports.protocolHandler = {}
 
 function XMLHttpRequest() {
 	this._reqHeaders = Object.assign({}, exports.defaultHeaders)
@@ -118,6 +119,11 @@ XMLHttpRequest.prototype = {
 				}
 				done()
 			})
+			return
+		}
+
+		if (exports.protocolHandler[proto]) {
+			exports.protocolHandler[proto](url, head, fillBody, done)
 			return
 		}
 

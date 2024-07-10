@@ -1,6 +1,6 @@
 
 describe("XMLHttpRequest", function() {
-	var XMLHttpRequest = require("../net.js").XMLHttpRequest
+	var { XMLHttpRequest, protocolHandler } = require("../net.js")
 
 	it("throws on invalid protocol", function(assert) {
 		assert.throws(function() {
@@ -146,6 +146,29 @@ describe("XMLHttpRequest", function() {
 			}
 			xhr.send()
 		})
+	})
+
+	// Blob was added in Node18
+	it("has a protocolHandler", parseInt(process.versions.node) >= 18 && function(assert) {
+		protocolHandler.blob = function(url, head, fillBody, done) {
+			var blob = require("buffer").resolveObjectURL("" + url)
+			if (blob) blob.text().then(function(text) {
+				head(200, "OK", { "content-type": blob.type, "content-length": blob.length })
+				fillBody(text)
+				done()
+			})
+			else done(Error("Blob not found"))
+		}
+		var url = URL.createObjectURL(new Blob(['<q id="a"><span id="b">hey!</span></q>'], { type: "text/html" }))
+		var xhr = new XMLHttpRequest()
+		xhr.open("GET", url)
+		xhr.onload = function() {
+			assert.equal(xhr.getResponseHeader("content-type"), "text/html")
+			assert.equal(xhr.responseText, '<q id="a"><span id="b">hey!</span></q>')
+			assert.equal(xhr.readyState, 4)
+			assert.end()
+		}
+		xhr.send()
 	})
 })
 
