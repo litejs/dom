@@ -1,7 +1,7 @@
 
 [1]: https://badgen.net/coveralls/c/github/litejs/dom
 [2]: https://coveralls.io/r/litejs/dom
-[3]: https://badgen.net/packagephobia/install/@litejs/dom
+[3]: https://packagephobia.now.sh/badge?p=@litejs/dom
 [4]: https://packagephobia.now.sh/result?p=@litejs/dom
 [5]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
 [6]: https://www.buymeacoffee.com/lauriro
