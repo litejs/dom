@@ -93,18 +93,17 @@ XMLHttpRequest.prototype = {
 				res.on("data", fillBody)
 				res.on("end", done)
 			})
-			if (xhr.onerror) req.on("error", xhr.onerror)
+			req.on("error", done)
 			req.end(data)
 			return
 		}
 		if (proto === "data") {
 			var match = dataUrlRe.exec(url.pathname)
-			if (!match) throw Error("Invalid URL: " + url)
-			process.nextTick(function() {
+			if (match) {
 				head(200, "OK", { "content-type": match[1] || "text/plain" })
 				fillBody(match[2] ? Buffer.from(match[3], "base64") : unescape(match[3]))
 				done()
-			})
+			} else done(Error("Invalid URL: " + url))
 			return
 		}
 
@@ -133,8 +132,12 @@ XMLHttpRequest.prototype = {
 			xhr.responseText += chunk.toString("utf8")
 			setState(xhr, xhr.LOADING)
 		}
-		function done() {
-			setState(xhr, xhr.DONE)
+		function done(err) {
+			if (err) {
+				if (xhr.onerror) xhr.onerror(err)
+				else throw err
+			}
+			else process.nextTick(setState, xhr, xhr.DONE)
 		}
 	}
 }
