@@ -5,10 +5,10 @@
 
 var DOM = module.exports = require(".")
 , HTMLElementExtra = {
-	focus: function() {
+	focus() {
 		this.ownerDocument.activeElement = this
 	},
-	blur: function() {
+	blur() {
 		this.ownerDocument.activeElement = null
 	}
 }

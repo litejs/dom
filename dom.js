@@ -37,9 +37,7 @@ var boolAttrs = {
 		if (this.nodeType === 3 || this.nodeType === 8) this.data = text
 	},
 	get textContent() {
-		return this.nodeType === 3 || this.nodeType === 8 ? this.data : this.childNodes.map(function(child) {
-			return child.textContent
-		}).join("")
+		return this.nodeType === 3 || this.nodeType === 8 ? this.data : this.childNodes.map(node => node.textContent).join("")
 	},
 	set textContent(text) {
 		if (this.nodeType === 3 || this.nodeType === 8) this.data = text
@@ -114,20 +112,20 @@ var boolAttrs = {
 	set style(value) {
 		this.style.cssText = value
 	},
-	contains: function (el) {
+	contains(el) {
 		for (; el; el = el.parentNode) if (el === this) return true
 		return false
 	},
-	hasChildNodes: function() {
+	hasChildNodes() {
 		return this.childNodes && this.childNodes.length > 0
 	},
-	getElementById: function(id) {
+	getElementById(id) {
 		return selector.find(this, "#" + id, 1)
 	},
-	appendChild: function(el) {
+	appendChild(el) {
 		return this.insertBefore(el)
 	},
-	insertBefore: function(el, ref) {
+	insertBefore(el, ref) {
 		var node = this
 		, childs = node.childNodes
 
@@ -146,7 +144,7 @@ var boolAttrs = {
 		}
 		return el
 	},
-	removeChild: function(el) {
+	removeChild(el) {
 		var node = this
 		, index = node.childNodes.indexOf(el)
 		if (index === -1) throw Error("NOT_FOUND_ERR")
@@ -155,35 +153,31 @@ var boolAttrs = {
 		el.parentNode = null
 		return el
 	},
-	replaceChild: function(el, ref) {
+	replaceChild(el, ref) {
 		this.insertBefore(el, ref)
 		return this.removeChild(ref)
 	},
-	cloneNode: function(deep) {
+	cloneNode(deep) {
 		var node = this
 		, clone = new node.constructor(node.tagName || node.data)
 		clone.ownerDocument = node.ownerDocument
 
 		if (node.attributes) {
-			node.attributes.names().forEach(function(attr) {
-				clone.setAttribute(attr, node.getAttribute(attr))
-			})
+			node.attributes.names().forEach(attr => clone.setAttribute(attr, node.getAttribute(attr)))
 		}
 
 		if (deep && node.hasChildNodes()) {
-			node.childNodes.forEach(function(child) {
-				clone.appendChild(child.cloneNode(deep))
-			})
+			node.childNodes.forEach(child => clone.appendChild(child.cloneNode(deep)))
 		}
 		return clone
 	},
-	querySelector: function(sel) {
+	querySelector(sel) {
 		return selector.find(this, sel, 1)
 	},
-	querySelectorAll: function(sel) {
+	querySelectorAll(sel) {
 		return selector.find(this, sel)
 	},
-	toString: function(minify) {
+	toString(minify) {
 		return rawTextElements[this.tagName] ? this.textContent : this.childNodes.reduce(function(memo, node) {
 			return memo + node.toString(minify)
 		}, "")
@@ -203,29 +197,31 @@ var boolAttrs = {
 		return getSibling(this, -1, 1)
 	},
 	replaceChildren: replaceChildren,
-	hasAttribute: function(name) {
+	hasAttribute(name) {
 		return this.attributes.getNamedItem(name) != null
 	},
-	getAttribute: function(name) {
+	getAttribute(name) {
 		var attr = this.attributes.getNamedItem(name)
 		return attr ? attr.value : null
 	},
-	setAttribute: function(name, value) {
+	setAttribute(name, value) {
 		this.attributes.setNamedItem(new Attr(this, name, value))
 	},
-	removeAttribute: function(name) {
+	removeAttribute(name) {
 		this.attributes.removeNamedItem(name)
 	},
-	getElementsByTagName: function(tag) {
+	getElementsByTagName(tag) {
 		return selector.find(this, tag)
 	},
-	getElementsByClassName: function(sel) {
+	getElementsByClassName(sel) {
 		return selector.find(this, "." + sel.replace(/\s+/g, "."))
 	}
 }
 , quotedAttrRe = /[\s"'`=<>]/
 , escRe = /<|&(?=[a-z#])/gi
+, escFn = chr => chr === "<" ? "&lt;" : "&amp;"
 , unescRe = /&[a-z]{1,31};?|&#(x|)([\da-f]+);/ig
+, unescFn = (ent, hex, num) => num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : entities[ent] || ent
 , entities = {
 	"&amp;": "&", "&apos;": "'", "&cent;": "¢", "&copy;": "©", "&curren;": "¤",
 	"&deg;": "°", "&euro;": "€", "&gt;": ">", "&lt;": "<", "&nbsp;": " ",
@@ -247,18 +243,10 @@ function addGetter(key) {
 			this.isNum ? function() { return +this.getAttribute(attr) || 0 } :
 			function() { return this.getAttribute(attr) || "" }
 		),
-		set: function(value) {
+		set(value) {
 			this.setAttribute(attr, value)
 		}
 	})
-}
-
-function escFn(chr) {
-	return chr === "<" ? "&lt;" : "&amp;"
-}
-
-function unescFn(ent, hex, num) {
-	return num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : entities[ent] || ent
 }
 
 ;["hasAttribute", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
@@ -274,16 +262,16 @@ function Attr(node, name, value) {
 }
 
 function NamedNodeMap(node) {
-	Object.defineProperty(this, "length", { get: function() { return this.names().length } })
+	Object.defineProperty(this, "length", { get() { return this.names().length } })
 	Object.defineProperty(this, "ownerElement", { value: node })
 }
 
 NamedNodeMap.prototype = {
-	names: function() {
+	names() {
 		this.getNamedItem("style")
 		return Object.keys(this)
 	},
-	getNamedItem: function(name) {
+	getNamedItem(name) {
 		var loName = name.toLowerCase()
 		, attr = this[loName] || null
 		if (loName === "style" && this.ownerElement._style) {
@@ -292,24 +280,24 @@ NamedNodeMap.prototype = {
 		}
 		return attr
 	},
-	removeNamedItem: function(name) {
+	removeNamedItem(name) {
 		var loName = name.toLowerCase()
 		, attr = this[loName] || null
 		if (loName === "style") delete this.ownerElement._style
 		if (attr !== null) delete this[loName]
 		return attr
 	},
-	setNamedItem: function(attr) {
+	setNamedItem(attr) {
 		var oldAttr = this.getNamedItem(attr.name)
 		if (attr.name === "style") attr.value = new CSSStyleDeclaration(attr.value).cssText
 		this[attr.name] = attr
 		return oldAttr
 	},
-	toString: function(minify) {
+	toString(minify) {
 		var map = this
 		, tagName = map.ownerElement.tagName
 		, isXml = map.ownerElement.ownerDocument.contentType === "application/xml"
-		return map.names().map(function(loName) {
+		return map.names().map(loName => {
 			var attr = map.getNamedItem(loName)
 			, name = attr.name
 			, value = attr.value.replace(escRe, escFn)
@@ -346,16 +334,16 @@ function HTMLElement(tag) {
 
 extendNode(HTMLElement, Element, {
 	nodeType: 1,
-	matches: function(sel) {
+	matches(sel) {
 		return selector.matches(this, sel)
 	},
-	closest: function(sel) {
+	closest(sel) {
 		return selector.closest(this, sel)
 	},
 	namespaceURI: "http://www.w3.org/1999/xhtml",
 	localName: null,
 	tagName: null,
-	toString: function(minify) {
+	toString(minify) {
 		var attrs = this.attributes.toString(minify)
 		return "<" + this.localName + (attrs ? " " + attrs + (attrs.slice(-1) === "/" ? " >" : ">") : ">") +
 		(voidElements[this.tagName] ? "" : Node.toString.call(this, minify) + "</" + this.localName + ">")
@@ -379,7 +367,7 @@ function Text(data) {
 extendNode(Text, {
 	nodeType: 3,
 	nodeName: "#text",
-	toString: function(minify) {
+	toString(minify) {
 		return (minify ? ("" + this.data).trim() : "" + this.data).replace(escRe, escFn)
 	}
 })
@@ -391,7 +379,7 @@ function Comment(data) {
 extendNode(Comment, {
 	nodeType: 8,
 	nodeName: "#comment",
-	toString: function(minify) {
+	toString(minify) {
 		return minify ? "" : "<!--" + this.data + "-->"
 	}
 })
@@ -402,7 +390,7 @@ function DocumentType(data) {
 
 extendNode(DocumentType, {
 	nodeType: 10,
-	toString: function() {
+	toString() {
 		return "<" + this.data + ">"
 		// var node = document.doctype
 		// return "<!DOCTYPE " + node.name +
@@ -442,15 +430,13 @@ extendNode(Document, Element, {
 function DOMParser() {}
 function XMLSerializer() {}
 
-DOMParser.prototype.parseFromString = function(str, mime) {
+DOMParser.prototype.parseFromString = (str, mime) => {
 	var doc = new Document()
 	doc.contentType = mime || "text/html"
 	doc.documentElement.outerHTML = str
 	return doc
 }
-XMLSerializer.prototype.serializeToString = function(doc) {
-	return doc.toString()
-}
+XMLSerializer.prototype.serializeToString = doc => doc.toString()
 
 
 function own(Class) {

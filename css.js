@@ -3,17 +3,15 @@
 
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 
-// CSSStyleDeclaration is a single CSS declaration block,
-// accessible via HTMLElement.style for inline styles, document.styleSheets[0].cssRules[0].style, and getComputedStyle()
 function CSSStyleDeclaration(style) {
 	this.cssText = style
 }
 
 CSSStyleDeclaration.prototype = {
 	get cssText() {
-		return Object.keys(this).map(function(key) {
-			return (key === "cssFloat" ? "float:" : hyphenCase(key) + ":") + this[key]
-		}, this).join(";")
+		return Object.keys(this).map(
+			key => (key === "cssFloat" ? "float:" : hyphenCase(key) + ":") + this[key]
+		).join(";")
 	},
 	set cssText(style) {
 		for (var m, re = /(?:^|;)\s*([-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)(?=;|$)/ig; (m = re.exec(style)); ) {

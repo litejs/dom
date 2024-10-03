@@ -7,6 +7,13 @@ var DOM = require(".")
 , URL = require("url").URL
 , parser = new DOM.DOMParser()
 , dataUrlRe = /^([^;,]*?)(;[^,]+?|),(.*)$/
+, setState = (xhr, state) => {
+	if (xhr.readyState !== state) {
+		xhr.readyState = state
+		if (xhr.onreadystatechange) xhr.onreadystatechange()
+		if (state === xhr.DONE && xhr.onload) xhr.onload()
+	}
+}
 
 exports.XMLHttpRequest = XMLHttpRequest
 exports.defaultHeaders = {
@@ -18,13 +25,6 @@ function XMLHttpRequest() {
 	this._reqHeaders = Object.assign({}, exports.defaultHeaders)
 }
 
-function setState(xhr, state) {
-	if (xhr.readyState !== state) {
-		xhr.readyState = state
-		if (xhr.onreadystatechange) xhr.onreadystatechange()
-		if (state === xhr.DONE && xhr.onload) xhr.onload()
-	}
-}
 
 XMLHttpRequest.prototype = {
 	UNSENT: 0,
@@ -49,23 +49,23 @@ XMLHttpRequest.prototype = {
 			parser.parseFromString(xhr.responseText, mime)
 		)
 	},
-	getAllResponseHeaders: function () {
+	getAllResponseHeaders() {
 		var xhr = this
-		return xhr.readyState >= xhr.HEADERS_RECEIVED && Object.keys(xhr._headers).map(function(name) {
-			return name + ": " + xhr._headers[name] + "\r\n"
-		}).join("") || null
+		return xhr.readyState >= xhr.HEADERS_RECEIVED && Object.keys(xhr._headers).map(
+			name => name + ": " + xhr._headers[name] + "\r\n"
+		).join("") || null
 	},
-	getResponseHeader: function (name) {
+	getResponseHeader(name) {
 		var xhr = this
 		return xhr.readyState >= xhr.HEADERS_RECEIVED && xhr._headers[name.toLowerCase()] || null
 	},
-	setRequestHeader: function(name, value) {
+	setRequestHeader(name, value) {
 		this._reqHeaders[name.toLowerCase()] = [name, value]
 	},
-	abort: function() {
+	abort() {
 		throw Error("XMLHttpRequest abort/reuse not implemented")
 	},
-	open: function (method, url, isAsync) {
+	open(method, url, isAsync) {
 		var xhr = this
 		xhr._sync = isAsync === false
 
@@ -77,20 +77,38 @@ XMLHttpRequest.prototype = {
 		xhr.responseURL = url
 		setState(xhr, xhr.OPENED)
 	},
-	send: function (data) {
+	send(data) {
 		var xhr = this
 		, url = new URL(xhr.responseURL, XMLHttpRequest.base)
 		, proto = url.protocol.slice(0, -1)
+		, head = (code, text, headers) => {
+			xhr.status = code
+			xhr.statusText = text
+			xhr._headers = headers
+			setState(xhr, xhr.HEADERS_RECEIVED)
+		}
+		, fillBody = chunk => {
+			xhr.responseText += chunk.toString("utf8")
+			setState(xhr, xhr.LOADING)
+		}
+		, done = err => {
+			if (err) {
+				if (xhr.onerror) xhr.onerror(err)
+				else throw err
+			}
+			else if (xhr._sync) setState(xhr, xhr.DONE)
+			else process.nextTick(setState, xhr, xhr.DONE)
+		}
 
 		if (proto === "http" || proto === "https") {
 			if (xhr._sync) throw Error("XMLHttpRequest sync not implemented")
 			url.method = xhr.method
-			url.headers = Object.keys(xhr._reqHeaders).reduce(function(result, key) {
+			url.headers = Object.keys(xhr._reqHeaders).reduce((result, key) => {
 				var entrie = xhr._reqHeaders[key]
 				result[entrie[0]] = entrie[1]
 				return result
 			}, {})
-			var req = require(proto).request(url, function(res) {
+			var req = require(proto).request(url, res => {
 				head(res.statusCode, res.statusMessage, res.headers)
 				res.on("data", fillBody)
 				res.on("end", done)
@@ -110,7 +128,7 @@ XMLHttpRequest.prototype = {
 		}
 
 		if (proto === "file") {
-			require("fs").readFile(url, function(err, chunk) {
+			require("fs").readFile(url, (err, chunk) => {
 				if (err) {
 					head(404, "Not Found", {})
 				} else {
@@ -128,25 +146,6 @@ XMLHttpRequest.prototype = {
 		}
 
 		throw Error("Unsuported protocol in: " + url)
-
-		function head(code, text, headers) {
-			xhr.status = code
-			xhr.statusText = text
-			xhr._headers = headers
-			setState(xhr, xhr.HEADERS_RECEIVED)
-		}
-		function fillBody(chunk) {
-			xhr.responseText += chunk.toString("utf8")
-			setState(xhr, xhr.LOADING)
-		}
-		function done(err) {
-			if (err) {
-				if (xhr.onerror) xhr.onerror(err)
-				else throw err
-			}
-			else if (xhr._sync) setState(xhr, xhr.DONE)
-			else process.nextTick(setState, xhr, xhr.DONE)
-		}
 	}
 }
 

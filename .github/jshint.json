@@ -1,6 +1,6 @@
 {
   "asi": true,
-  "esversion": 5,
+  "esversion": 6,
   "evil": true,
   "laxcomma": true,
   "maxdepth": 6,
