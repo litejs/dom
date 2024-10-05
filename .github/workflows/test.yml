@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
         - { node: 8,  os: ubuntu-latest,  arch: x86 }
-        - { node: 8,  os: windows-latest, arch: x86 }
+        - { node: 10, os: windows-latest, arch: x86 }
         - { node: 12, os: macos-latest,   arch: x64 }
         - { node: 16, os: ubuntu-latest,  arch: x64 }
     runs-on: ${{ matrix.os }}

@@ -23,6 +23,6 @@
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
-    "@litejs/cli": "23.11.1"
+    "@litejs/cli": "24.10.0"
   }
 }
