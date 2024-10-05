@@ -1,12 +1,9 @@
-/* global unescape */
 
 /*! litejs.com/MIT-LICENSE.txt */
-
 
 var DOM = require(".")
 , URL = require("url").URL
 , parser = new DOM.DOMParser()
-, dataUrlRe = /^([^;,]*?)(;[^,]+?|),(.*)$/
 , setState = (xhr, state) => {
 	if (xhr.readyState !== state) {
 		xhr.readyState = state
@@ -24,7 +21,6 @@ exports.protocolHandler = {}
 function XMLHttpRequest() {
 	this._reqHeaders = Object.assign({}, exports.defaultHeaders)
 }
-
 
 XMLHttpRequest.prototype = {
 	UNSENT: 0,
@@ -118,7 +114,7 @@ XMLHttpRequest.prototype = {
 			return
 		}
 		if (proto === "data") {
-			var match = dataUrlRe.exec(url.pathname)
+			var match = /^([^;,]*?)(;[^,]+?|),(.*)$/.exec(url.pathname)
 			if (match) {
 				head(200, "OK", { "content-type": match[1] || "text/plain" })
 				fillBody(match[2] ? Buffer.from(match[3], "base64") : unescape(match[3]))
