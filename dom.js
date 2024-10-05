@@ -107,7 +107,7 @@ var boolAttrs = {
 		this.parentNode.replaceChild(frag, this)
 	},
 	get style() {
-		return this._style || (this._style = new CSSStyleDeclaration(this.getAttribute("style") || ""))
+		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
 	},
 	set style(value) {
 		this.style.cssText = value
@@ -289,7 +289,7 @@ NamedNodeMap.prototype = {
 	},
 	setNamedItem(attr) {
 		var oldAttr = this.getNamedItem(attr.name)
-		if (attr.name === "style") attr.value = new CSSStyleDeclaration(attr.value).cssText
+		if (attr.name === "style") attr.value = CSSStyleDeclaration(attr.value).cssText
 		this[attr.name] = attr
 		return oldAttr
 	},

@@ -52,7 +52,7 @@ describe("parser", function() {
 			)
 			assert.equal(
 				ul.style.backgroundImage,
-				"url('https://1.1.1.1:80/i.png')"
+				"url(https://1.1.1.1:80/i.png)"
 			)
 			return result
 		})
