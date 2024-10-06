@@ -16,7 +16,7 @@ var boolAttrs = {
 , rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
-, CSSStyleDeclaration = require("./css.js").CSSStyleDeclaration
+, { CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
 , selector = require("./selector.js")
 , Node = {
 	ELEMENT_NODE:                1,
@@ -106,6 +106,9 @@ var boolAttrs = {
 		frag.innerHTML = html
 		this.parentNode.replaceChild(frag, this)
 	},
+	get sheet() {
+		if (this.tagName === "STYLE") return new CSSStyleSheet({ el: this })
+	},
 	get style() {
 		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
 	},
@@ -178,9 +181,10 @@ var boolAttrs = {
 		return selector.find(this, sel)
 	},
 	toString(minify) {
-		return rawTextElements[this.tagName] ? this.textContent : this.childNodes.reduce(function(memo, node) {
-			return memo + node.toString(minify)
-		}, "")
+		return rawTextElements[this.tagName] ? (
+			minify && this.tagName === "STYLE" ? this.sheet.toString(minify) :
+			this.textContent
+		) : this.childNodes.map(node => node.toString(minify)).join("")
 	}
 }
 , Element = {
