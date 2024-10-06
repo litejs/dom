@@ -1,4 +1,4 @@
-describe("Selectors", function() {
+describe("Selectors", () => {
 	var DOM = require("../")
 	, document = DOM.document
 
@@ -11,8 +11,7 @@ describe("Selectors", function() {
 		return el
 	}
 
-	this
-	.test("getElementById, getElementsByTagName, getElementsByClassName, querySelector", function (assert) {
+	test("getElementById, getElementsByTagName, getElementsByClassName, querySelector", assert => {
 		document = new DOM.Document()
 
 		var result
@@ -95,7 +94,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	.test("Element.matches and Element.closest", function (assert) {
+	test("Element.matches and Element.closest", assert => {
 		document = new DOM.Document()
 
 		var el1   = append_el(1, document.body, "div")
@@ -122,8 +121,8 @@ describe("Selectors", function() {
 		in1.disabled = true
 		in2.required = true
 
-		assert.throws(function() { el1.matches({}) })
-		assert.throws(function() { el1.matches([]) })
+		assert.throws(() => { el1.matches({}) })
+		assert.throws(() => { el1.matches([]) })
 
 		assert.equal(el1.matches(null), false)
 		assert.equal(el1.matches("div"), true)
@@ -295,7 +294,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	.test(":nth-child selector", function (assert) {
+	test(":nth-child selector", assert => {
 		document = new DOM.Document()
 		var el = document.body
 		, p1   = append_el("p1", el, "p")
@@ -356,7 +355,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	.test(":nth-last-child selector", function (assert) {
+	test(":nth-last-child selector", assert => {
 		document = new DOM.Document()
 		var el = document.body
 		, p1   = append_el("p1", el, "p")
@@ -420,7 +419,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	.test(":lang() selector", function (assert) {
+	test(":lang() selector", assert => {
 		var document = new DOM.Document()
 		, el = document.body
 		, p1   = append_el("p1", el, "p")
@@ -440,7 +439,7 @@ describe("Selectors", function() {
 		assert.end()
 	})
 
-	.test(":contains() selector", function (assert) {
+	test(":contains() selector", assert => {
 		var document = new DOM.Document()
 		, el = document.body
 		, p1   = append_el(1, el, "p", "ab cd")

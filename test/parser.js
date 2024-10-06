@@ -1,15 +1,15 @@
 
-describe("parser", function() {
+describe("parser", () => {
 	require("@litejs/cli/snapshot")
 
-	var DOM = require("../")
-	, parser = new DOM.DOMParser()
-	, serializer = new DOM.XMLSerializer()
+	var { Document, DOMParser, XMLSerializer } = require("../")
+	, parser = new DOMParser()
+	, serializer = new XMLSerializer()
 	, fs = require("fs")
 	, path = require("path")
 	, test = describe.test
 
-	test("MDN DOMParser example", function (assert) {
+	test("MDN DOMParser example", assert => {
 		var xmlStr = '<q id="a"><span id="b">hey!</span></q>'
 		, doc = parser.parseFromString(xmlStr, "application/xml")
 
@@ -24,9 +24,9 @@ describe("parser", function() {
 		assert.end()
 	})
 
-	test("parse and stringify", function (assert) {
-		assert.matchSnapshot("./test/samp1.html", function(str) {
-			var document = new DOM.Document()
+	test("parse and stringify", assert => {
+		assert.matchSnapshot("./test/samp1.html", str => {
+			var document = new Document()
 			document.documentElement.outerHTML = str
 			assert.equal(document.querySelector("span").textContent, "&<>'\"")
 			assert.equal(document.querySelector("span").title, "&<>'\"")
@@ -34,54 +34,39 @@ describe("parser", function() {
 		})
 		assert.end()
 	})
-	test("minify samp1.html", function (assert) {
-		assert.matchSnapshot("./test/samp1.html", function(str) {
-			var document = new DOM.Document()
-			document.documentElement.outerHTML = str
-			var script = document.querySelector("script")
-			, ul = document.getElementsByClassName("gr")[0]
-			, result = document.toString(true)
-			assert.equal(
-				script.textContent,
-				"\ndocument.write('<p>ETAGO delimiter</p><script>console.log(\"A\")<\\/script><script>console.log(\"B\")<\\/script>')\n"
-			)
-			script.textContent = "document.write('<script>alert(\"<!--\")</script><script>alert(\"--!>\")</script>')"
-			assert.equal(
-				script.textContent,
-				"document.write('<script>alert(\"<\\!--\")<\\/script><script>alert(\"--!>\")<\\/script>')"
-			)
-			assert.equal(
-				ul.style.backgroundImage,
-				"url(https://1.1.1.1:80/i.png)"
-			)
-			return result
-		})
-		assert.end()
-	})
-	test("parse and reminify samp1.html.snap1", function (assert) {
+
+	test("minify {0}", [
+		[ "samp1.html", "" ],
+		[ "samp2.html", "text/html" ],
+		[ "atom.xml", "application/xml" ],
+	], (file, mime, assert) => assert.matchSnapshot("./test/" + file, str => parser.parseFromString(str, mime).toString(true)).end())
+
+	test("parse and reminify samp1.html.snap1", assert => {
 		var src = fs.readFileSync(path.resolve("./test/samp1.html.snap1"), "utf8").trim()
-		assert.equal(parser.parseFromString(src).toString(true), src)
-		assert.end()
-	})
-	test("minify samp2.html", function (assert) {
-		assert.matchSnapshot("./test/samp2.html", function(str) {
-			var document = new DOM.Document()
-			document.documentElement.outerHTML = str
-			return document.toString(true)
-		})
-		assert.end()
-	})
-	test("minify atom.xml", function (assert) {
-		assert.matchSnapshot("./test/atom.xml", function(str) {
-			return parser.parseFromString(str, "application/xml").toString(true)
-		})
+		, document = parser.parseFromString(src)
+		, script = document.querySelector("script")
+		, ul = document.getElementsByClassName("gr")[0]
+
+		assert.equal(document.toString(true), src)
+		assert.equal(
+			script.textContent,
+			"\ndocument.write('<p>ETAGO delimiter</p><script>console.log(\"A\")<\\/script><script>console.log(\"B\")<\\/script>')\n"
+		)
+		script.textContent = "document.write('<script>alert(\"<!--\")</script><script>alert(\"--!>\")</script>')"
+		assert.equal(
+			script.textContent,
+			"document.write('<script>alert(\"<\\!--\")<\\/script><script>alert(\"--!>\")<\\/script>')"
+		)
+		assert.equal(
+			ul.style.backgroundImage,
+			"url(https://1.1.1.1:80/i.png)"
+		)
 		assert.end()
 	})
 
-	test("replace document", function (assert) {
+	test("replace document", assert => {
 		var document = readDom("./test/samp1.html")
-
-		var header = document.getElementById("header")
+		, header = document.getElementById("header")
 		, comment = header.firstChild
 		, comment2 = document.body.firstChild
 		assert.equal(comment.nodeType, 8)
@@ -95,7 +80,7 @@ describe("parser", function() {
 		assert.end()
 	})
 
-	test("document.title", function(assert) {
+	test("document.title", assert => {
 		var document = parser.parseFromString("<h1>Hi</h1>")
 		assert.equal(document.querySelector("title"), null)
 		assert.equal(document.title, "")
@@ -105,13 +90,12 @@ describe("parser", function() {
 		assert.end()
 	})
 
-	test("unclosed style", function(assert) {
+	test("unclosed style", assert => {
 		var document = parser.parseFromString("<head><style>a<style>b")
-		assert.equal(document.querySelectorAll("style").length, 1)
-		assert.end()
+		assert.equal(document.querySelectorAll("style").length, 1).end()
 	})
 
-	test("atom", function (assert) {
+	test("atom", assert => {
 		var document = readDom("./test/atom.xml")
 
 		assert.equal(document.querySelectorAll("feed").length, 1)
@@ -124,7 +108,7 @@ describe("parser", function() {
 
 
 	/*
-	test("rdf", function (assert) {
+	test("rdf", assert => {
 		var document = readDom("./test/rdf.xml")
 
 		//assert.equal(document.querySelectorAll("rdf\\:Description").length, 4)
@@ -133,9 +117,9 @@ describe("parser", function() {
 		assert.end()
 	})
 
-	test("rss", function (assert) {
+	test("rss", assert => {
 		var src = readDom("./test/rss.xml")
-		, document = new DOM.Document()
+		, document = new Document()
 
 		document.documentElement.outerHTML = src
 
@@ -151,11 +135,10 @@ describe("parser", function() {
 
 	function readDom(fileName) {
 		var src = fs.readFileSync(path.resolve(fileName.split("?")[0]), "utf8").trim()
-		, document = new DOM.Document()
+		, document = new Document()
 		document.documentElement.outerHTML = src
 
 		return document
 	}
-
-
 })
+

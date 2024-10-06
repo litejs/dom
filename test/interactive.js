@@ -1,12 +1,11 @@
 
 
-describe("Interactive DOM", function() {
+describe("Interactive DOM", () => {
 	var undef
-	, DOM = require("../interactive")
-	, document = DOM.document
+	,  { document } = require("../interactive")
 	, it = describe.it
 
-	it("have focus and blur", function (assert) {
+	it("have focus and blur", assert => {
 		var el = document.createElement("h1")
 
 		assert.type(el.focus, "function")

@@ -1,49 +1,40 @@
 
-describe("XMLHttpRequest", function() {
+describe("XMLHttpRequest", () => {
 	var { XMLHttpRequest, protocolHandler } = require("../net.js")
 
-	it("throws on invalid protocol", function(assert) {
-		assert.throws(function() {
+	it("throws", assert => {
+		assert.throws(() => {
 			var xhr = new XMLHttpRequest()
 			xhr.open("GET", "foo://litejs.com")
 			xhr.send()
-		})
-		assert.end()
-	})
+		}, "on invalid protocol")
 
-	it("throws on sync request", function(assert) {
-		assert.throws(function() {
+		assert.throws(() => {
 			var xhr = new XMLHttpRequest()
 			xhr.open("GET", "https://litejs.com", false)
 			xhr.send()
-		})
-		assert.end()
-	})
+		}, "on sync request")
 
-	it("throws on abort", function(assert) {
-		assert.throws(function() {
+		assert.throws(() => {
 			var xhr = new XMLHttpRequest()
 			xhr.abort()
-		})
-		assert.end()
-	})
+		}, "on abort")
 
-	it("throws on reuse", function(assert) {
-		assert.throws(function() {
+		assert.throws(() => {
 			var xhr = new XMLHttpRequest()
 			xhr.open("GET", "https://litejs.com")
 			xhr.open("GET", "https://litejs.com")
-		})
+		}, "on reuse")
 		assert.end()
 	})
 
-	it("make request", function (assert) {
+	it("make request", assert => {
 		assert.setTimeout(5000)
 		var xhr = new XMLHttpRequest()
 		xhr.setRequestHeader("Accept", "text/html")
 		xhr.open("GET", "https://litejs.com")
 		xhr.responseType = "document"
-		xhr.onload = function() {
+		xhr.onload = () => {
 			var doc = xhr.responseXML
 			assert.equal(doc.documentElement.nodeName, "HTML")
 			assert.equal(doc.querySelector("title").textContent, "LiteJS")
@@ -53,12 +44,12 @@ describe("XMLHttpRequest", function() {
 		xhr.send()
 	})
 
-	it("calls onreadystatechange", function (assert, mock) {
+	it("calls onreadystatechange", (assert, mock) => {
 		assert.setTimeout(5000)
 		var xhr = new XMLHttpRequest()
 		xhr.open("GET", "https://litejs.com")
 		xhr.onreadystatechange = mock.fn()
-		xhr.onload = function() {
+		xhr.onload = () => {
 			assert.equal(xhr.status, 200)
 			assert.equal(xhr.statusText, "OK")
 			assert.equal(xhr.responseXML, null)
@@ -72,11 +63,11 @@ describe("XMLHttpRequest", function() {
 		xhr.send()
 	})
 
-	it("calls onerror", function (assert, mock) {
+	it("calls onerror", (assert, mock) => {
 		assert.setTimeout(5000)
 		var xhr = new XMLHttpRequest()
 		xhr.open("GET", "http://0.0.0.0:0")
-		xhr.onerror = function() {
+		xhr.onerror = () => {
 			assert.equal(xhr.status, 0)
 			assert.equal(xhr.statusText, "")
 			assert.equal(xhr.responseXML, null)
@@ -86,7 +77,7 @@ describe("XMLHttpRequest", function() {
 		xhr.send()
 	})
 
-	describe("Data URLs", function() {
+	describe("Data URLs", () => {
 		var table = [
 			[ "data:,Hello%2C%20World%21", "text/plain", "Hello, World!" ],
 			[ "data:text/html,%3Ch1%3EHello%2C%20World%21%3C%2Fh1%3E", "text/html", "<h1>Hello, World!</h1>" ],
@@ -94,33 +85,33 @@ describe("XMLHttpRequest", function() {
 			[ "data:text/javascript,console.log('a')", "text/javascript", "console.log('a')" ]
 		]
 
-		it("handles invalid Data URL", function(assert) {
+		it("handles invalid Data URL", assert => {
 			assert.plan(2)
-			assert.throws(function() {
+			assert.throws(() => {
 				var xhr = new XMLHttpRequest()
 				xhr.open("GET", "data:Hello")
 				xhr.send()
 			})
 			var xhr = new XMLHttpRequest()
-			xhr.onerror = function(err) {
+			xhr.onerror = err => {
 				assert.ok(err)
 			}
 			xhr.open("GET", "data:Hello")
 			xhr.send()
 		})
 
-		it("handles async request {i}", table, function(url, mime, body, assert) {
+		it("handles async request {i}", table, (url, mime, body, assert) => {
 			var xhr = new XMLHttpRequest()
 			xhr.open("GET", url)
 			assert.equal(xhr.responseText, "")
-			xhr.onload = function() {
+			xhr.onload = () => {
 				assert.equal(xhr.getResponseHeader("content-type"), mime)
 				assert.equal(xhr.responseText, body)
 				assert.end()
 			}
 			xhr.send()
 		})
-		it("handles sync request {i}", table, function(url, mime, body, assert) {
+		it("handles sync request {i}", table, (url, mime, body, assert) => {
 			var xhr = new XMLHttpRequest()
 			xhr.open("GET", url, false)
 			xhr.send()
@@ -130,15 +121,15 @@ describe("XMLHttpRequest", function() {
 			assert.end()
 		})
 	})
-	describe("File URLs", function() {
+	describe("File URLs", () => {
 		it("reads {0}", [
 			[ "./README.md", 200, "text/plain" ],
 			[ "./bad-file.txt", 404, null ]
-		], function(file, statusCode, type, assert, mock) {
+		], (file, statusCode, type, assert, mock) => {
 			mock.swap(XMLHttpRequest, "base", "file://" + process.cwd() + "/")
 			var xhr = new XMLHttpRequest()
 			xhr.open("GET", file)
-			xhr.onload = function() {
+			xhr.onload = () => {
 				assert.equal(xhr.status, statusCode)
 				assert.equal(xhr.getResponseHeader("content-type"), type)
 				//assert.equal(xhr.responseText, data[2])
@@ -149,10 +140,10 @@ describe("XMLHttpRequest", function() {
 	})
 
 	// Blob was added in Node18
-	it("has a protocolHandler", parseInt(process.versions.node) >= 18 && function(assert) {
-		protocolHandler.blob = function(url, head, fillBody, done) {
+	it("has a protocolHandler", parseInt(process.versions.node) >= 18 ? assert => {
+		protocolHandler.blob = (url, head, fillBody, done) => {
 			var blob = require("buffer").resolveObjectURL("" + url)
-			if (blob) blob.text().then(function(text) {
+			if (blob) blob.text().then(text => {
 				head(200, "OK", { "content-type": blob.type, "content-length": blob.length })
 				fillBody(text)
 				done()
@@ -162,13 +153,13 @@ describe("XMLHttpRequest", function() {
 		var url = URL.createObjectURL(new Blob(['<q id="a"><span id="b">hey!</span></q>'], { type: "text/html" }))
 		var xhr = new XMLHttpRequest()
 		xhr.open("GET", url)
-		xhr.onload = function() {
+		xhr.onload = () => {
 			assert.equal(xhr.getResponseHeader("content-type"), "text/html")
 			assert.equal(xhr.responseText, '<q id="a"><span id="b">hey!</span></q>')
 			assert.equal(xhr.readyState, 4)
 			assert.end()
 		}
 		xhr.send()
-	})
+	} : null)
 })
 
