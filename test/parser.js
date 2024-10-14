@@ -36,10 +36,14 @@ describe("parser", () => {
 	})
 
 	test("minify {0}", [
-		[ "samp1.html", "" ],
-		[ "samp2.html", "text/html" ],
-		[ "atom.xml", "application/xml" ],
-	], (file, mime, assert) => assert.matchSnapshot("./test/" + file, str => parser.parseFromString(str, mime).toString(true)).end())
+		[ "samp1.html", "", true ],
+		[ "samp1.html", "", false ],
+		[ "samp1.html", "", {} ],
+		[ "samp1.html", "", { css: true } ],
+		[ "samp1.html", "", { css: {} } ],
+		[ "samp2.html", "text/html", true ],
+		[ "atom.xml", "application/xml", true ],
+	], (file, mime, min, assert) => assert.matchSnapshot("./test/" + file, str => parser.parseFromString(str, mime).toString(min)).end())
 
 	test("parse and reminify samp1.html.snap1", assert => {
 		var src = fs.readFileSync(path.resolve("./test/samp1.html.snap1"), "utf8").trim()

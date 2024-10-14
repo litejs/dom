@@ -6,9 +6,11 @@
   "author": "Lauri Rooden <lauri@rooden.ee>",
   "keywords": [
     "document",
-    "dom",
-    "html",
+    "DOM",
+    "HTML",
     "DOMParser",
+    "CSSOM",
+    "CSSStyleSheet",
     "XMLHttpRequest",
     "XMLSerializer",
     "litejs"

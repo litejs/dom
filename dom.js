@@ -180,11 +180,11 @@ var boolAttrs = {
 	querySelectorAll(sel) {
 		return selector.find(this, sel)
 	},
-	toString(minify) {
+	toString(min) {
 		return rawTextElements[this.tagName] ? (
-			minify && this.tagName === "STYLE" ? this.sheet.toString(minify) :
+			this.tagName === "STYLE" && (min === true || min && min.css) ? "\n" + this.sheet.toString(min.css || true) + "\n" :
 			this.textContent
-		) : this.childNodes.map(node => node.toString(minify)).join("")
+		) : this.childNodes.map(node => node.toString(min)).join("")
 	}
 }
 , Element = {
