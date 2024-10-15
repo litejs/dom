@@ -65,7 +65,7 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 	})
 
 	test("parse and stringify", assert => {
-		assert.matchSnapshot("./test/samp1.css", str => {
+		assert.matchSnapshot("./test/data/ui/css/samp1.css", str => {
 			const sheet = new CSSStyleSheet
 			sheet.replaceSync(str)
 			return sheet.toString()

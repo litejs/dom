@@ -25,7 +25,7 @@ describe("parser", () => {
 	})
 
 	test("parse and stringify", assert => {
-		assert.matchSnapshot("./test/data/ui/samp1.html", str => {
+		assert.matchSnapshot("./test/data/ui/index.html", str => {
 			var document = new Document()
 			document.documentElement.outerHTML = str
 			assert.equal(document.querySelector("span").textContent, "&<>'\"")
@@ -39,17 +39,17 @@ describe("parser", () => {
 	})
 
 	test("minify {0}", [
-		[ "data/ui/samp1.html", "", true ],
-		[ "data/ui/samp1.html", "", false ],
-		[ "data/ui/samp1.html", "", {} ],
-		[ "data/ui/samp1.html", "", { css: true } ],
-		[ "data/ui/samp1.html", "", { css: {} } ],
+		[ "data/ui/index.html", "", true ],
+		[ "data/ui/index.html", "", false ],
+		[ "data/ui/index.html", "", {} ],
+		[ "data/ui/index.html", "", { css: true } ],
+		[ "data/ui/index.html", "", { css: {} } ],
 		[ "samp2.html", "text/html", true ],
-		[ "atom.xml", "application/xml", true ],
+		[ "data/atom.xml", "application/xml", true ],
 	], (file, mime, min, assert) => assert.matchSnapshot("./test/" + file, str => parser.parseFromString(str, mime).toString(min)).end())
 
-	test("parse and reminify samp1.html.snap1", assert => {
-		var src = fs.readFileSync(path.resolve("./test/data/ui/samp1.html.snap1"), "utf8").trim()
+	test("parse and reminify index.html.snap1", assert => {
+		var src = fs.readFileSync(path.resolve("./test/data/ui/index.html.snap1"), "utf8").trim()
 		, document = parser.parseFromString(src)
 		, script = document.querySelector("script")
 		, ul = document.getElementsByClassName("gr")[0]
@@ -57,12 +57,12 @@ describe("parser", () => {
 		assert.equal(document.toString(true), src)
 		assert.equal(
 			script.textContent,
-			"\ndocument.write('<p>ETAGO delimiter</p><script>console.log(\"A\")<\\/script><script>console.log(\"B\")<\\/script>')\n"
+			"\nconsole.log('<p>ETAGO delimiter</p><script>console.log(\"A\")<\\/script><script>console.log(\"B\")<\\/script>')\n"
 		)
-		script.textContent = "document.write('<script>alert(\"<!--\")</script><script>alert(\"--!>\")</script>')"
+		script.textContent = "console.log('<script>alert(\"<!--\")</script><script>alert(\"--!>\")</script>')"
 		assert.equal(
 			script.textContent,
-			"document.write('<script>alert(\"<\\!--\")<\\/script><script>alert(\"--!>\")<\\/script>')"
+			"console.log('<script>alert(\"<\\!--\")<\\/script><script>alert(\"--!>\")<\\/script>')"
 		)
 		assert.equal(
 			ul.style.backgroundImage,
@@ -72,7 +72,7 @@ describe("parser", () => {
 	})
 
 	test("replace document", assert => {
-		var document = readDom("./test/data/ui/samp1.html")
+		var document = readDom("./test/data/ui/index.html")
 		, header = document.getElementById("header")
 		, comment = header.firstChild
 		, comment2 = document.body.firstChild
@@ -103,7 +103,7 @@ describe("parser", () => {
 	})
 
 	test("atom", assert => {
-		var document = readDom("./test/atom.xml")
+		var document = readDom("./test/data/atom.xml")
 
 		assert.equal(document.querySelectorAll("feed").length, 1)
 		assert.equal(document.querySelectorAll("feed>link").length, 2)
