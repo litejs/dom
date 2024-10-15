@@ -5,7 +5,7 @@ var boolAttrs = {
 	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:1
 }
 , numAttrs = "height maxLength minLength size tabIndex width"
-, strAttrs = "accept accesskey autocapitalize autofocus capture class contenteditable crossorigin dir for hidden href id integrity lang name nonce slot spellcheck src title type translate"
+, strAttrs = "accept accesskey autocapitalize autofocus capture class contenteditable crossorigin dir for hidden href id integrity lang name nonce rel slot spellcheck src title type translate"
 , defaultAttrs = {
 	"form method get":1, "input type text":1,
 	"script type text/javascript":1, "style type text/css":1
@@ -107,7 +107,10 @@ var boolAttrs = {
 		this.parentNode.replaceChild(frag, this)
 	},
 	get sheet() {
-		if (this.tagName === "STYLE") return new CSSStyleSheet({ el: this })
+		if (this.tagName === "STYLE" || this.tagName === "LINK" && this.rel === "stylesheet" && this.href) return new CSSStyleSheet({
+			href: this.href,
+			ownerNode: this
+		})
 	},
 	get style() {
 		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
@@ -412,6 +415,9 @@ function Document() {
 }
 
 extendNode(Document, Element, {
+	get styleSheets() {
+		return selector.find(this, "style,link[rel=stylesheet][href]").map(el => el.sheet)
+	},
 	get title() {
 		var el = selector.find(this, "title", 1)
 		return el && el.textContent || ""

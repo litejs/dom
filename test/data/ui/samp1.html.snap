@@ -7,7 +7,10 @@
 body { background-image: url("CDATA-in-block-comment.png?width=300&height=300") }
 /**/
 </style>
+<link rel="stylesheet">
+	<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" type="text/css" href="styles/a.css?123">
+		<link rel="icon" type="image/png" href="data:image/png;base64,">
 <!--[if lt IE 8]><link rel="stylesheet" type="text/css" href="styles/ie.css?123"><![endif]-->
 <script>
 document.write('<p>ETAGO delimiter</p><script>console.log("A")<\/script><script>console.log("B")<\/script>')

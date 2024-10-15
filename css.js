@@ -100,7 +100,7 @@ function CSSStyleDeclaration(text, parentRule = null) {
 
 function CSSStyleSheet(opts) {
 	Object.assign(this, opts)
-	this.replaceSync(this.el ? this.el.textContent : "")
+	this.replaceSync(this.ownerNode ? this.ownerNode.textContent : "")
 }
 
 CSSStyleSheet.prototype = {

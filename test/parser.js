@@ -25,28 +25,31 @@ describe("parser", () => {
 	})
 
 	test("parse and stringify", assert => {
-		assert.matchSnapshot("./test/samp1.html", str => {
+		assert.matchSnapshot("./test/data/ui/samp1.html", str => {
 			var document = new Document()
 			document.documentElement.outerHTML = str
 			assert.equal(document.querySelector("span").textContent, "&<>'\"")
 			assert.equal(document.querySelector("span").title, "&<>'\"")
+			assert.equal(document.styleSheets.length, 3)
+			assert.notOk(document.querySelectorAll("link[rel=stylesheet]")[0].sheet)
+			assert.ok(document.querySelectorAll("link[rel=stylesheet]")[1].sheet)
 			return document.toString().replace(/--!>/g, "-->").replace(/=""/g, "")
 		})
 		assert.end()
 	})
 
 	test("minify {0}", [
-		[ "samp1.html", "", true ],
-		[ "samp1.html", "", false ],
-		[ "samp1.html", "", {} ],
-		[ "samp1.html", "", { css: true } ],
-		[ "samp1.html", "", { css: {} } ],
+		[ "data/ui/samp1.html", "", true ],
+		[ "data/ui/samp1.html", "", false ],
+		[ "data/ui/samp1.html", "", {} ],
+		[ "data/ui/samp1.html", "", { css: true } ],
+		[ "data/ui/samp1.html", "", { css: {} } ],
 		[ "samp2.html", "text/html", true ],
 		[ "atom.xml", "application/xml", true ],
 	], (file, mime, min, assert) => assert.matchSnapshot("./test/" + file, str => parser.parseFromString(str, mime).toString(min)).end())
 
 	test("parse and reminify samp1.html.snap1", assert => {
-		var src = fs.readFileSync(path.resolve("./test/samp1.html.snap1"), "utf8").trim()
+		var src = fs.readFileSync(path.resolve("./test/data/ui/samp1.html.snap1"), "utf8").trim()
 		, document = parser.parseFromString(src)
 		, script = document.querySelector("script")
 		, ul = document.getElementsByClassName("gr")[0]
@@ -69,7 +72,7 @@ describe("parser", () => {
 	})
 
 	test("replace document", assert => {
-		var document = readDom("./test/samp1.html")
+		var document = readDom("./test/data/ui/samp1.html")
 		, header = document.getElementById("header")
 		, comment = header.firstChild
 		, comment2 = document.body.firstChild

@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang=en data-a=http://www.w3.org/1999/xhtml data-b=http://opengraphprotocol.org/schema/ ><head><title>1 + 2 = 3</title><meta http-equiv=Content-Type content="text/html; charset=utf-8"><style>
 body{background-image:url(CDATA-in-block-comment.png?width=300&height=300)}
-</style><link rel=stylesheet type=text/css href=styles/a.css?123><script>
+</style><link rel=stylesheet><link rel=manifest href=manifest.json><link rel=stylesheet type=text/css href=styles/a.css?123><link rel=icon type=image/png href=data:image/png;base64,><script>
 document.write('<p>ETAGO delimiter</p><script>console.log("A")<\/script><script>console.log("B")<\/script>')
 </script><script async src=http://www.google-analytics.com/ga.js></script><script>
 //
