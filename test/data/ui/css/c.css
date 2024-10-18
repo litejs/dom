@@ -1,0 +1,8 @@
+
+.c {
+	content: "url(my-icon.jpg)";
+	cursor: url(my-icon.jpg);
+	background: url('/static/star.gif') bottom right repeat-x blue;
+	mask-image: image(url("https://example.com/images/mask.png"), skyblue, linear-gradient(rgb(0 0 0 / 100%), transparent));
+}
+

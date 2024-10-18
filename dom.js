@@ -110,7 +110,7 @@ var boolAttrs = {
 		if (this.tagName === "STYLE" || this.tagName === "LINK" && this.rel === "stylesheet" && this.href) return new CSSStyleSheet({
 			href: this.href,
 			ownerNode: this
-		})
+		}, this.tagName === "STYLE" && this.textContent)
 	},
 	get style() {
 		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))

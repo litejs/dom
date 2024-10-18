@@ -1,8 +1,12 @@
 
-@import url("fineprint.css") print;
-@import url("bluish.css") print, screen;
-@import "common.css" screen;
-@import url("landscape.css") screen and (orientation: landscape);
+@import url("a.css") print;
+@import url(../b.css) print, screen;
+@import 'c.css' screen;
+@import url("a.css") screen and (orientation: landscape);
+@import url("a.css") supports(display: flex);
+@import url("a.css") supports(selector(p:has(a)));
+@import url("a.css");
+
 
 @namespace url(http://www.w3.org/1999/xhtml);
 @namespace svg url(http://www.w3.org/2000/svg);

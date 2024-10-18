@@ -31,7 +31,7 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 	})
 
 	describe("CSSStyleSheet", () => {
-		const sheet = new CSSStyleSheet
+		const sheet = new CSSStyleSheet()
 		test("constructor", assert => {
 			sheet.insertRule(".btn { padding-top: 10px; }")
 			assert.equal(sheet.rules.length, 1)
@@ -62,12 +62,45 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 			sheet.replaceSync(text)
 			assert.equal(sheet.toString(), expected).end()
 		})
+
+		test("@import", [
+			[ null, "@import 'css/c.css';", "@import 'css/c.css';" ],
+			[ {}, "@import 'css/c.css';", "@import 'css/c.css';" ],
+			[ { min: true }, "@import 'css/c.css';", "@import 'css/c.css';" ],
+			[ { min: { import: true } },
+				"@import 'test/data/ui/css/c.css';",
+				".c{content:'url(my-icon.jpg)';cursor:url(test/data/ui/css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
+			],
+			[ { min: { import: true, root: "test/data/ui" } },
+				"@import 'css/c.css';",
+				".c{content:'url(my-icon.jpg)';cursor:url(css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
+			],
+			[ { min: { import: true, root: "test/data/ui/css" } }, "@import 'c.css';",
+				".c{content:'url(my-icon.jpg)';cursor:url(my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
+			],
+
+		], (opts, source, result, assert) => {
+			const sheet = new CSSStyleSheet(opts)
+			sheet.replaceSync(source)
+			assert.equal(sheet.toString(), result)
+			assert.end()
+		})
 	})
 
-	test("parse and stringify", assert => {
+	test("lint", function(assert) {
+		assert.throws(function() {
+			const sheet = new CSSStyleSheet()
+			sheet.replaceSync("a{b:1;}}")
+		}).end()
+	})
+
+	test("parse and stringify", [
+		[ null ],
+		[ true ],
+		[ { import: true, root: "./test/data/ui/css" } ],
+	], (min, assert) => {
 		assert.matchSnapshot("./test/data/ui/css/samp1.css", str => {
-			const sheet = new CSSStyleSheet
-			sheet.replaceSync(str)
+			const sheet = new CSSStyleSheet({ min }, str)
 			return sheet.toString()
 		})
 		assert.end()

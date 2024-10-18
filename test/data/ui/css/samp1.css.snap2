@@ -1,10 +1,10 @@
-@import 'a.css' print;
-@import url(../b.css) print,screen;
-@import 'c.css' screen;
-@import 'a.css' screen and (orientation:landscape);
-@import 'a.css' supports(display:flex);
-@import 'a.css' supports(selector(p:has(a)));
-@import 'a.css';
+.a{top:0px}
+.b{top:1px}
+.c{content:'url(my-icon.jpg)';cursor:url(my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}
+.a{top:0px}
+.a{top:0px}
+.a{top:0px}
+.a{top:0px}
 @namespace url(http://www.w3.org/1999/xhtml);
 @namespace svg url(http://www.w3.org/2000/svg);
 @media (min-width:500px){body{color:blue}}

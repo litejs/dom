@@ -4,7 +4,8 @@
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 
-var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + str + "'" : _) :
+var path = require("path")
+, clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + str + "'" : _) :
 	_.replace(/[\t\n]+/g, " ")
 	.replace(/ *([,;{}>~+\/]) */g, "$1")
 	.replace(/;(?=})/g, "")
@@ -43,6 +44,7 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 }
 , ruleTypes = {
 	style: {
+		type: 1,
 		get cssText() {
 			return this.style.length > 0 ? this.selectorText + "{" + this.style.cssText + "}" : ""
 		},
@@ -54,9 +56,32 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 	},
 	import: {
 		get cssText() {
-			return this.text
+			var href
+			, sheet = this.parentStyleSheet
+			, min = sheet.min
+			, text = this.text
+			, urlRe = /(["']).*?\1|url\((['"]?)(?!\/|data:|https?:)(.*?)\2\)/g
+			, urlFn = (m,q1,q2,u) => q1 ? m : "url('" + path.join(text.baseURI, u) + "')"
+			if (min && min.import) {
+				href = path.join(sheet.baseURI, this.href)
+				text = new CSSStyleSheet({
+					parentStyleSheet: sheet,
+					href,
+					min
+				}, require("fs").readFileSync(path.resolve(min.root || "", href), "utf8"))
+				if (sheet.baseURI !== text.baseURI) {
+					text.rules.forEach(rule => {
+						if (rule.type === 1) for (let style = rule.style, i = style.length; i--; ) {
+							if (urlRe.test(style[style[i]])) style[style[i]] = style[style[i]].replace(urlRe, urlFn)
+						}
+					})
+				}
+				text += ""
+			}
+			return text
 		},
 		set cssText(text) {
+			this.href = text.split(/['"()]+/)[1]
 			this.text = clear(text.replace(/url\(("|')(.+?)\1\)/g, "'$2'"))
 		}
 	},
@@ -100,12 +125,21 @@ function CSSStyleDeclaration(text, parentRule = null) {
 	return style
 }
 
-function CSSStyleSheet(opts) {
+function CSSStyleSheet(opts, text = "") {
 	Object.assign(this, opts)
-	this.replaceSync(this.ownerNode ? this.ownerNode.textContent : "")
+	if (opts && opts.href) {
+		this.baseURI = path.join(
+			(opts.parentStyleSheet || opts.ownerNode && opts.ownerNode.ownerDocument).baseURI || "",
+			opts.href,
+			".."
+		)
+	}
+	this.replaceSync(text)
 }
 
 CSSStyleSheet.prototype = {
+	baseURI: "",
+	root: "",
 	disabled: false,
 	type: "text/css",
 	deleteRule(idx) {
@@ -139,7 +173,8 @@ CSSStyleSheet.prototype = {
 			sheet.rules.push(CSSRule(text.slice(arr[m], arr[m + 1]), sheet, arr[m+2]))
 		}
 	},
-	toString() {
+	toString(min) {
+		if (min) this.min = min
 		return this.rules.map(rule => rule.cssText).filter(Boolean).join("\n")
 	}
 }
