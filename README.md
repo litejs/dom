@@ -10,16 +10,13 @@
 LiteJS DOM &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 ==========
 
-Dependency-free DOM library for handling HTML files on server-side.  
-[DOM spec](https://dom.spec.whatwg.org/) |
-[Selectors Level 3](http://www.w3.org/TR/selectors/)
+Dependency-free DOM library for handling HTML files on server-side.
 
-
-Examples
---------
 
 ```javascript
-const { document, DOMParser, XMLSerializer } = require("@litejs/dom");
+import { document, DOMParser, XMLSerializer } from "@litejs/dom";
+import { XMLHttpRequest } from "@litejs/dom/net.js";
+// const { document } = require("@litejs/dom");
 
 // Build DOM manually
 const el = document.createElement("h1");
@@ -43,14 +40,13 @@ el.querySelectorAll("b");
 // [ "<b>hello world</b>" ]
 
 // Use XMLHttpRequest in server side
-const { XMLHttpRequest } = require("@litejs/dom/net.js");
 const xhr = new XMLHttpRequest();
 xhr.open("GET", "https://litejs.com");
 xhr.responseType = "document";
 xhr.onload = function() {
-	const document = xhr.responseXML;
+	const doc = xhr.responseXML;
 	// Work with DOM in familiar way
-	console.log(document.querySelector("title").textContent);
+	console.log(doc.querySelector("title").textContent);
 }
 xhr.send();
 ```
