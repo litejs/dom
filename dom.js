@@ -123,7 +123,7 @@ var boolAttrs = {
 		return false
 	},
 	hasChildNodes() {
-		return this.childNodes && this.childNodes.length > 0
+		return !!this.firstChild
 	},
 	getElementById(id) {
 		return selector.find(this, "#" + id, 1)
