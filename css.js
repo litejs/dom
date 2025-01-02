@@ -62,7 +62,7 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 	"}": {
 		get cssText() {
 			var body = "" + this.style
-			return body.length > 0 ? this.mediaText + "{\n" + body + "\n}" : ""
+			return body.length > 0 ? this.mediaText + "{" + body + "}" : ""
 		},
 		set cssText(text) {
 			var idx = text.indexOf("{")

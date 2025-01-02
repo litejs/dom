@@ -64,6 +64,12 @@ CSSPageRule @page at-rule is a CSS at-rule used to modify different aspects of p
 }
 
 
+[data-error]:after {
+	content: "Error " attr(data-error);
+	color: #eb5757;
+	display: block;
+	padding: 1em;
+}
 
 
 
