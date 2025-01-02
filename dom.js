@@ -488,6 +488,8 @@ function getSibling(node, step, type) {
 
 exports.document = new Document()
 exports.entities = entities
+exports.CSSStyleDeclaration = CSSStyleDeclaration
+exports.CSSStyleSheet = CSSStyleSheet
 exports.DOMParser = DOMParser
 exports.Document = Document
 exports.DocumentFragment = DocumentFragment
