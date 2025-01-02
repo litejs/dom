@@ -14,4 +14,4 @@ svg|a{top:2px}
 @page{margin:1cm}
 @keyframes slidein{from{transform:translateX(0%)}
 to{transform:translateX(100%)}}
-[data-error]:after{content:'Error ' attr(data-error);color:#eb5757;display:block;padding:1em}
+[data-error]:after{content:'Error ' attr(data-error);color:#eb5757;display:block;font-size:.75em}

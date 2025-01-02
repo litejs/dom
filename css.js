@@ -9,6 +9,7 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 	.replace(/ *([,;{}>~+\/]) */g, "$1")
 	.replace(/;(?=})/g, "")
 	.replace(/: +/g, ":")
+	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
 , clear = s => s.replace(/(["'])((?:\\\1|.)*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
 , styleHandler = {
 	get(style, prop) {
