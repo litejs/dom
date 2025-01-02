@@ -6,11 +6,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
-    - run: npm install --no-audit
+    - run: npm install --no-audit && npm install -g uglify-js
     - run: npm audit --audit-level=low
     - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
     - run: node --import=@litejs/cli/test.js test/load.mjs
-    - run: npm run lint
+    - run: npx lj lint
     - uses: coverallsapp/github-action@v2
       name: Upload to coveralls.io
       with:
@@ -61,7 +61,10 @@ jobs:
       with:
         registry-url: https://registry.npmjs.org/
     - run: |
-        gh release create $TAG --title $TAG --notes "$(git tag -l --format='%(subject)%0a%0a%(contents:body)' $TAG)"
+        MSG=$(git log -1 --no-show-signature --format=%B $TAG)
+        TITLE=$(echo "$MSG" | head -n 1)
+        NOTES=$(echo "$MSG" | tail -n +2)
+        gh release create $TAG --title "$TITLE" --notes "$NOTES"
         gh run list --json databaseId  -q '.[20:]|.[].databaseId' --limit 100 | xargs -I{} gh run delete "{}"
         [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "PUBLISH=latest" >> $GITHUB_ENV || echo "PUBLISH=next" >> $GITHUB_ENV
       env:

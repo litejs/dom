@@ -20,11 +20,10 @@
     "*.js"
   ],
   "scripts": {
-    "lint": "npx jshint -c .github/jshint.json *.js",
-    "test": "lj t test/*.js"
+    "test": "lj t"
   },
   "repository": "github:litejs/dom",
   "devDependencies": {
-    "@litejs/cli": "24.10.0"
+    "@litejs/cli": "25.1.0"
   }
 }

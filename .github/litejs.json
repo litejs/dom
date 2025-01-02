@@ -1,3 +1,10 @@
 {
-  "build": false
+  "lint": {
+    "jshint": ".github/jshint.json",
+    "_": [
+      "*.json",
+      ".github/*.json",
+      "*.js"
+    ]
+  }
 }
