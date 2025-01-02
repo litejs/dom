@@ -7,7 +7,7 @@
 @media (min-width:500px){body{color:blue}}
 @font-face{font-family:'Trickster';src:local('Trickster'),url(trickster-COLRv1.otf) format('opentype') tech(color-COLRv1),url(trickster-outline.otf) format('opentype'),url(trickster-outline.woff) format('woff')}
 @counter-style thumbs{system:cyclic;symbols:'\1F44D';suffix:' '}
-ul{list-style:thumbs}
+.ul,ul{list-style:thumbs}
 a{top:1px}
 svg|a{top:2px}
 *|a{top:3px}

@@ -28,6 +28,7 @@
   suffix: " ";
 }
 
+.ul,
 ul {
   list-style: thumbs;
 }

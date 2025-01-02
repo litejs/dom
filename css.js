@@ -47,7 +47,7 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 		},
 		set cssText(text) {
 			var idx = text.indexOf("{")
-			this.selectorText = text.slice(0, idx).trim()
+			this.selectorText = clear(text.slice(0, idx).trim())
 			this.style = CSSStyleDeclaration(text.slice(idx + 1).replace(/}\s*/, ""), this)
 		}
 	},
