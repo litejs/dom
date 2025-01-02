@@ -1,7 +1,7 @@
-@import url(fineprint.css) print;
-@import url(bluish.css) print,screen;
-@import'common.css'screen;
-@import url(landscape.css) screen and (orientation:landscape);
+@import 'fineprint.css' print;
+@import 'bluish.css' print,screen;
+@import 'common.css' screen;
+@import 'landscape.css' screen and (orientation:landscape);
 @namespace url(http://www.w3.org/1999/xhtml);
 @namespace svg url(http://www.w3.org/2000/svg);
 @media (min-width:500px){

@@ -5,9 +5,9 @@ exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 
 var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + str + "'" : _) :
-	_.trim().replace(/[\t\n]/g, " ")
+	_.replace(/[\t\n]+/g, " ")
 	.replace(/ *([,;{}>~+\/]) */g, "$1")
-	.replace(/^ +|;(?=})/g, "")
+	.replace(/;(?=})/g, "")
 	.replace(/: +/g, ":")
 , clear = s => s.replace(/(["'])((?:\\\1|.)*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
 , styleHandler = {
@@ -23,7 +23,7 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 	set(style, prop, val) {
 		if (prop === "cssText") {
 			var m, k
-			, re = /(?:^|;)\s*([-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)(?=;|$)/ig
+			, re = /([*_]?[-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)/ig
 			, len = 0
 			, lastIdx = {}
 			for (; (m = re.exec(val)); ) {
@@ -31,7 +31,7 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 				if (lastIdx[k] >= 0) style.__[lastIdx[k]] = style[k]
 				style[style[lastIdx[k] = len++] = k] = style[
 					k === "float" ? "cssFloat" : k.replace(/-([a-z])/g, (_, a) => a.toUpperCase())
-				] = clear(m[2])
+				] = clear(m[2]).trim()
 			}
 			style.length = len
 		} else {
@@ -53,10 +53,10 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 	},
 	import: {
 		get cssText() {
-			return clear(this.text)
+			return this.text
 		},
 		set cssText(text) {
-			this.text = clear(text)
+			this.text = clear(text.replace(/url\(("|')(.+?)\1\)/g, "'$2'"))
 		}
 	},
 	"}": {
