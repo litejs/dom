@@ -28,13 +28,18 @@
   suffix: " ";
 }
 
-.ul,
+/*
+Expects box-sizing: border-box;
+*/
+
+
+.ul, /* .nul */
 ul {
   list-style: thumbs;
+  background: fixed bottom right/contain no-repeat #040505 url('ul.svg'); /*! data-uri */
 }
 
-/* This matches all XHTML <a> elements, as XHTML is the default unprefixed namespace */
-a {
+a /* This matches all XHTML <a> elements, as XHTML is the default unprefixed namespace */ {
 	top: 1px;
 }
 

@@ -62,14 +62,15 @@ var clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + st
 	},
 	"}": {
 		get cssText() {
-			var body = "" + this.style
+			var style = new CSSStyleSheet({})
+			style.replaceSync(this.text)
+			var body = "" + style
 			return body.length > 0 ? this.mediaText + "{" + body + "}" : ""
 		},
 		set cssText(text) {
 			var idx = text.indexOf("{")
 			this.mediaText = clear(text.slice(0, idx).trim())
-			this.style = new CSSStyleSheet({})
-			this.style.replaceSync(text.slice(idx + 1, -1))
+			this.text = text.slice(idx + 1, -1)
 		}
 	},
 	";": {
@@ -86,7 +87,7 @@ function CSSRule(text, parentStyleSheet, atType, parentRule = null) {
 	// Clear comments and trim
 	text = text.replace(/^\s+|\/\*[^*]*\*+([^/*][^*]*\*+)*\/|\s+$/g, "")
 	var type = text[0] === "@" && text.slice(1, text.indexOf(" ")) || "style"
-	, rule = Object.create(ruleTypes[type] || ruleTypes[type === "font-face" || type === "counter-style" ? "style" : atType])
+	, rule = Object.create(ruleTypes[type] || ruleTypes[type === "page" || type === "font-face" || type === "counter-style" ? "style" : atType])
 	rule.cssText = text
 	rule.parentStyleSheet = parentStyleSheet
 	rule.parentRule = parentRule
@@ -116,17 +117,26 @@ CSSStyleSheet.prototype = {
 	replaceSync(text) {
 		var m
 		, sheet = this
-		, re = /((?:("|')(?:\\.|(?!\2)[^\\])*?\2|[^"'}{;])+)|./ig
+		, re = /((?:("|')(?:\\.|(?!\2)[^\\])*?\2|[^"'}{;\/]|\/(?!\*))+)|(\/\*[\s\S]*?\*\/)|./g
 		, block = 0
 		, pos = 0
+		, arr = []
 		sheet.rules = sheet.cssRules = []
 		sheet.warnings = []
 		for (; (m = re.exec(text)); ) {
 			if (m[0] === "{") {
 				block++
-			} else if (m[0] === ";" && block === 0 || m[0] === "}" && --block < 1) {
-				sheet.rules.push(CSSRule(text.slice(pos, pos = re.lastIndex), sheet, m[0]))
+			} else if (m[3] && block === 0) {
+				text = text.slice(0, m.index) + text.slice(re.lastIndex)
+				re.lastIndex = m.index
+			} else if (m[0] === ";" && block === 0 || m[0] === "}" && --block === 0) {
+				arr.push(pos, pos = re.lastIndex, m[0])
+			} else if (block < 0) {
+				throw "Invalid css"
 			}
+		}
+		for (m = 0; m < arr.length; m += 3) {
+			sheet.rules.push(CSSRule(text.slice(arr[m], arr[m + 1]), sheet, arr[m+2]))
 		}
 	},
 	toString() {
