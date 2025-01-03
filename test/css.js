@@ -49,14 +49,18 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 			assert.end()
 		})
 
-		test("parse {i}", [
+		test("parse '{0}'", [
 			[" ", ""],
 			[" html {} body{  } ", ""],
+			["a{a:1}b{b:2}c{c:3}", "a{a:1}\nb{b:2}\nc{c:3}"],
+			["/*A*/a/*B\\*/{b:c}/**/d/**/{e:f}", "a{b:c}\nd{e:f}"],
+			["a\\,b{c:d}", "a\\,b{c:d}"],
 			[" * {margin:0} body { font-size: 1.4em; } p { color: red; }", "*{margin:0}\nbody{font-size:1.4em}\np{color:red}"],
 			["div {\n background: #00a400;\n background: linear-gradient(to bottom, rgb(214, 122, 127) 0%, hsla(237deg 74% 33% / 61%) 100%);}", "div{background:#00a400;background:linear-gradient(to bottom,rgb(214,122,127) 0%,hsla(237deg 74% 33%/61%) 100%)}"],
 			[" @import url('a.css') screen;  @import url(\"b.css\") screen; * { margin: 0; }", "@import 'a.css' screen;\n@import 'b.css' screen;\n*{margin:0}"],
 			["@media (min-width: 500px) {\n  body {\n    color: blue;\n  }\n}\n", "@media (min-width:500px){body{color:blue}}"],
 			["@media (min-width: 500px) {\n\n}\n", ""],
+			[".a { b: url('a\\'b') }", ".a{b:url(\"a'b\")}"],
 			//[":root{--my-test-variable:123px}.p{ width: var(--my-test-variable); }", ".p{width:123px}"],
 		], (text, expected, assert) => {
 			sheet.replaceSync(text)

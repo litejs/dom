@@ -5,13 +5,13 @@ exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 
 var path = require("path")
-, clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + str + "'" : _) :
+, clearFn = (_, q, str) => q ? (q = str.indexOf("'") == -1 ? "'" : "\"", q + str.replace(q === "'" ? /\\(")/g : /\\(')/g, "$1")) + q :
 	_.replace(/[\t\n]+/g, " ")
 	.replace(/ *([,;{}>~+\/]) */g, "$1")
 	.replace(/;(?=})/g, "")
 	.replace(/: +/g, ":")
 	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
-, clear = s => s.replace(/(["'])((?:\\\1|.)*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
+, clear = s => s.replace(/("|')((?:\\\1|[^\1])*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
 , styleHandler = {
 	get(style, prop) {
 		if (prop === "cssText") {
@@ -110,7 +110,7 @@ var path = require("path")
 
 function CSSRule(text, parentStyleSheet, atType, parentRule = null) {
 	// Clear comments and trim
-	text = text.replace(/^\s+|\/\*[^*]*\*+([^/*][^*]*\*+)*\/|\s+$/g, "")
+	text = text.replace(/\/\*(?:[^*]|\*(?!\/))*\*\//g, "").trim()
 	var type = text[0] === "@" && text.slice(1, text.indexOf(" ")) || "style"
 	, rule = Object.create(ruleTypes[type] || ruleTypes[type === "page" || type === "font-face" || type === "counter-style" ? "style" : atType])
 	rule.cssText = text
@@ -149,28 +149,34 @@ CSSStyleSheet.prototype = {
 		this.rules.splice(idx > -1 ? idx : this.rules.length, 0, CSSRule(rule, this))
 	},
 	replaceSync(text) {
-		var m
-		, sheet = this
-		, re = /((?:("|')(?:\\.|(?!\2)[^\\])*?\2|[^"'}{;\/]|\/(?!\*))+)|(\/\*[\s\S]*?\*\/)|./g
-		, block = 0
-		, pos = 0
-		, arr = []
+		var qpos, sheet = this
 		sheet.rules = sheet.cssRules = []
 		sheet.warnings = []
-		for (; (m = re.exec(text)); ) {
-			if (m[0] === "{") {
-				block++
-			} else if (m[3] && block === 0) {
-				text = text.slice(0, m.index) + text.slice(re.lastIndex)
-				re.lastIndex = m.index
-			} else if (m[0] === ";" && block === 0 || m[0] === "}" && --block === 0) {
-				arr.push(pos, pos = re.lastIndex, m[0])
-			} else if (block < 0) {
-				throw "Invalid css"
+		for (var char, inQuote, depth = 0, start = 0, pos = 0, len = text.length; pos < len; pos++) {
+			char = text[pos]
+			if (char === "\\" && inQuote !== "/") {
+				pos++
+			} else if (inQuote) {
+				if (char === inQuote) {
+					if (char !== "/" || text[pos - 1] === "*") {
+						if (char === "/" && depth < 1) {
+							// Remove root level comments
+							text = text.slice(0, qpos) + text.slice(pos + 1)
+							pos = qpos - 1
+							len = text.length
+						}
+						inQuote = ""
+					}
+				}
+			} else if (char === "'" || char === "\"" || char === "/" && text[pos+1] === "*") {
+				inQuote = char
+				qpos = pos
+			} else if (char === "{") {
+				depth++
+			} else if (char === "}" && --depth < 1 || char === ";" && depth < 1) {
+				if (depth < 0) throw "Invalid css"
+				sheet.rules.push(CSSRule(text.slice(start, start = pos + 1), sheet, char))
 			}
-		}
-		for (m = 0; m < arr.length; m += 3) {
-			sheet.rules.push(CSSRule(text.slice(arr[m], arr[m + 1]), sheet, arr[m+2]))
 		}
 	},
 	toString(min) {
