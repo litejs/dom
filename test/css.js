@@ -57,6 +57,7 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 			[" @import url('a.css') screen;  @import url(\"b.css\") screen; * { margin: 0; }", "@import 'a.css' screen;\n@import 'b.css' screen;\n*{margin:0}"],
 			["@media (min-width: 500px) {\n  body {\n    color: blue;\n  }\n}\n", "@media (min-width:500px){body{color:blue}}"],
 			["@media (min-width: 500px) {\n\n}\n", ""],
+			[".a { b: url('a\\'b') }", ".a{b:url(\"a'b\")}"],
 			//[":root{--my-test-variable:123px}.p{ width: var(--my-test-variable); }", ".p{width:123px}"],
 		], (text, expected, assert) => {
 			sheet.replaceSync(text)

@@ -5,13 +5,13 @@ exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 
 var path = require("path")
-, clearFn = (_, q, str) => q ? (q == "\"" && str.indexOf("'") == -1 ? "'" + str + "'" : _) :
+, clearFn = (_, q, str) => q ? (q = str.indexOf("'") == -1 ? "'" : "\"", q + str.replace(q === "'" ? /\\(")/g : /\\(')/g, "$1")) + q :
 	_.replace(/[\t\n]+/g, " ")
 	.replace(/ *([,;{}>~+\/]) */g, "$1")
 	.replace(/;(?=})/g, "")
 	.replace(/: +/g, ":")
 	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
-, clear = s => s.replace(/(["'])((?:\\\1|.)*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
+, clear = s => s.replace(/("|')((?:\\\1|[^\1])*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
 , styleHandler = {
 	get(style, prop) {
 		if (prop === "cssText") {
@@ -110,7 +110,7 @@ var path = require("path")
 
 function CSSRule(text, parentStyleSheet, atType, parentRule = null) {
 	// Clear comments and trim
-	text = text.replace(/^\s+|\/\*[^*]*\*+([^/*][^*]*\*+)*\/|\s+$/g, "")
+	text = text.replace(/\/\*(?:[^*]|\*(?!\/))*\*\//g, "").trim()
 	var type = text[0] === "@" && text.slice(1, text.indexOf(" ")) || "style"
 	, rule = Object.create(ruleTypes[type] || ruleTypes[type === "page" || type === "font-face" || type === "counter-style" ? "style" : atType])
 	rule.cssText = text
@@ -151,7 +151,7 @@ CSSStyleSheet.prototype = {
 	replaceSync(text) {
 		var m
 		, sheet = this
-		, re = /((?:("|')(?:\\.|(?!\2)[^\\])*?\2|[^"'}{;\/]|\/(?!\*))+)|(\/\*[\s\S]*?\*\/)|./g
+		, re = /("|')(?:[^\n\\]|\\.)*?\1|(\/\*(?:[^*]|\*(?!\/))*\*\/)|[{};]/g
 		, block = 0
 		, pos = 0
 		, arr = []
@@ -160,7 +160,7 @@ CSSStyleSheet.prototype = {
 		for (; (m = re.exec(text)); ) {
 			if (m[0] === "{") {
 				block++
-			} else if (m[3] && block === 0) {
+			} else if (m[2] && block === 0) {
 				text = text.slice(0, m.index) + text.slice(re.lastIndex)
 				re.lastIndex = m.index
 			} else if (m[0] === ";" && block === 0 || m[0] === "}" && --block === 0) {
