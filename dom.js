@@ -294,7 +294,6 @@ NamedNodeMap.prototype = {
 	},
 	setNamedItem(attr) {
 		var oldAttr = this.getNamedItem(attr.name)
-		if (attr.name === "style") attr.value = CSSStyleDeclaration(attr.value).cssText
 		this[attr.name] = attr
 		return oldAttr
 	},
@@ -303,6 +302,7 @@ NamedNodeMap.prototype = {
 		, tagName = map.ownerElement.tagName
 		, isXml = map.ownerElement.ownerDocument.contentType === "application/xml"
 		return map.names().map(loName => {
+			if (loName === "style" && minify && map.ownerElement.style) { /* Access to style makes _style */ }
 			var attr = map.getNamedItem(loName)
 			, name = attr.name
 			, value = attr.value.replace(escRe, escFn)
