@@ -16,7 +16,7 @@ var boolAttrs = {
 , rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
-, { CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
+, { selectorSplit, CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
 , selector = require("./selector.js")
 , Node = {
 	ELEMENT_NODE:                1,
@@ -488,6 +488,7 @@ function getSibling(node, step, type) {
 
 exports.document = new Document()
 exports.entities = entities
+exports.selectorSplit = selectorSplit
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 exports.DOMParser = DOMParser
