@@ -50,6 +50,33 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 			assert.end()
 		})
 
+		test("color {i} '{1}'", [
+			[ ".a{color:rgb(255 0 153)}.b{color:rgb( 0 1 2 )}", ".a{color:rgb(255 0 153)}\n.b{color:rgb( 0 1 2 )}"],
+		], (text, expected, assert) => {
+			const sheet = new CSSStyleSheet()
+			sheet.replaceSync(text)
+			assert.equal(sheet.toString(true), expected).end()
+		})
+
+		test("color {i} '{1}'", [
+			[ { color: true }, ".a{color:rgb(255,0,153)}.b{color:rgb( 0 1 2 )}", ".a{color:#f09}\n.b{color:#000102}"],
+			[ { color: true }, ".a{color:hsl(0 0% 0%)}", ".a{color:#000}"],
+			[ { color: true }, ".a{color:hsl(0 0% 100%)}", ".a{color:#fff}"],
+			[ { color: true }, ".a{color:hsl(0deg 100% 100%)}", ".a{color:#fff}"],
+			[ { color: true }, ".a{color:hsl(30 10 90)}", ".a{color:#e8e6e3}"],
+			[ { color: true }, ".a{color:hsl(60,20%,80%)}", ".a{color:#d6d6c2}"],
+			[ { color: true }, ".a{color:hsla(90,30,70)}", ".a{color:#b3c99c}"],
+			[ { color: true }, ".a{color:hsla(90 30 70 / 1)}", ".a{color:#b3c99c}"],
+			[ { color: true }, ".a{color:hsla(90 30 70 100%)}", ".a{color:#b3c99c}"],
+			[ { color: true }, ".a{color:hsla(90 30 70 / 0.5)}", ".a{color:rgba(179,201,156,.5)}"],
+			[ { color: true }, ".a{color:hsla(90, 30%, 70%, 50%)}", ".a{color:rgba(179,201,156,.5)}"],
+			[ { color: true }, ".a{color:hsl(120 40% 60%)}", ".a{color:#70c270}"],
+		], (min, text, expected, assert) => {
+			const sheet = new CSSStyleSheet({ min })
+			sheet.replaceSync(text)
+			assert.equal(sheet.toString(), expected).end()
+		})
+
 		test("parse '{0}'", [
 			[" ", ""],
 			[" html {} body{  } ", ""],

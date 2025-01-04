@@ -13,15 +13,38 @@ var path = require("path")
 	.replace(/: +/g, ":")
 	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
 , clear = s => s.replace(/("|')((?:\\\1|[^\1])*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
+, toRgb = {
+	rgb(r, g, b) {
+		var f = n => ((n | 0) + 256).toString(16).slice(1)
+		return f(r) + f(g) + f(b)
+	},
+	hsl(h, s, l) {
+		l /= 100
+		s /= 100 / (l < 0.5 ? l : 1 - l)
+		function f(n) {
+			n = (n + h / 30) % 12
+			return (0 | 256.5 + (255 * (l - s * (n < 2 || n > 10 ? -1 : n < 4 ? n - 3 : n > 8 ? 9 - n : 1)))).toString(16).slice(1)
+		}
+		return f(0) + f(8) + f(4)
+	}
+}
+, toRgba = (rgbHex, alpha) => ("rgba(" + rgbHex.replace(/../g, x => parseInt(x, 16)+",") + alpha + ")").replace("0.", ".")
+, colorRe = /\b(rgb|hsl)a?\s*\(\s*(\d+)(?:deg)?[\s,]+(\d+)[\s,%]+(\d+)%?(?:[\s,\/]+(0?\.?\d+)(%?))?\s*\)/g
+, colorFn = (_, name, a, b, c, d, p) => (_ = toRgb[name](a, b, c), (p ? d/=100 : d) < 1 ? toRgba(_, d) : "#" + _.replace(/(\w)\1(\w)\2(\w)\3/, "$1$2$3"))
 , styleHandler = {
 	get(style, prop) {
 		if (prop === "cssText") {
+			var min = style.parentRule && style.parentRule.parentStyleSheet.min
 			for (var out = [], i = style.length; i--; ) {
-				out[i] = style[i] + ":" + (style.__[i] || style[style[i]])
+				out[i] = joinProp(style[i], style.__[i] || style[style[i]])
 			}
 			return out.join(";")
 		}
 		return style[prop] || ""
+		function joinProp(name, value) {
+			if (min && min.color) value = value.replace(colorRe, colorFn)
+			return name + ":" + value
+		}
 	},
 	set(style, prop, val) {
 		if (prop === "cssText") {
