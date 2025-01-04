@@ -15,14 +15,22 @@ jobs:
       name: Upload to coveralls.io
       with:
         github-token: ${{ github.token }}
+  Bun:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: oven-sh/setup-bun@v2
+    - run: bun i
+    - run: bun x lj t
   Test:
     strategy:
       matrix:
         include:
-        - { node: 8,  os: ubuntu-latest,  arch: x86 }
-        - { node: 10, os: windows-latest, arch: x86 }
-        - { node: 12, os: macos-latest,   arch: x64 }
-        - { node: 16, os: ubuntu-latest,  arch: x64 }
+        - { node: 8,  os: ubuntu-24.04,   arch: x86 }
+        - { node: 10, os: windows-2022,   arch: x86 }
+        - { node: 12, os: macos-13,       arch: x64 }
+        - { node: 16, os: ubuntu-24.04,   arch: x64 }
+        - { node: 22, os: macos-14,       arch: arm64 }
     runs-on: ${{ matrix.os }}
     name: Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
