@@ -168,9 +168,7 @@ var boolAttrs = {
 		, clone = new node.constructor(node.tagName || node.data)
 		clone.ownerDocument = node.ownerDocument
 
-		if (node.attributes) {
-			node.attributes.names().forEach(attr => clone.setAttribute(attr, node.getAttribute(attr)))
-		}
+		mergeAttributes(node, clone)
 
 		if (deep && node.hasChildNodes()) {
 			node.childNodes.forEach(child => clone.appendChild(child.cloneNode(deep)))
@@ -486,8 +484,15 @@ function getSibling(node, step, type) {
 	return type > 0 ? getElement(silbings, index + step, step, type) : silbings && silbings[index + step] || null
 }
 
+function mergeAttributes(source, target) {
+	if (source && target && source.attributes) {
+		source.attributes.names().forEach(attr => target.setAttribute(attr, source.getAttribute(attr)))
+	}
+}
+
 exports.document = new Document()
 exports.entities = entities
+exports.mergeAttributes = mergeAttributes
 exports.selectorSplit = selectorSplit
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
