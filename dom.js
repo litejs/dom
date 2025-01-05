@@ -13,6 +13,9 @@ var boolAttrs = {
 , voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1, KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
+, svgVoidElements = {
+	circle:1, ellipse:1, image:1, line:1, path:1, polygon:1, polyline:1, rect:1, stop:1, use:1,
+}
 , rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
@@ -69,6 +72,7 @@ var boolAttrs = {
 		, attrRe = /([^=\s]+)(?:\s*=\s*(("|')((?:\\\3|[\s\S])*?)\3|[^\s"'`=<>]+)|)/g
 		, frag = doc.createDocumentFragment()
 		, tree = frag
+		, voidEl = doc.documentElement.tagName === "svg" ? svgVoidElements : voidElements
 
 		for (; (m = tagRe.exec(html)); ) {
 			if (m[4]) {
@@ -83,7 +87,7 @@ var boolAttrs = {
 					for (text = ""; (m = tagRe.exec(html)) && !re.test(m[0]); text += m[3] || m[0]);
 					child.textContent = text.replace(unescRe, unescFn)
 					if (!m) break
-				} else if (!voidElements[child.tagName] && !m[8]) tree = child
+				} else if (!voidEl[child.tagName] && !m[8]) tree = child
 			} else {
 				tree.appendChild(
 					m[2] ? doc.createComment(m[2].replace(unescRe, unescFn)) :
@@ -350,8 +354,11 @@ extendNode(HTMLElement, Element, {
 	tagName: null,
 	toString(minify) {
 		var attrs = this.attributes.toString(minify)
-		return "<" + this.localName + (attrs ? " " + attrs + (attrs.slice(-1) === "/" ? " >" : ">") : ">") +
-		(voidElements[this.tagName] ? "" : Node.toString.call(this, minify) + "</" + this.localName + ">")
+		, isXml = this.ownerDocument.contentType === "application/xml"
+		, voidEl = this.ownerDocument.documentElement.tagName === "svg" ? svgVoidElements : voidElements
+		return "<" + this.localName +
+			(attrs ? " " + (attrs.slice(-1) === "/" ? attrs + " " : attrs) : "") +
+			(voidEl[this.tagName] ? (isXml ? "/>" : ">") : ">" + Node.toString.call(this, minify) + "</" + this.localName + ">")
 	}
 })
 

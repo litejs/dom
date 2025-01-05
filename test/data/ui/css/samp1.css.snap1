@@ -10,7 +10,7 @@
 @media (min-width:500px){body{color:blue}}
 @font-face{font-family:'Trickster';src:local('Trickster'),url(trickster-COLRv1.otf) format('opentype') tech(color-COLRv1),url(trickster-outline.otf) format('opentype'),url(trickster-outline.woff) format('woff')}
 @counter-style thumbs{system:cyclic;symbols:'\1F44D';suffix:' '}
-.ul,ul{list-style:thumbs;content:url(data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=) "url('icon.png')";background:fixed bottom right/contain no-repeat #040505 url('data:image/svg+xml;,<svg xmlns="http://www.w3.org/2000/svg" height="600" width="900" viewbox="-300 -200 900 600" fill="%2300a651"><path d="M14 340a2.2 2.2 0 1 1 0 .1zm9 20a5.2 5.2 0 1 1 0 .1z"></path></svg>')}
+.ul,ul{list-style:thumbs;content:url(data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=) "url('icon.png')";background:fixed bottom right/contain no-repeat #040505 url('data:image/svg+xml;,<svg xmlns="http://www.w3.org/2000/svg" height="600" width="900" viewbox="-300 -200 900 600" fill="%2300a651"><path d="M14 340a2.2 2.2 0 1 1 0 .1zm9 20a5.2 5.2 0 1 1 0 .1z"/></svg>')}
 a{top:1px}
 svg|a{top:2px}
 *|a{top:3px}

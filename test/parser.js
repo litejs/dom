@@ -87,6 +87,13 @@ describe("parser", () => {
 		assert.end()
 	})
 
+	test("svg void elements", assert => {
+		var document = parser.parseFromString("<svg xmlns='http://www.w3.org/2000/svg'></svg>", "application/xml")
+		document.documentElement.innerHTML = "<path d='m1'></path>"
+		assert.equal(document.toString(true), '<svg xmlns="http://www.w3.org/2000/svg"><path d="m1"/></svg>')
+		assert.end()
+	})
+
 	test("document.title", assert => {
 		var document = parser.parseFromString("<h1>Hi</h1>")
 		assert.equal(document.querySelector("title"), null)
