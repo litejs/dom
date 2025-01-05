@@ -11,6 +11,7 @@ jobs:
     - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
     - run: node --import=@litejs/cli/test.js test/load.mjs
     - run: npx lj lint
+    - run: ./test/readme.sh
     - uses: coverallsapp/github-action@v2
       name: Upload to coveralls.io
       with:

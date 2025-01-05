@@ -1,0 +1,4 @@
+<h1 id="123" class="large"><b>hello world</b></h1>
+<h1 id=123 class=large><b>hello world</b></h1>
+.a{color:#fff}
+LiteJS

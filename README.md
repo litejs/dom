@@ -10,13 +10,13 @@
 LiteJS DOM &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 ==========
 
-Dependency-free DOM library for handling HTML files on server-side.
+Dependency-free DOM library for handling HTML and CSS files on server-side.
 
 
 ```javascript
-import { document, DOMParser, XMLSerializer } from "@litejs/dom";
-import { XMLHttpRequest } from "@litejs/dom/net.js";
 // const { document } = require("@litejs/dom");
+import { document, CSSStyleSheet, DOMParser, XMLSerializer } from "@litejs/dom";
+import { XMLHttpRequest } from "@litejs/dom/net.js";
 
 // Build DOM manually
 const el = document.createElement("h1");
@@ -27,13 +27,13 @@ const fragment = document.createDocumentFragment();
 fragment.appendChild(document.createTextNode("hello"));
 el.appendChild(fragment);
 
-// Replace the DOM tree with parsed HTML
+// Replace the DOM tree with HTML
 el.innerHTML = "<b>hello world</b>";
-el.toString();
+console.log(el.toString());
 // <h1 id="123" class="large"><b>hello world</b></h1>
 
-// minify output
-el.toString(true);
+// Minify HTML
+console.log(el.toString(true));
 // <h1 id=123 class=large><b>hello world</b></h1>
 
 el.querySelectorAll("b");
@@ -49,6 +49,12 @@ xhr.onload = function() {
 	console.log(doc.querySelector("title").textContent);
 }
 xhr.send();
+
+// Minify CSS
+const sheet = new CSSStyleSheet({ min: { color: true } })
+sheet.replaceSync(".a { color: hsl(0 0% 100%) }")
+console.log(sheet.toString())
+// .a{color:#fff}
 ```
 
 ## Contributing
@@ -57,7 +63,7 @@ Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide),
 run tests `npm install; npm test`.
 
 
-> Copyright (c) 2014-2024 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+> Copyright (c) 2014-2025 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [MIT License](https://litejs.com/MIT-LICENSE.txt) |
 [GitHub repo](https://github.com/litejs/dom) |
 [npm package](https://npmjs.org/package/@litejs/dom) |
