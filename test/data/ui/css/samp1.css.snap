@@ -10,7 +10,7 @@
 @media (min-width:500px){body{color:blue}}
 @font-face{font-family:'Trickster';src:local('Trickster'),url(trickster-COLRv1.otf) format('opentype') tech(color-COLRv1),url(trickster-outline.otf) format('opentype'),url(trickster-outline.woff) format('woff')}
 @counter-style thumbs{system:cyclic;symbols:'\1F44D';suffix:' '}
-.ul,ul{list-style:thumbs;background:fixed bottom right/contain no-repeat #040505 url(ul.svg)}
+.ul,ul{list-style:thumbs;content:url(tiny.gif) "url('icon.png')";background:fixed bottom right/contain no-repeat #040505 url(ul.svg)}
 a{top:1px}
 svg|a{top:2px}
 *|a{top:3px}
@@ -18,3 +18,4 @@ svg|a{top:2px}
 @keyframes slidein{from{transform:translateX(0%)}
 to{transform:translateX(100%)}}
 [data-error]:after{content:'Error ' attr(data-error);color:#eb5757;display:block;font-size:.75em}
+.Chart-xLabel{text-anchor:middle}

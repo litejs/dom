@@ -7,13 +7,18 @@ exports.CSSStyleSheet = CSSStyleSheet
 
 var fs = require("fs")
 , path = require("path")
-, clearFn = (_, q, str) => q ? (q = str.indexOf("'") == -1 ? "'" : "\"", q + str.replace(q === "'" ? /\\(")/g : /\\(')/g, "$1")) + q :
+, urlRe = /(["']).*?\1|url\((['"]?)(?!\/|data:|https?:)(.*?)\2\)/g
+, clearFn = (_, q, str, c) =>
+	q ? (q = str.indexOf("'") == -1 ? "'" : "\"", q + str.replace(q === "'" ? /\\(")/g : /\\(')/g, "$1")) + q :
+	c ? "" :
 	_.replace(/[\t\n]+/g, " ")
 	.replace(/ *([,;{}>~+\/]) */g, "$1")
 	.replace(/;(?=})/g, "")
 	.replace(/: +/g, ":")
 	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
-, clear = s => s.replace(/("|')((?:\\\1|[^\1])*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
+, clear = s => s
+	.replace(/("|')((?:\\\1|[^\1])*?)\1|\s*(\/)\*(?:[^*]|\*(?!\/))*\*\/\s*|(?:[^"'\/]|\/(?!\*))+/g, clearFn)
+	.replace(/(["']).*?\1|url\(("|')([^'"()\s]+)\2\)/g, (m,q1,q2,u) => q1 ? m : "url(" + u + ")")
 , read = (sheet, url, enc = "utf8") => fs.readFileSync(path.resolve(sheet.min.root || "", sheet.baseURI, url), enc)
 , toRgb = {
 	rgb(r, g, b) {
@@ -51,20 +56,45 @@ var fs = require("fs")
 	set(style, prop, val) {
 		if (prop === "cssText") {
 			var m, k
-			, re = /([*_]?[-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)/ig
+			, sheet = style.parentRule && style.parentRule.parentStyleSheet
+			, min = sheet && sheet.min
+			, re = /([*_]?[-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)|\/\*!?((?:[^*]|\*(?!\/))*)\*\//ig
 			, len = 0
 			, lastIdx = {}
 			for (; (m = re.exec(val)); ) {
-				k = m[1]
-				if (lastIdx[k] >= 0) style.__[lastIdx[k]] = style[k]
-				style[style[lastIdx[k] = len++] = k] = style[
-					k === "float" ? "cssFloat" : k.replace(/-([a-z])/g, (_, a) => a.toUpperCase())
-				] = clear(m[2]).trim()
+				if (m[4]) {
+					if (min && len) style[k = style[len - 1]] = clear(transformValue(m[4].trim(), style[k]))
+					continue
+				} else {
+					k = m[1]
+					if (lastIdx[k] >= 0) style.__[lastIdx[k]] = style[k]
+					style[style[lastIdx[k] = len++] = k] = style[
+						k === "float" ? "cssFloat" : k.replace(/-([a-z])/g, (_, a) => a.toUpperCase())
+					] = clear(m[2]).trim()
+				}
 			}
 			style.length = len
 		} else {
 			if (!style[prop]) style[style.length++] = prop
 			style[prop] = style[prop === "cssFloat" ? "float" : prop.replace(/[A-Z]/g, "-$&").toLowerCase()] = clear(val)
+		}
+		function transformValue(cmd, v) {
+			var { DOMParser } = require("./dom.js")
+			if (cmd === "data-uri") {
+				return v.replace(urlRe, function(_, q1, q2, url) {
+					if (q1) return _
+					var ext = url.split(".").pop()
+					, enc = ext === "svg" ? "utf8" : "base64"
+					url = read(sheet, url, enc)
+					if (ext === "svg") {
+						enc = ""
+						ext += "+xml"
+						url = new DOMParser().parseFromString(url, "application/xml").toString(true).replace(/#/g, "%23")
+					}
+					return "url('data:image/" + ext + ";" + enc + "," + url + "')"
+				})
+			}
+			return v
 		}
 	}
 }
@@ -82,17 +112,14 @@ var fs = require("fs")
 	},
 	import: {
 		get cssText() {
-			var href
-			, sheet = this.parentStyleSheet
+			var sheet = this.parentStyleSheet
 			, min = sheet.min
 			, text = this.text
-			, urlRe = /(["']).*?\1|url\((['"]?)(?!\/|data:|https?:)(.*?)\2\)/g
 			, urlFn = (m,q1,q2,u) => q1 ? m : "url('" + path.join(text.baseURI, u) + "')"
 			if (min && min.import) {
-				href = path.join(sheet.baseURI, this.href)
 				text = new CSSStyleSheet({
 					parentStyleSheet: sheet,
-					href,
+					href: this.href,
 					min
 				}, read(sheet, this.href))
 				if (sheet.baseURI !== text.baseURI) {
@@ -136,12 +163,12 @@ var fs = require("fs")
 
 function CSSRule(text, parentStyleSheet, atType, parentRule = null) {
 	// Clear comments and trim
-	text = text.replace(/\/\*(?:[^*]|\*(?!\/))*\*\//g, "").trim()
+	text = text.trim()
 	var type = text[0] === "@" && text.slice(1, text.indexOf(" ")) || "style"
 	, rule = Object.create(ruleTypes[type] || ruleTypes[type === "page" || type === "font-face" || type === "counter-style" ? "style" : atType])
-	rule.cssText = text
 	rule.parentStyleSheet = parentStyleSheet
 	rule.parentRule = parentRule
+	rule.cssText = rule.type === 1 ? text : text.replace(/\/\*(?:[^*]|\*(?!\/))*\*\//g, "")
 	return rule
 }
 

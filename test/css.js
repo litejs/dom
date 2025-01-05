@@ -13,20 +13,19 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 		CSSStyleDeclaration,
 	} = env
 
-	describe("{0.name}", [
-		[ CSSStyleDeclaration, [
+	describe("CSSStyleDeclaration", () => {
+		test("{0}", [
 			[ "top:1px", { top: "1px" } ],
 			[ "margin-top: 12em ; padding-top: none", { marginTop: "12em", paddingTop: "none" } ],
 			[ "top: 2px", { top: "2px" } ],
 			[ "; top  :  3px ;", { top: "3px" } ],
 			[ "x: 1; y: 2;", { x: "1", y: "2" } ],
-		]],
-	], (fn, tests) => {
-		test("{0}", tests, (init, expected, assert) => {
-			const obj = fn(init)
+		], (init, expected, assert) => {
+			const obj = CSSStyleDeclaration(init)
+			const re = /^[; ]+| |[; ]+$/g
 			assert
 			.own(obj, expected)
-			.equal(obj.cssText.replace(/[ ;]/g, ""), init.replace(/[ ;]/g, ""))
+			.equal(obj.cssText.replace(re, ""), init.replace(re, ""))
 			.end()
 		})
 	})

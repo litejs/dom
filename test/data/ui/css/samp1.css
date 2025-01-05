@@ -20,7 +20,7 @@
 @font-face {
   font-family: "Trickster";
   src:
-    local("Trickster"),
+    local("Trickster"), /* tricki */
     url("trickster-COLRv1.otf") format("opentype") tech(color-COLRv1),
     url("trickster-outline.otf") format("opentype"),
     url("trickster-outline.woff") format("woff");
@@ -40,6 +40,7 @@ Expects box-sizing: border-box;
 .ul, /* .nul */
 ul {
   list-style: thumbs;
+  content: url('tiny.gif') "url('icon.png')"; /*! data-uri */
   background: fixed bottom right/contain no-repeat #040505 url('ul.svg'); /*! data-uri */
 }
 
@@ -81,6 +82,10 @@ CSSPageRule @page at-rule is a CSS at-rule used to modify different aspects of p
 	font-size: 0.75em;
 }
 
+.Chart-xLabel {
+	text-anchor: middle;
+	/*transform: translate(-100%, 0);*/
+}
 
 
 
