@@ -111,10 +111,7 @@ var boolAttrs = {
 		this.parentNode.replaceChild(frag, this)
 	},
 	get sheet() {
-		if (this.tagName === "STYLE" || this.tagName === "LINK" && this.rel === "stylesheet" && this.href) return new CSSStyleSheet({
-			href: this.href,
-			ownerNode: this
-		}, this.tagName === "STYLE" && this.textContent)
+		return makeSheet(this)
 	},
 	get style() {
 		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
@@ -187,7 +184,7 @@ var boolAttrs = {
 	},
 	toString(min) {
 		return rawTextElements[this.tagName] ? (
-			this.tagName === "STYLE" && (min === true || min && min.css) ? "\n" + this.sheet.toString(min.css || true) + "\n" :
+			this.tagName === "STYLE" && (min === true || min && min.css) ? "\n" + makeSheet(this, min.css || true) + "\n" :
 			this.textContent
 		) : this.childNodes.map(node => node.toString(min)).join("")
 	}
@@ -489,6 +486,14 @@ function getSibling(node, step, type) {
 	var silbings = node.parentNode && node.parentNode.childNodes
 	, index = silbings ? silbings.indexOf(node) : -1
 	return type > 0 ? getElement(silbings, index + step, step, type) : silbings && silbings[index + step] || null
+}
+
+function makeSheet(el, min) {
+	if (el.tagName === "STYLE" || el.tagName === "LINK" && el.rel === "stylesheet" && el.href) return new CSSStyleSheet({
+		href: el.href,
+		ownerNode: el,
+		min
+	}, el.tagName === "STYLE" && el.textContent)
 }
 
 function mergeAttributes(source, target) {
