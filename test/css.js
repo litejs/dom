@@ -129,10 +129,10 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 	test("parse and stringify", [
 		[ null ],
 		[ true ],
-		[ { import: true, root: "./test/data/ui/css" } ],
+		[ { import: true } ],
 	], (min, assert) => {
 		assert.matchSnapshot("./test/data/ui/css/samp1.css", str => {
-			const sheet = new CSSStyleSheet({ min }, str)
+			const sheet = new CSSStyleSheet({ min, baseURI: "test/data/ui/css" }, str)
 			return sheet.toString()
 		})
 		assert.end()

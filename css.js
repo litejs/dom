@@ -5,7 +5,8 @@ exports.selectorSplit = selectorSplit
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 
-var path = require("path")
+var fs = require("fs")
+, path = require("path")
 , clearFn = (_, q, str) => q ? (q = str.indexOf("'") == -1 ? "'" : "\"", q + str.replace(q === "'" ? /\\(")/g : /\\(')/g, "$1")) + q :
 	_.replace(/[\t\n]+/g, " ")
 	.replace(/ *([,;{}>~+\/]) */g, "$1")
@@ -13,6 +14,7 @@ var path = require("path")
 	.replace(/: +/g, ":")
 	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
 , clear = s => s.replace(/("|')((?:\\\1|[^\1])*?)\1|[^"']+/g, clearFn).replace(/url\(("|')([^'"()\s]+)\1\)/g, "url($2)")
+, read = (sheet, url, enc = "utf8") => fs.readFileSync(path.resolve(sheet.min.root || "", sheet.baseURI, url), enc)
 , toRgb = {
 	rgb(r, g, b) {
 		var f = n => ((n | 0) + 256).toString(16).slice(1)
@@ -92,7 +94,7 @@ var path = require("path")
 					parentStyleSheet: sheet,
 					href,
 					min
-				}, require("fs").readFileSync(path.resolve(min.root || "", href), "utf8"))
+				}, read(sheet, this.href))
 				if (sheet.baseURI !== text.baseURI) {
 					text.rules.forEach(rule => {
 						if (rule.type === 1) for (let style = rule.style, i = style.length; i--; ) {
