@@ -340,16 +340,22 @@ function HTMLElement(tag) {
 }
 
 extendNode(HTMLElement, Element, {
+	localName: null,
+	namespaceURI: "http://www.w3.org/1999/xhtml",
 	nodeType: 1,
-	matches(sel) {
-		return selector.matches(this, sel)
+	tagName: null,
+	blur() {
+		this.ownerDocument.activeElement = null
 	},
 	closest(sel) {
 		return selector.closest(this, sel)
 	},
-	namespaceURI: "http://www.w3.org/1999/xhtml",
-	localName: null,
-	tagName: null,
+	focus() {
+		this.ownerDocument.activeElement = this
+	},
+	matches(sel) {
+		return selector.matches(this, sel)
+	},
 	toString(minify) {
 		var attrs = this.attributes.toString(minify)
 		, isXml = this.ownerDocument.contentType === "application/xml"

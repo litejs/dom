@@ -2,8 +2,7 @@
 
 describe("Interactive DOM", () => {
 	var undef
-	,  { document } = require("../interactive")
-	, it = describe.it
+	,  { document } = require("..")
 
 	it("have focus and blur", assert => {
 		var el = document.createElement("h1")

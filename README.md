@@ -10,7 +10,7 @@
 LiteJS DOM &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 ==========
 
-Dependency-free DOM library for handling HTML and CSS files on server-side.
+Dependency-free DOM library for handling HTML, XML and CSS files on server-side.
 
 
 ```javascript
