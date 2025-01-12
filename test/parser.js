@@ -91,7 +91,9 @@ describe("parser", () => {
 	})
 
 	test("svg void elements", assert => {
-		var document = parser.parseFromString("<svg xmlns='http://www.w3.org/2000/svg'></svg>", "application/xml")
+		var document = parser.parseFromString("<svg xmlns='http://www.w3.org/2000/svg'><g id='circle-1'></g><circle id='circle-2'/></svg>", "application/xml")
+		assert.equal(document.getElementById("circle-1").tagName, "g")
+		assert.equal(document.getElementById("circle-2").tagName, "circle")
 		document.documentElement.innerHTML = "<path d='m1'></path>"
 		assert.equal(document.toString(true), '<svg xmlns="http://www.w3.org/2000/svg"><path d="m1"/></svg>')
 		assert.end()

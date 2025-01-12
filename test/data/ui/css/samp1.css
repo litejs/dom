@@ -43,6 +43,12 @@ ul {
   content: url('tiny.gif') "url('icon.png')"; /*! data-uri */
   background: fixed bottom right/contain no-repeat #040505 url('ul.svg'); /*! data-uri */
 }
+ul.c1 {
+  background: url('ul.svg#circle-1'); /*! data-uri */
+}
+ul.c2 {
+  background: url('ul.svg#circle-2'); /*! data-uri */
+}
 
 a /* This matches all XHTML <a> elements, as XHTML is the default unprefixed namespace */ {
 	top: 1px;

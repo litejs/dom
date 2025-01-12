@@ -19,7 +19,7 @@ var fs = require("fs")
 , clear = s => s
 	.replace(/("|')((?:\\\1|[^\1])*?)\1|\s*(\/)\*(?:[^*]|\*(?!\/))*\*\/\s*|(?:[^"'\/]|\/(?!\*))+/g, clearFn)
 	.replace(/(["']).*?\1|url\(("|')([^'"()\s]+)\2\)/g, (m,q1,q2,u) => q1 ? m : "url(" + u + ")")
-, read = (sheet, url, enc = "utf8") => fs.readFileSync(path.resolve(sheet.min.root || "", sheet.baseURI, url), enc)
+, read = (sheet, url, enc = "utf8") => fs.readFileSync(path.resolve(sheet.min.root || "", sheet.baseURI, url).split(/[+#]/)[0], enc)
 , toRgb = {
 	rgb(r, g, b) {
 		var f = n => ((n | 0) + 256).toString(16).slice(1)
@@ -83,13 +83,19 @@ var fs = require("fs")
 			if (cmd === "data-uri") {
 				return v.replace(urlRe, function(_, q1, q2, url) {
 					if (q1) return _
-					var ext = url.split(".").pop()
+					var frag = url.split("#").pop()
+					, ext = url.split(/[?#]/)[0].split(".").pop()
 					, enc = ext === "svg" ? "utf8" : "base64"
 					url = read(sheet, url, enc)
 					if (ext === "svg") {
+						url = new DOMParser().parseFromString(url, "application/xml")
+						if (frag && (frag = url.getElementById(frag))) {
+							frag.removeAttribute("id")
+							url.documentElement.childNodes = frag.tagName === "g" ? frag.childNodes : [ frag ]
+						}
+						url = url.toString(true).replace(/#/g, "%23")
 						enc = ""
 						ext += "+xml"
-						url = new DOMParser().parseFromString(url, "application/xml").toString(true).replace(/#/g, "%23")
 					}
 					return "url('data:image/" + ext + ";" + enc + "," + url + "')"
 				})

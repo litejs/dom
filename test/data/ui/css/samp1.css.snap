@@ -11,6 +11,8 @@
 @font-face{font-family:'Trickster';src:local('Trickster'),url(trickster-COLRv1.otf) format('opentype') tech(color-COLRv1),url(trickster-outline.otf) format('opentype'),url(trickster-outline.woff) format('woff')}
 @counter-style thumbs{system:cyclic;symbols:'\1F44D';suffix:' '}
 .ul,ul{list-style:thumbs;content:url(tiny.gif) "url('icon.png')";background:fixed bottom right/contain no-repeat #040505 url(ul.svg)}
+ul.c1{background:url(ul.svg#circle-1)}
+ul.c2{background:url(ul.svg#circle-2)}
 a{top:1px}
 svg|a{top:2px}
 *|a{top:3px}
