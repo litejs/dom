@@ -45,7 +45,10 @@ describe("parser", () => {
 		[ "data/ui/index.html", "", { css: true } ],
 		[ "data/ui/index.html", "", { css: {} } ],
 		[ "samp2.html", "text/html", true ],
+		[ "data/atom.xml", "application/xml", false ],
 		[ "data/atom.xml", "application/xml", true ],
+		[ "data/ui/css/ul.svg", "application/xml", false ],
+		[ "data/ui/css/ul.svg", "application/xml", true ],
 	], (file, mime, min, assert) => assert.matchSnapshot("./test/" + file, str => parser.parseFromString(str, mime).toString(min)).end())
 
 	test("parse and reminify index.html.snap1", assert => {

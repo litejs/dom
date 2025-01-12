@@ -263,7 +263,7 @@ function addGetter(key) {
 
 function Attr(node, name, value) {
 	this.ownerElement = node
-	this.name = name.toLowerCase()
+	this.name = name
 	this.value = "" + value
 }
 
@@ -295,7 +295,7 @@ NamedNodeMap.prototype = {
 	},
 	setNamedItem(attr) {
 		var oldAttr = this.getNamedItem(attr.name)
-		this[attr.name] = attr
+		this[attr.name.toLowerCase()] = attr
 		return oldAttr
 	},
 	toString(minify) {
@@ -315,6 +315,7 @@ NamedNodeMap.prototype = {
 					if (!quotedAttrRe.test(value)) return name + "=" + value
 					if (value.split("\"").length > value.split("'").length) return name + "='" + value.replace(/'/g, "&#39;") + "'"
 				}
+				name = loName
 			}
 			return name + "=\"" + value.replace(/"/g, "&quot;") + "\""
 		}).filter(Boolean).join(" ")
