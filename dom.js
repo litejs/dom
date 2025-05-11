@@ -132,9 +132,6 @@ var boolAttrs = {
 	hasChildNodes() {
 		return !!this.firstChild
 	},
-	getElementById(id) {
-		return selector.find(this, "#" + id, 1)
-	},
 	appendChild(el) {
 		return this.insertBefore(el)
 	},
@@ -452,7 +449,10 @@ extendNode(Document, Element, {
 	createTextNode: own(Text),
 	createComment: own(Comment),
 	createDocumentType: own(DocumentType), //Should be document.implementation.createDocumentType(name, publicId, systemId)
-	createDocumentFragment: own(DocumentFragment)
+	createDocumentFragment: own(DocumentFragment),
+	getElementById(id) {
+		return selector.find(this, "#" + id, 1)
+	}
 })
 
 function DOMParser() {}
