@@ -1,6 +1,8 @@
 
 /*! litejs.com/MIT-LICENSE.txt */
 
+"use strict"
+
 var DOM = require(".")
 , URL = require("url").URL
 , parser = new DOM.DOMParser()

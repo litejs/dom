@@ -1,6 +1,8 @@
 
 /*! litejs.com/MIT-LICENSE.txt */
 
+"use strict"
+
 exports.selectorSplit = selectorSplit
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
@@ -101,6 +103,7 @@ var fs = require("fs")
 			if (!style[prop]) style[style.length++] = prop
 			style[prop] = style[prop === "cssFloat" ? "float" : prop.replace(/[A-Z]/g, "-$&").toLowerCase()] = clear(val)
 		}
+		return true
 	}
 }
 , ruleTypes = {

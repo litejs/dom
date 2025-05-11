@@ -1,7 +1,7 @@
 
-
 /*! litejs.com/MIT-LICENSE.txt */
 
+"use strict"
 
 !function(exports) {
 	var selectorCache = {

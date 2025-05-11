@@ -1,6 +1,8 @@
 
 /*! litejs.com/MIT-LICENSE.txt */
 
+"use strict"
+
 var boolAttrs = {
 	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:1
 }
@@ -44,9 +46,12 @@ var boolAttrs = {
 	},
 	set textContent(text) {
 		if (this.nodeType === 3 || this.nodeType === 8) this.data = text
-		else replaceChildren.call(this, this.ownerDocument.createTextNode(
-			rawTextEscape[this.tagName] ? text.replace(rawTextEscape[this.tagName], "<\\") : text
-		))
+		else {
+			removeChilds(this)
+			this.appendChild(this.ownerDocument.createTextNode(
+				rawTextEscape[this.tagName] ? text.replace(rawTextEscape[this.tagName], "<\\") : text
+			))
+		}
 	},
 	get firstChild() {
 		return this.childNodes && this.childNodes[0] || null
@@ -96,7 +101,8 @@ var boolAttrs = {
 				)
 			}
 		}
-		replaceChildren.call(node, frag)
+		removeChilds(node)
+		node.appendChild(frag)
 
 		function setAttr(_, name, value, q, qvalue) {
 			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
@@ -202,7 +208,10 @@ var boolAttrs = {
 	get previousElementSibling() {
 		return getSibling(this, -1, 1)
 	},
-	replaceChildren: replaceChildren,
+	replaceChildren() {
+		removeChilds(this)
+		for (var i = 0, l = arguments.length; i < l; ) this.insertBefore(arguments[i++])
+	},
 	hasAttribute(name) {
 		return this.attributes.getNamedItem(name) != null
 	},
@@ -235,18 +244,18 @@ var boolAttrs = {
 	"&sect;": "§", "&sup2;": "²", "&sup3;": "³", "&yen;": "¥"
 }
 
-Object.keys(boolAttrs).forEach(addGetter, { isBool: true, readonly: "readOnly" })
-numAttrs.split(" ").forEach(addGetter, { isNum: true })
-strAttrs.split(" ").forEach(addGetter, { "for": "htmlFor", "class": "className" })
+Object.keys(boolAttrs).forEach(key => addGetter(key, { isBool: true, readonly: "readOnly" }))
+numAttrs.split(" ").forEach(key => addGetter(key, { isNum: true }))
+strAttrs.split(" ").forEach(key => addGetter(key, { "for": "htmlFor", "class": "className" }))
 
-function addGetter(key) {
+function addGetter(key, opts) {
 	var attr = key.toLowerCase()
-	Object.defineProperty(Element, this[key] || key, {
+	Object.defineProperty(Element, opts[key] || key, {
 		configurable: true,
 		enumerable: true,
 		get: (
-			this.isBool ? function() { return this.hasAttribute(attr) } :
-			this.isNum ? function() { return +this.getAttribute(attr) || 0 } :
+			opts.isBool ? function() { return this.hasAttribute(attr) } :
+			opts.isNum ? function() { return +this.getAttribute(attr) || 0 } :
 			function() { return this.getAttribute(attr) || "" }
 		),
 		set(value) {
@@ -477,9 +486,9 @@ function extendNode(obj, extras) {
 	obj.prototype.constructor = obj
 }
 
-function replaceChildren() {
-	for (var arr = this.childNodes, i = 0, l = arr.length; i < l; ) arr[i++].parentNode = null
-	for (i = arr.length = 0, l = arguments.length; i < l; ) this.insertBefore(arguments[i++])
+function removeChilds(node) {
+	node.childNodes.forEach(child => child.parentNode = null)
+	node.childNodes.length = 0
 }
 
 function getElement(childs, index, step, type) {
