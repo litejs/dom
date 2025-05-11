@@ -125,15 +125,27 @@ var boolAttrs = {
 	set style(value) {
 		this.style.cssText = value
 	},
+	appendChild(el) {
+		return this.insertBefore(el)
+	},
+	cloneNode(deep) {
+		var node = this
+		, clone = new node.constructor(node.tagName || node.data)
+		clone.ownerDocument = node.ownerDocument
+
+		mergeAttributes(node, clone)
+
+		if (deep && node.hasChildNodes()) {
+			node.childNodes.forEach(child => clone.appendChild(child.cloneNode(deep)))
+		}
+		return clone
+	},
 	contains(el) {
 		for (; el; el = el.parentNode) if (el === this) return true
 		return false
 	},
 	hasChildNodes() {
 		return !!this.firstChild
-	},
-	appendChild(el) {
-		return this.insertBefore(el)
 	},
 	insertBefore(el, ref) {
 		var node = this
@@ -166,18 +178,6 @@ var boolAttrs = {
 	replaceChild(el, ref) {
 		this.insertBefore(el, ref)
 		return this.removeChild(ref)
-	},
-	cloneNode(deep) {
-		var node = this
-		, clone = new node.constructor(node.tagName || node.data)
-		clone.ownerDocument = node.ownerDocument
-
-		mergeAttributes(node, clone)
-
-		if (deep && node.hasChildNodes()) {
-			node.childNodes.forEach(child => clone.appendChild(child.cloneNode(deep)))
-		}
-		return clone
 	},
 	querySelector(sel) {
 		return selector.find(this, sel, 1)
