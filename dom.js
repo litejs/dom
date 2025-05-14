@@ -108,9 +108,6 @@ var boolAttrs = {
 			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
 		}
 	},
-	get sheet() {
-		return makeSheet(this)
-	},
 	get style() {
 		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
 	},
@@ -350,6 +347,9 @@ extendNode(HTMLElement, Element, {
 	namespaceURI: "http://www.w3.org/1999/xhtml",
 	nodeType: 1,
 	tagName: null,
+	get sheet() {
+		return makeSheet(this)
+	},
 	blur() {
 		this.ownerDocument.activeElement = null
 	},
