@@ -3,12 +3,15 @@
 
 "use strict"
 
+exports.find = find
+exports.selectorSplit = selectorSplit
+
 var selectorCache = {
-	"": function() {}
+	"": () => {}
 }
 , selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 , selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
-, selectorMap = {
+, selectorMap = exports.selectorMap = {
 	"contains": "_.textContent.indexOf(v)>-1",
 	"empty": "!_.lastChild",
 	"enabled": "!m(_,':disabled')",
@@ -38,6 +41,9 @@ var selectorCache = {
 	"": "c(_.parentNode,v)"
 }
 , closest = exports.closest = walk.bind(exports, "parentNode", 1)
+, matches = exports.matches = (el, sel) => !!selectorFn(sel)(el)
+, next = exports.next = (el, sel) => walk("nextSibling", 1, el.nextSibling, sel)
+, prev = exports.prev = (el, sel) => walk("previousSibling", 1, el.previousSibling, sel)
 
 
 selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
@@ -45,16 +51,16 @@ selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length
 function selectorFn(str) {
 	if (str != null && typeof str !== "string") throw Error("Invalid selector")
 	return selectorCache[str || ""] ||
-	(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
-		selectorSplit(str).map(function(sel) {
+	(selectorCache[str] = Function("m,c,n,p", "return (_,v,a,b)=>" +
+		selectorSplit(str).map(sel => {
 			var relation, from
 			, rules = ["_&&_.nodeType==1"]
-			, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
+			, parentSel = sel.replace(selectorLastRe, (_, _rel, a, start) => {
 				from = start + _rel.length
 				relation = _rel.trim()
 				return ""
 			})
-			, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
+			, tag = sel.slice(from).replace(selectorRe, (_, op, key, subSel, fn, val, quotation) => {
 				rules.push(
 					"((v='" +
 					(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/[\\']/g, "\\$&") +
@@ -70,7 +76,7 @@ function selectorFn(str) {
 			if (tag && tag != "*") rules[0] += "&&_.tagName==(_.namespaceURI?'" + tag.toUpperCase() + "':'" + tag + "')"
 			if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
 			return rules.join("&&")
-		}).join("||") + "}"
+		}).join("||")
 	)(matches, closest, next, prev))
 }
 
@@ -95,9 +101,9 @@ function selectorSplit(text) {
 	return out
 }
 
-function walk(next, first, el, sel, nextFn) {
+function walk(attr, first, el, sel, nextFn) {
 	sel = selectorFn(sel)
-	for (var out = []; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
+	for (var out = []; el; el = el[attr] || nextFn && nextFn(el)) if (sel(el)) {
 		if (first) return el
 		out.push(el)
 	}
@@ -105,28 +111,9 @@ function walk(next, first, el, sel, nextFn) {
 }
 
 function find(node, sel, first) {
-	return walk("firstChild", first, node.firstChild, sel, function(el) {
-		for (var next = el.nextSibling; !next && ((el = el.parentNode) !== node); ) next = el.nextSibling
-		return next
+	return walk("firstChild", first, node.firstChild, sel, (el, pos) => {
+		for (pos = el.nextSibling; !pos && ((el = el.parentNode) !== node); ) pos = el.nextSibling
+		return pos
 	})
 }
-
-function matches(el, sel) {
-	return !!selectorFn(sel)(el)
-}
-
-function next(el, sel) {
-	return walk("nextSibling", 1, el.nextSibling, sel)
-}
-
-function prev(el, sel) {
-	return walk("previousSibling", 1, el.previousSibling, sel)
-}
-
-exports.find = find
-exports.matches = matches
-exports.next = next
-exports.prev = prev
-exports.selectorMap = selectorMap
-exports.selectorSplit = selectorSplit
 
