@@ -3,7 +3,6 @@
 
 "use strict"
 
-exports.selectorSplit = selectorSplit
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 
@@ -244,27 +243,6 @@ CSSStyleSheet.prototype = {
 		if (min) this.min = min
 		return this.rules.map(rule => rule.cssText).filter(Boolean).join("\n")
 	}
-}
-
-function selectorSplit(text) {
-	for (var char, inQuote, depth = 0, start = 0, pos = 0, len = text.length, out = []; pos < len; ) {
-		char = text[pos++]
-		if (char === "\\") {
-			pos++
-		} else if (inQuote) {
-			if (char === inQuote) inQuote = ""
-		} else if (char === "'" || char === "\"") {
-			inQuote = char
-		} else if (char === "(" || char === "[") {
-			depth++
-		} else if (char === ")" || char === "]") {
-			depth--
-		} else if (char === "," && depth === 0) {
-			out.push(text.slice(start, (start = pos) - 1).trim())
-		}
-	}
-	out.push(text.slice(start).trim())
-	return out
 }
 
 

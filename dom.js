@@ -21,7 +21,7 @@ var boolAttrs = {
 , rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
-, { selectorSplit, CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
+, { CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
 , selector = require("./selector.js")
 , Node = {
 	ELEMENT_NODE:                1,
@@ -521,7 +521,7 @@ function mergeAttributes(source, target) {
 exports.document = new Document()
 exports.entities = entities
 exports.mergeAttributes = mergeAttributes
-exports.selectorSplit = selectorSplit
+exports.selectorSplit = selector.selectorSplit
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 exports.DOMParser = DOMParser

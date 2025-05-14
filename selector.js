@@ -9,7 +9,6 @@
 	}
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
-	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\.|[^\\"])*?"|'(?:\\.|[^\\'])*?'|\((?:[^()]|\([^()]+\))+?\))+$)/
 	, selectorMap = {
 		"contains": "_.textContent.indexOf(v)>-1",
 		"empty": "!_.lastChild",
@@ -48,7 +47,7 @@
 		if (str != null && typeof str !== "string") throw Error("Invalid selector")
 		return selectorCache[str || ""] ||
 		(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
-			str.split(selectorSplitRe).map(function(sel) {
+			selectorSplit(str).map(function(sel) {
 				var relation, from
 				, rules = ["_&&_.nodeType==1"]
 				, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
@@ -76,6 +75,26 @@
 		)(matches, closest, next, prev))
 	}
 
+	function selectorSplit(text) {
+		for (var char, inQuote, depth = 0, start = 0, pos = 0, len = text.length, out = []; pos < len; ) {
+			char = text[pos++]
+			if (char === "\\") {
+				pos++
+			} else if (inQuote) {
+				if (char === inQuote) inQuote = ""
+			} else if (char === "'" || char === "\"") {
+				inQuote = char
+			} else if (char === "(" || char === "[") {
+				depth++
+			} else if (char === ")" || char === "]") {
+				depth--
+			} else if (char === "," && depth === 0) {
+				out.push(text.slice(start, (start = pos) - 1).trim())
+			}
+		}
+		out.push(text.slice(start).trim())
+		return out
+	}
 
 	function walk(next, first, el, sel, nextFn) {
 		sel = selectorFn(sel)
@@ -110,5 +129,6 @@
 	exports.next = next
 	exports.prev = prev
 	exports.selectorMap = selectorMap
+	exports.selectorSplit = selectorSplit
 }(this) // jshint ignore:line
 

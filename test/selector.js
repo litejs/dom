@@ -34,7 +34,7 @@ describe("Selectors", () => {
 		assert.equal(document.getElementById(1),    el1)
 		assert.equal(document.getElementById("2"),  el2)
 		assert.equal(document.getElementById(3),    el3)
-		assert.equal(document.getElementById(11),   el11)
+		assert.equal(document.getElementById("11"), el11)
 		assert.equal(document.getElementById(12),   el12)
 		assert.equal(document.getElementById(21),   el21)
 		assert.equal(document.getElementById(22),   el22)
@@ -466,6 +466,14 @@ describe("Selectors", () => {
 		, [])
 
 		assert.end()
+	})
+
+	it("split selectors {0}", DOM.selectorSplit && [
+		[ "html", ["html"] ],
+		[ "[a]", ["[a]"] ],
+		[ ".a,b:not(.b,.c) , .d[a='a,\\'b][c']:focus", [".a", "b:not(.b,.c)", ".d[a='a,\\'b][c']:focus"] ],
+	], function(sel, arr, assert) {
+		assert.equal(DOM.selectorSplit(sel), arr).end()
 	})
 })
 

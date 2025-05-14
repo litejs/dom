@@ -8,7 +8,6 @@
 describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native", native]] : [["mock", require("../css.js")]], (name, env) => {
 	require("@litejs/cli/snapshot")
 	const {
-		selectorSplit,
 		CSSStyleSheet,
 		CSSStyleDeclaration,
 	} = env
@@ -137,12 +136,5 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 		assert.end()
 	})
 
-	it("split selectors {0}", selectorSplit && [
-		[ "html", ["html"] ],
-		[ "[a]", ["[a]"] ],
-		[ ".a,b:not(.b,.c) , .d[a='a,\\'b][c']:focus", [".a", "b:not(.b,.c)", ".d[a='a,\\'b][c']:focus"] ],
-	], function(sel, arr, assert) {
-		assert.equal(selectorSplit(sel), arr).end()
-	})
 })
 
