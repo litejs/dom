@@ -108,14 +108,6 @@ var boolAttrs = {
 			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
 		}
 	},
-	get outerHTML() {
-		return this.toString()
-	},
-	set outerHTML(html) {
-		var frag = this.ownerDocument.createDocumentFragment()
-		frag.innerHTML = html
-		this.parentNode.replaceChild(frag, this)
-	},
 	get sheet() {
 		return makeSheet(this)
 	},
@@ -204,6 +196,14 @@ var boolAttrs = {
 	},
 	get previousElementSibling() {
 		return getSibling(this, -1, 1)
+	},
+	get outerHTML() {
+		return this.toString()
+	},
+	set outerHTML(html) {
+		var frag = this.ownerDocument.createDocumentFragment()
+		frag.innerHTML = html
+		this.parentNode.replaceChild(frag, this)
 	},
 	replaceChildren() {
 		removeChilds(this)

@@ -58,11 +58,9 @@ describe("DOM lite", function() {
 		assert.equal(el.nodeName, "#comment")
 		assert.equal(el.data, "hello comment")
 		assert.equal(el.nodeValue, "hello comment")
-		assert.equal(el.outerHTML, "<!--hello comment-->")
 		assert.equal((el.nodeValue = "value"), "value")
 		assert.equal(el.data, "value")
 		assert.equal(el.nodeValue, "value")
-		assert.equal(el.outerHTML, "<!--value-->")
 
 		assert.end()
 	})
