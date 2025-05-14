@@ -23,6 +23,7 @@ var boolAttrs = {
 , hasOwn = voidElements.hasOwnProperty
 , { CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
 , selector = require("./selector.js")
+, cssEscape = sel => ("" + sel).replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, "\\$&").replace(/^(-?)([0-9])/, "$1\\3$2 ")
 , Node = {
 	ELEMENT_NODE:                1,
 	TEXT_NODE:                   3,
@@ -522,6 +523,7 @@ exports.document = new Document()
 exports.entities = entities
 exports.mergeAttributes = mergeAttributes
 exports.selectorSplit = selector.selectorSplit
+exports.cssEscape = cssEscape
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 exports.DOMParser = DOMParser

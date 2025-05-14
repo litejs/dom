@@ -426,6 +426,18 @@ describe("DOM lite", function() {
 
 		assert.end()
 	})
+
+	test("cssEscape", [
+		[ "a", "a" ],
+		[ ".foo#bar", "\\.foo\\#bar" ],
+		[ "()[]{}", "\\(\\)\\[\\]\\{\\}" ],
+		[ "--a", "--a" ],
+		[ 0, "\\30 " ],
+		[ "12 b%c", "\\31 2\\ b\\%c" ],
+		//[ "\0", "\ufffd" ],
+	], function(selector, escaped, assert) {
+		assert.equal(DOM.cssEscape(selector), escaped).end()
+	})
 })
 
 
