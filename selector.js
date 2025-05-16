@@ -36,7 +36,7 @@ var selectorCache = {
 	"~": "~a.split(/\\s+/).indexOf(v)",
 	"*": "~a.indexOf(v)",
 	">>": "m(_.parentNode,v)",
-	"++": "m(_.previousSibling,v)",
+	"++": "m(_.previousElementSibling,v)",
 	"~~": "p(_,v)",
 	"": "c(_.parentNode,v)"
 }

@@ -104,6 +104,9 @@ describe("Selectors", () => {
 		, in1   = append_el("in1", el1, "input")
 		, in2   = append_el("in2", el1, "input")
 
+		el1.className = 'dummy'
+		document.body.insertBefore(document.createTextNode("\n"), s1)
+
 		s2.lang = "en"
 		s2.name = "map[]"
 		s2.setAttribute("data-space", "a b")
@@ -141,15 +144,19 @@ describe("Selectors", () => {
 		assert.equal(el1.matches("html > div#2"), false)
 
 		assert.equal(el1.matches("div + div"), false)
+		assert.equal(s1.matches("span+span"), false)
+		assert.equal(s1.matches(".dummy+span"), true)
 		assert.equal(s1.matches("div + span"), true)
 		assert.equal(s2.matches("div + span"), false)
 		assert.equal(s2.matches("div + div"), false)
 
 		assert.equal(el1.matches("div ~ div"), false)
-		assert.equal(s1.matches("div ~ span"), true)
+		assert.equal(s1.matches("div ~ span"), true, 'div ~ span')
 		assert.equal(s1.matches("div~ span"), true)
 		assert.equal(s1.matches("div ~span"), true)
-		assert.equal(s2.matches("div ~ span"), true)
+
+		assert.equal(s2.matches("span ~ span"), true)
+		assert.equal(s2.matches(".dummy ~ span"), true)
 		assert.equal(s2.matches("div ~ div"), false)
 
 		assert.equal(el1.matches("body div#1"), true)
