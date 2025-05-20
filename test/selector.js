@@ -15,15 +15,15 @@ describe("Selectors", () => {
 		document = new DOM.Document()
 
 		var result
-		, el1   = append_el(1, document.body)
-		, el2   = append_el(2, document.body)
-		, el11  = append_el(11,  el1)
-		, el12  = append_el(12,  el1)
-		, el21  = append_el(21,  el2)
-		, el22  = append_el(22,  el2)
-		, el221 = append_el(221, el22, "span")
-		, el222 = append_el(222, el22)
-		, el3   = append_el(3, document.body)
+		, el1   = append_el("i1", document.body)
+		, el2   = append_el("i2", document.body)
+		, el11  = append_el("i11",  el1)
+		, el12  = append_el("i12",  el1)
+		, el21  = append_el("i21",  el2)
+		, el22  = append_el("i22",  el2)
+		, el221 = append_el("i221", el22, "span")
+		, el222 = append_el("i222", el22)
+		, el3   = append_el("i3", document.body)
 
 		el21.className = "findme first"
 		el222.setAttribute("type", "text/css")
@@ -31,15 +31,15 @@ describe("Selectors", () => {
 
 		assert.equal(document.body.appendChild(el3), el3)
 
-		assert.equal(document.getElementById(1),    el1)
-		assert.equal(document.getElementById("2"),  el2)
-		assert.equal(document.getElementById(3),    el3)
-		assert.equal(document.getElementById("11"), el11)
-		assert.equal(document.getElementById(12),   el12)
-		assert.equal(document.getElementById(21),   el21)
-		assert.equal(document.getElementById(22),   el22)
-		assert.equal(document.getElementById(221),  el221)
-		assert.equal(document.getElementById(222),  el222)
+		assert.equal(document.getElementById("i1"),    el1)
+		assert.equal(document.getElementById("i2"),  el2)
+		assert.equal(document.getElementById("i3"),    el3)
+		assert.equal(document.getElementById("i11"), el11)
+		assert.equal(document.getElementById("i12"),   el12)
+		assert.equal(document.getElementById("i21"),   el21)
+		assert.equal(document.getElementById("i22"),   el22)
+		assert.equal(document.getElementById("i221"),  el221)
+		assert.equal(document.getElementById("i222"),  el222)
 
 		assert.equal(document.getElementsByTagName("div").length,  8)
 
@@ -54,9 +54,9 @@ describe("Selectors", () => {
 		assert.equal(document.querySelector("body"), document.body)
 
 		assert.equal(document.querySelector("span"),      el221)
-		assert.equal(document.querySelector("#22"),       el22)
-		assert.equal(document.querySelector("div#22"),    el22)
-		assert.equal(document.querySelector("span#22"),   null)
+		assert.equal(document.querySelector("#i22"),       el22)
+		assert.equal(document.querySelector("div#i22"),    el22)
+		assert.equal(document.querySelector("span#i22"),   null)
 
 		assert.equal(document.querySelector(".findme"),         el21)
 		assert.equal(document.querySelector(".not_found"),      null)
@@ -64,8 +64,8 @@ describe("Selectors", () => {
 		assert.equal(document.querySelector("div.not_found"),   null)
 		assert.equal(document.querySelector("span.first"),      null)
 		assert.equal(document.querySelector("span.not_found"),  null)
-		assert.equal(document.querySelector("#21.findme"),      el21)
-		assert.equal(document.querySelector("div#21.findme"),   el21)
+		assert.equal(document.querySelector("#i21.findme"),      el21)
+		assert.equal(document.querySelector("div#i21.findme"),   el21)
 
 		assert.equal(document.querySelectorAll("div")
 		, [el1, el11, el12, el2, el21, el22, el222, el3])
