@@ -14,7 +14,7 @@ var fs = require("fs")
 		var { DOMParser } = require("./dom.js")
 		return v.replace(urlRe, function(_, q1, q2, url) {
 			if (q1) return _
-			var frag = url.split("#").pop()
+			var frag = url.split("#")[1]
 			, ext = url.split(/[?#]/)[0].split(".").pop()
 			, enc = ext === "svg" ? "utf8" : "base64"
 			url = read(sheet, url, enc)
