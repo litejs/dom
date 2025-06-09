@@ -44,17 +44,15 @@ var fs = require("fs")
 , clear = s => s
 	.replace(/("|')((?:\\\1|[^\1])*?)\1|\s*(\/)\*(?:[^*]|\*(?!\/))*\*\/\s*|(?:[^"'\/]|\/(?!\*))+/g, clearFn)
 	.replace(/(["']).*?\1|url\(("|')([^'"()\s]+)\2\)/g, (m,q1,q2,u) => q1 ? m : "url(" + u + ")")
+, hex = n => (0 | +n + 256.5).toString(16).slice(1)
 , toRgb = {
-	rgb(r, g, b) {
-		var f = n => ((n | 0) + 256).toString(16).slice(1)
-		return f(r) + f(g) + f(b)
-	},
+	rgb: (r, g, b) => hex(r) + hex(g) + hex(b),
 	hsl(h, s, l) {
 		l /= 100
 		s /= 100 / (l < 0.5 ? l : 1 - l)
 		function f(n) {
 			n = (n + h / 30) % 12
-			return (0 | 256.5 + (255 * (l - s * (n < 2 || n > 10 ? -1 : n < 4 ? n - 3 : n > 8 ? 9 - n : 1)))).toString(16).slice(1)
+			return hex(255 * (l - s * (n < 2 || n > 10 ? -1 : n < 4 ? n - 3 : n > 8 ? 9 - n : 1)))
 		}
 		return f(0) + f(8) + f(4)
 	}
@@ -88,7 +86,6 @@ var fs = require("fs")
 			for (; (m = re.exec(val)); ) {
 				if (m[4]) {
 					if (min && len && plugins[m[4] = m[4].trim()]) style[k = style[len - 1]] = clear(plugins[m[4]](sheet, style[k]))
-					continue
 				} else {
 					k = m[1]
 					if (lastIdx[k] >= 0) style.__[lastIdx[k]] = style[k]
