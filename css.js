@@ -231,10 +231,11 @@ CSSStyleSheet.prototype = {
 			} else if (char === "{") {
 				depth++
 			} else if (char === "}" && --depth < 1 || char === ";" && depth < 1) {
-				if (depth < 0) throw "Invalid css"
+				if (depth < 0) throw Error("Unexpected '}'")
 				sheet.rules.push(CSSRule(text.slice(start, start = pos + 1), sheet, char))
 			}
 		}
+		if (depth > 0) throw Error("Unclosed block")
 	},
 	toString(min) {
 		if (min) this.min = min

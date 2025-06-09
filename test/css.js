@@ -117,11 +117,11 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 		})
 	})
 
-	test("lint", function(assert) {
-		assert.throws(function() {
-			const sheet = new CSSStyleSheet()
-			sheet.replaceSync("a{b:1;}}")
-		}).end()
+	test("lint", [
+		[ "a{b:1;}}" ],
+		[ "a{b:1;" ],
+	], (css, assert) => {
+		assert.throws(() => new CSSStyleSheet().replaceSync(css)).end()
 	})
 
 	test("parse and stringify", [
