@@ -1,6 +1,6 @@
 {
   "name": "@litejs/dom",
-  "version": "25.9.1",
+  "version": "25.9.2",
   "description": "A small DOM library for server-side testing, rendering, and handling of HTML files",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
