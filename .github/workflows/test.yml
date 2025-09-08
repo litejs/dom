@@ -4,8 +4,8 @@ jobs:
   Coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
     - run: npm install --no-audit && npm install -g uglify-js
     - run: npm audit --audit-level=low
     - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
@@ -19,7 +19,7 @@ jobs:
   Bun:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: oven-sh/setup-bun@v2
     - run: bun i
     - run: bun x lj t
@@ -36,8 +36,8 @@ jobs:
     name: Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
     - run: git config --global core.autocrlf false
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
       with:
         node-version: ${{ matrix.node }}
         architecture: ${{ matrix.arch }}
@@ -46,7 +46,7 @@ jobs:
   Analyze:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: github/codeql-action/init@v3
       with:
         languages: javascript
@@ -62,7 +62,7 @@ jobs:
       id-token: write
       actions: write
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         ref: ${{ github.ref }}
     - run: |
@@ -70,7 +70,7 @@ jobs:
         git config gpg.ssh.allowedSignersFile ./allowed_signers
         git verify-tag -v ${{ github.ref_name }}
       name: Verify release tag signature
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v5
       with:
         registry-url: https://registry.npmjs.org/
     - run: |
