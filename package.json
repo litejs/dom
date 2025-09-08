@@ -22,7 +22,10 @@
   "scripts": {
     "test": "lj t"
   },
-  "repository": "https://github.com/litejs/dom.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/litejs/dom.git"
+  },
   "devDependencies": {
     "@litejs/cli": "25.1.0"
   }
