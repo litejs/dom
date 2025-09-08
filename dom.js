@@ -259,7 +259,7 @@ function addGetter(key, opts) {
 	})
 }
 
-;["hasAttribute", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
+;["hasAttribute", "getAttribute", "setAttribute", "removeAttribute"].forEach(name => {
 	Element[name + "NS"] = function(ns, a, b) {
 		return this[name].call(this, a, b)
 	}
