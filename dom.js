@@ -32,6 +32,12 @@ var boolAttrs = {
 	DOCUMENT_NODE:               9,
 	DOCUMENT_TYPE_NODE:         10,
 	DOCUMENT_FRAGMENT_NODE:     11,
+	DOCUMENT_POSITION_DISCONNECTED: 1,
+	DOCUMENT_POSITION_PRECEDING: 2,
+	DOCUMENT_POSITION_FOLLOWING: 4,
+	DOCUMENT_POSITION_CONTAINS: 8,
+	DOCUMENT_POSITION_CONTAINED_BY: 16,
+	DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: 32,
 	nodeName:        null,
 	parentNode:      null,
 	ownerDocument:   null,
@@ -129,6 +135,18 @@ var boolAttrs = {
 			node.childNodes.forEach(child => clone.appendChild(child.cloneNode(deep)))
 		}
 		return clone
+	},
+	compareDocumentPosition(other) {
+		var node = this
+		if (node === other) return 0
+		if (node.getRootNode() !== other.getRootNode()) return Node.DOCUMENT_POSITION_DISCONNECTED
+		if (node.contains(other)) return Node.DOCUMENT_POSITION_CONTAINS
+		if (other.contains(node)) return Node.DOCUMENT_POSITION_CONTAINED_BY
+
+		for (; node; node = node.nextSibling || node.parentNode && node.parentNode.nextSibling) {
+			if (node === other) return Node.DOCUMENT_POSITION_FOLLOWING
+		}
+		return Node.DOCUMENT_POSITION_PRECEDING
 	},
 	contains(el) {
 		for (; el; el = el.parentNode) if (el === this) return true

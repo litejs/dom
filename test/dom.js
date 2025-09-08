@@ -273,16 +273,24 @@ describe("DOM lite", function() {
 		h1.textContent = "Head"
 
 		assert.equal(node.contains(h2), false)
+		assert.equal(h2.compareDocumentPosition(h2), 0)
+		assert.equal(h2.compareDocumentPosition(node), 1)
+		assert.equal(node.compareDocumentPosition(h2), 1)
 		assert.equal(node.appendChild(h2), h2)
 		assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
 		assert.ok(node.querySelector("h2"))
 		assert.equal(node.contains(h2), true)
 
 		assert.equal(node.insertBefore(h1, h2), h1)
+		assert.equal(h1.compareDocumentPosition(h2), 4)
+		assert.equal(h2.compareDocumentPosition(h1), 2)
 		assert.equal(""+node, mask.replace("%s", "<h1>Head</h1><h2></h2>"))
+
 
 		assert.equal(node.appendChild(h1), h1)
 		assert.equal(h1.getRootNode(), node)
+		assert.equal(node.compareDocumentPosition(h1), 8)
+		assert.equal(h1.compareDocumentPosition(node), 16)
 		assert.equal(""+node, mask.replace("%s", "<h2></h2><h1>Head</h1>"))
 
 		assert.equal(node.removeChild(h1), h1)
