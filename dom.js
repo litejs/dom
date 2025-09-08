@@ -134,6 +134,10 @@ var boolAttrs = {
 		for (; el; el = el.parentNode) if (el === this) return true
 		return false
 	},
+	getRootNode() {
+		for (var node = this; node.parentNode; ) node = node.parentNode
+		return node
+	},
 	hasChildNodes() {
 		return !!this.firstChild
 	},
