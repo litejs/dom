@@ -60,7 +60,6 @@ jobs:
     permissions:
       contents: write
       id-token: write
-      actions: write
     steps:
     - uses: actions/checkout@v5
       with:
@@ -74,7 +73,6 @@ jobs:
       with:
         registry-url: https://registry.npmjs.org/
     - run: |
-        gh run list --json databaseId  -q '.[20:]|.[].databaseId' --limit 100 | xargs -I{} gh run delete "{}"
         MSG=$(git log -1 --no-show-signature --format=%B $TAG)
         TITLE=$(echo "$MSG" | head -n 1)
         NOTES=$(echo "$MSG" | tail -n +2)
