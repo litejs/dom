@@ -407,6 +407,15 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
+	it("has innerText", function (assert) {
+		var div  = document.createElement("div")
+		div.innerHTML = "<span>Take a look at<br>how this text<br>is interpreted below.</span>"
+
+		assert.equal(div.innerText, 'Take a look at\nhow this text\nis interpreted below.')
+
+		assert.end()
+	})
+
 	it("has replaceChildren", function (assert) {
 		var el = document.createElement("el")
 		, a1 = document.createElement("a")

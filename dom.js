@@ -12,6 +12,9 @@ var boolAttrs = {
 	"form method get":1, "input type text":1,
 	"script type text/javascript":1, "style type text/css":1
 }
+, blockElements = {
+	P:1, DIV:1, LI:1, TR:1, TD:1, TH:1, SECTION:1, ARTICLE:1, HEADER:1, FOOTER:1, H1:1, H2:1, H3:1, H4:1, H5:1, H6:1
+}
 , voidElements = {
 	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1, KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
 }
@@ -114,6 +117,18 @@ var boolAttrs = {
 		function setAttr(_, name, value, q, qvalue) {
 			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
 		}
+	},
+	get innerText() {
+		console.log('GET', this.nodeType, this.tagName)
+		return (
+			this.nodeType === 3 ? this.data.replace(/\u00A0/g, " ") :
+			this.nodeType === 1 ? (
+				this.tagName === "BR" ? "\n" :
+				this.childNodes.map(node => node.innerText).join("").replace(/\s+$/, "") + (
+					blockElements[this.tagName] ? "\n" : ""
+				)
+			) : ""
+		)
 	},
 	get style() {
 		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
