@@ -447,6 +447,7 @@ extendNode(DocumentType, {
 
 function Document() {
 	this.childNodes = []
+	this.attributes = new NamedNodeMap(this)
 	this
 	.appendChild(this.createElement("html"))
 	.appendChild(this.body = this.createElement("body"))
@@ -554,4 +555,3 @@ exports.DocumentFragment = DocumentFragment
 exports.HTMLElement = HTMLElement
 exports.Node = Node
 exports.XMLSerializer = XMLSerializer
-
