@@ -202,6 +202,22 @@ var boolAttrs = {
 			this.tagName === "STYLE" && (min === true || min && min.css) ? "\n" + makeSheet(this, min.css || true) + "\n" :
 			this.textContent
 		) : this.childNodes.map(node => node.toString(min)).join("")
+	},
+	toJSON() {
+		var node = this
+		, json = {
+			name: node.nodeName
+		}
+		if (node.nodeType === 1) {
+			json.attributes = {}
+			node.attributes.names().forEach(name => json.attributes[name] = node.getAttribute(name))
+		}
+		if (node.nodeType === 1 || node.nodeType === 9) {
+			json.children = node.childNodes.map(child => child.toJSON())
+		} else {
+			json.data = node.data
+		}
+		return json
 	}
 }
 , Element = {

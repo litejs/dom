@@ -436,6 +436,42 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
+	it("can stringify nodes to json", function (assert) {
+		var doc = new DOM.DOMParser().parseFromString('<root attr="1"><child>text</child><!--c--></root>')
+		, expectedDoc = {
+			name: "#document",
+			children: [ {
+				name: "ROOT",
+				attributes: { attr: "1" },
+				children: [
+					{
+						name: "CHILD",
+						attributes: {},
+						children: [
+							{ name: "#text", data: "text" }
+						]
+					},
+					{ name: "#comment", data: "c" }
+				]
+			} ],
+		}
+
+		assert.equal(JSON.stringify(doc), JSON.stringify(expectedDoc))
+
+		var el = document.createElement("section")
+		el.setAttribute("data-id", "123")
+		el.appendChild(document.createTextNode("hello"))
+		assert.equal(JSON.stringify(el), JSON.stringify({
+			name: "SECTION",
+			attributes: { "data-id": "123" },
+			children: [
+				{ name: "#text", data: "hello" }
+			]
+		}))
+
+		assert.end()
+	})
+
 	test("cssEscape", [
 		[ "a", "a" ],
 		[ ".foo#bar", "\\.foo\\#bar" ],
@@ -448,7 +484,5 @@ describe("DOM lite", function() {
 		assert.equal(DOM.cssEscape(selector), escaped).end()
 	})
 })
-
-
 
 
