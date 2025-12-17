@@ -15,9 +15,11 @@
     "XMLSerializer",
     "litejs"
   ],
+  "types": "types/index.d.ts",
   "main": "dom.js",
   "files": [
-    "*.js"
+    "*.js",
+    "types"
   ],
   "scripts": {
     "test": "lj t"

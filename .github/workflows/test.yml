@@ -12,6 +12,7 @@ jobs:
     - run: node --import=@litejs/cli/test.js test/load.mjs
     - run: npx lj lint
     - run: ./test/readme.sh
+    - run: npx tsc -p test/tsconfig.json --noEmit
     - uses: coverallsapp/github-action@v2
       name: Upload to coveralls.io
       with:
