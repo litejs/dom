@@ -101,6 +101,10 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 				"@import 'test/data/ui/css/c.css';",
 				".c{content:'url(my-icon.jpg)';cursor:url(test/data/ui/css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
 			],
+			[ { min: { import: true } },
+				"@import 'test/data/ui/css/import-nested.css';",
+				".nested{color:green}\n@media (min-width:1px){.hero{background:url(test/data/ui/css/media.png)}}\n@keyframes spin{from{background-image:url(test/data/ui/css/frames/start.png)}}"
+			],
 			[ { min: { import: true, root: "test/data/ui" } },
 				"@import 'css/c.css';",
 				".c{content:'url(my-icon.jpg)';cursor:url(css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
@@ -137,4 +141,3 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 	})
 
 })
-

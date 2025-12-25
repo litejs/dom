@@ -1,0 +1,13 @@
+@import "import-nested-child.css";
+
+@media (min-width: 1px) {
+	.hero {
+		background: url("media.png");
+	}
+}
+
+@keyframes spin {
+	from {
+		background-image: url("frames/start.png");
+	}
+}

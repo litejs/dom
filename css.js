@@ -127,11 +127,7 @@ var fs = require("fs")
 					min
 				}, read(sheet, this.href))
 				if (sheet.baseURI !== text.baseURI) {
-					text.rules.forEach(rule => {
-						if (rule.type === 1) for (let style = rule.style, i = style.length; i--; ) {
-							if (urlRe.test(style[style[i]])) style[style[i]] = style[style[i]].replace(urlRe, urlFn)
-						}
-					})
+					updateImportUrls(text, urlFn)
 				}
 				text += ""
 			}
@@ -194,6 +190,21 @@ function CSSStyleSheet(opts, text = "") {
 	this.replaceSync(text)
 }
 
+function updateImportUrls(sheet, urlFn) {
+	sheet.rules.forEach(rule => {
+		if (rule.type === 1) {
+			for (let style = rule.style, i = style.length; i--; ) {
+				if (urlRe.test(style[style[i]])) style[style[i]] = style[style[i]].replace(urlRe, urlFn)
+			}
+		} else if (rule.mediaText != null && rule.text != null) {
+			var nested = new CSSStyleSheet({})
+			nested.replaceSync(rule.text)
+			updateImportUrls(nested, urlFn)
+			rule.text = nested.toString()
+		}
+	})
+}
+
 CSSStyleSheet.prototype = {
 	baseURI: "",
 	root: "",
@@ -242,5 +253,4 @@ CSSStyleSheet.prototype = {
 		return this.rules.map(rule => rule.cssText).filter(Boolean).join("\n")
 	}
 }
-
 
