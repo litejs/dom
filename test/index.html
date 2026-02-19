@@ -25,12 +25,13 @@ var native = {
 require.def({
 	fs: "exports.readFileSync = function(path, enc){var req=xhr('GET',path,true);req.send();return req.responseText}"
 })
-var files = ["../css.js", "../dom.js", "css.js", "dom.js", "selector.js"]
+var files = ["../css.js", "../dom.js", "css.js", "dom.js", "selector.js", "interactive.js"]
 xhr.load(files, res => {
 	require.def(res.reduce((m,s,i)=>(m[files[i]]=s,m), {}))
 	require("dom.js")
 	require("css.js")
 	require("selector.js")
+	require("interactive.js")
 }, true)
 </script>
 <noscript>This application requires JavaScript</noscript></body></html>

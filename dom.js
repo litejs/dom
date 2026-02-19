@@ -400,7 +400,7 @@ extendNode(HTMLElement, Element, {
 		return makeSheet(this)
 	},
 	blur() {
-		this.ownerDocument.activeElement = null
+		this.ownerDocument.activeElement = this.ownerDocument.body || null
 	},
 	closest(sel) {
 		return selector.closest(this, sel)
