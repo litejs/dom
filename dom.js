@@ -306,7 +306,7 @@ function addGetter(key, opts) {
 		if (name !== "setAttribute" && ns) {
 			var lo = (":" + a).toLowerCase()
 			for (var key in this.attributes) {
-				if (key.slice(-lo.length) === lo) return this[name](key)
+				if (key.endsWith(lo)) return this[name](key)
 			}
 		}
 		return this[name](a, b)
@@ -320,8 +320,10 @@ function Attr(node, name, value) {
 }
 
 function NamedNodeMap(node) {
-	Object.defineProperty(this, "length", { get() { return this.names().length } })
-	Object.defineProperty(this, "ownerElement", { value: node })
+	Object.defineProperties(this, {
+		length: { get() { return this.names().length } },
+		ownerElement: { value: node }
+	})
 }
 
 NamedNodeMap.prototype = {
@@ -463,11 +465,6 @@ extendNode(DocumentType, {
 	nodeType: 10,
 	toString() {
 		return "<" + this.data + ">"
-		// var node = document.doctype
-		// return "<!DOCTYPE " + node.name +
-		// 	(node.publicId ? ' PUBLIC "' + node.publicId + '"' : '') +
-		// 	(!node.publicId && node.systemId ? ' SYSTEM' : '') +
-		// 	(node.systemId ? ' "' + node.systemId + '"' : '') + '>'
 	}
 })
 
@@ -527,11 +524,8 @@ function own(Class) {
 
 function extendNode(obj, extras) {
 	obj.prototype = Object.create(Node)
-	for (var descriptor, key, i = 1; (extras = arguments[i++]); ) {
-		for (key in extras) {
-			descriptor = Object.getOwnPropertyDescriptor(extras, key)
-			Object.defineProperty(obj.prototype, key, descriptor)
-		}
+	for (var i = 1; (extras = arguments[i++]); ) {
+		Object.defineProperties(obj.prototype, Object.getOwnPropertyDescriptors(extras))
 	}
 	obj.prototype.constructor = obj
 }
@@ -541,9 +535,9 @@ function removeChilds(node) {
 	node.childNodes.length = 0
 }
 
-function getElement(childs, index, step, type) {
+function getElement(childs, index, step) {
 	if (childs && index > -1) for (; childs[index]; index += step) {
-		if (childs[index].nodeType === type) return childs[index]
+		if (childs[index].nodeType === 1) return childs[index]
 	}
 	return null
 }
@@ -551,7 +545,7 @@ function getElement(childs, index, step, type) {
 function getSibling(node, step, type) {
 	var silbings = node.parentNode && node.parentNode.childNodes
 	, index = silbings ? silbings.indexOf(node) : -1
-	return type > 0 ? getElement(silbings, index + step, step, type) : silbings && silbings[index + step] || null
+	return type ? getElement(silbings, index + step, step) : silbings && silbings[index + step] || null
 }
 
 function makeSheet(el, min) {

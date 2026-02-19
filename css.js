@@ -9,10 +9,10 @@ var URL = global.URL || require("url").URL
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 exports.CSS = {
-	escape: function(sel) {
+	escape(sel) {
 		return ("" + sel).replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, "\\$&").replace(/^(-?)([0-9])/, "$1\\3$2 ")
 	},
-	minify: function(sheet, opts) {
+	minify(sheet, opts) {
 		var rules = sheet.cssRules || sheet.rules
 		return Array.prototype.map.call(rules, function(rule) {
 			var text = clear(rule.cssText)
@@ -23,8 +23,8 @@ exports.CSS = {
 	}
 }
 
-var toUrl = (dir) => new URL((dir || ".").replace(/\/*$/, "") + "/", "file:///").href
-, read = (sheet, url, enc = "utf8") => require("fs").readFileSync(new URL(url, new URL((sheet.baseURI || ".") + "/", new URL((sheet.min.root || ".").replace(/\/*$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.split(/[+#]/)[0], enc)
+var toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///").href
+, read = (sheet, url, enc = "utf8") => require("fs").readFileSync(new URL(url, new URL((sheet.baseURI || ".") + "/", new URL((sheet.min.root || ".").replace(/\/+$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.split(/[+#]/)[0], enc)
 , plugins = exports.plugins = {
 	"data-uri": function(sheet, v) {
 		var { DOMParser } = require("./dom.js")
@@ -53,12 +53,12 @@ var toUrl = (dir) => new URL((dir || ".").replace(/\/*$/, "") + "/", "file:///")
 	q ? (q = str.indexOf("'") == -1 ? "'" : "\"", q + str.replace(q === "'" ? /\\(")/g : /\\(')/g, "$1")) + q :
 	c ? "" :
 	_.replace(/[\t\n]+/g, " ")
-	.replace(/ *([,;{}>~+\/]) */g, "$1")
+	.replace(/ +(?=[,;{}>~+\/])/g, "").replace(/([,;{}>~+\/]) +/g, "$1")
 	.replace(/;(?=})/g, "")
 	.replace(/: +/g, ":")
 	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
 , clear = s => s
-	.replace(/("|')((?:\\\1|[^\1])*?)\1|\s*(\/)\*(?:[^*]|\*(?!\/))*\*\/\s*|(?:[^"'\/]|\/(?!\*))+/g, clearFn)
+	.replace(/("|')((?:\\.|[^\\\1])*?)\1|\s*(\/)\*(?:[^*]|\*(?!\/))*\*\/\s*|(?:[^"'\/]|\/(?!\*))+/g, clearFn)
 	.replace(/(["']).*?\1|url\(("|')([^'"()\s]+)\2\)/g, (m,q1,q2,u) => q1 ? m : "url(" + u + ")")
 , hex = n => (0 | +n + 256.5).toString(16).slice(1)
 , toRgb = {
@@ -80,16 +80,15 @@ var toUrl = (dir) => new URL((dir || ".").replace(/\/*$/, "") + "/", "file:///")
 	get(style, prop) {
 		if (prop === "cssText") {
 			var min = style.parentRule && style.parentRule.parentStyleSheet.min
-			for (var out = [], i = style.length; i--; ) {
-				out[i] = joinProp(style[i], style.__[i] || style[style[i]])
+			for (var out = [], name, value, i = style.length; i--; ) {
+				name = style[i]
+				value = style.__[i] || style[name]
+				if (min && min.color) value = value.replace(colorRe, colorFn)
+				out[i] = name + ":" + value
 			}
 			return out.join(";")
 		}
 		return style[prop] || ""
-		function joinProp(name, value) {
-			if (min && min.color) value = value.replace(colorRe, colorFn)
-			return name + ":" + value
-		}
 	},
 	set(style, prop, val) {
 		if (prop === "cssText") {
@@ -156,9 +155,7 @@ var toUrl = (dir) => new URL((dir || ".").replace(/\/*$/, "") + "/", "file:///")
 	},
 	"}": {
 		get cssText() {
-			var style = new CSSStyleSheet({})
-			style.replaceSync(this.text)
-			var body = "" + style
+			var body = "" + new CSSStyleSheet({}, this.text)
 			return body.length > 0 ? this.mediaText + "{" + body + "}" : ""
 		},
 		set cssText(text) {
@@ -207,8 +204,9 @@ function CSSStyleSheet(opts, text = "") {
 function updateImportUrls(sheet, urlFn) {
 	sheet.rules.forEach(rule => {
 		if (rule.type === 1) {
-			for (let style = rule.style, i = style.length; i--; ) {
-				if (urlRe.test(style[style[i]])) style[style[i]] = style[style[i]].replace(urlRe, urlFn)
+			for (let style = rule.style, val, i = style.length; i--; ) {
+				val = style[style[i]]
+				if (urlRe.test(val)) style[style[i]] = val.replace(urlRe, urlFn)
 			}
 		} else if (rule.mediaText != null && rule.text != null) {
 			var nested = new CSSStyleSheet({})
