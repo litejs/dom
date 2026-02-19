@@ -3,32 +3,33 @@
 	<title>LiteJS DOM test</title>
 	<link rel="icon" href="data:image/x-icon;,">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-</head><body>
-<p id=i></p>
+</head><body id=d>
 <pre id=r></pre>
-<p id=d></p>
 <script src="data/lib.js"></script>
 <script>
-i.innerHTML = "# " + [
-	"userAgent: " + navigator.userAgent,
-	"patched: " + xhr._p.length + " " + xhr._p.join(", ")
-].join("<br># ")
+console.log("userAgent:", navigator.userAgent)
+console.log("patched:", xhr._p.length + " " + xhr._p.join(", "))
 
 describe.env = "browser"
+describe.conf.brief = 1
+describe.conf.stack = 2
 describe.onend = function() {
 	r.innerHTML = describe.output
 }
-var exports = {}
-, native = {
+var native = {
 	CSSStyleDeclaration: function(str) {
 		d.style = str
 		return d.style
 	}
 }
-xhr.load(
-	["../css.js", "css.js"],
-	res => res.forEach(s => Function("exports", s).call(exports, exports)),
-	true
-)
+require.def({
+	fs: "exports.readFileSync = function(path, enc){var req=xhr('GET',path,true);req.send();return req.responseText}"
+})
+var files = ["../dom.js", "dom.js", "../css.js", "css.js"]
+xhr.load(files, res => {
+	require.def(res.reduce((m,s,i)=>(m[files[i]]=s,m), {}))
+	require("dom.js")
+	require("css.js")
+}, true)
 </script>
 <noscript>This application requires JavaScript</noscript></body></html>

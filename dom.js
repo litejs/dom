@@ -4,9 +4,10 @@
 "use strict"
 
 var boolAttrs = {
-	async:1, autoplay:1, loop:1, checked:1, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:1
+	async:1, autoplay:1, loop:1, checked:2, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:2
 }
-, numAttrs = "height maxLength minLength size tabIndex width"
+, numAttrs = "height size tabIndex width"
+, numAttrsNeg = "maxLength minLength"
 , strAttrs = "accept accesskey autocapitalize autofocus capture class contenteditable crossorigin dir for hidden href id integrity lang name nonce rel slot spellcheck src title type translate"
 , defaultAttrs = {
 	"form method get":1, "input type text":1,
@@ -21,9 +22,8 @@ var boolAttrs = {
 , rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
-, { CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
+, { CSS, CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
 , selector = require("./selector.js")
-, cssEscape = sel => ("" + sel).replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, "\\$&").replace(/^(-?)([0-9])/, "$1\\3$2 ")
 , Node = {
 	ELEMENT_NODE:                1,
 	TEXT_NODE:                   3,
@@ -140,8 +140,8 @@ var boolAttrs = {
 		var node = this
 		if (node === other) return 0
 		if (node.getRootNode() !== other.getRootNode()) return Node.DOCUMENT_POSITION_DISCONNECTED
-		if (node.contains(other)) return Node.DOCUMENT_POSITION_CONTAINS
-		if (other.contains(node)) return Node.DOCUMENT_POSITION_CONTAINED_BY
+		if (node.contains(other)) return Node.DOCUMENT_POSITION_CONTAINED_BY | Node.DOCUMENT_POSITION_FOLLOWING
+		if (other.contains(node)) return Node.DOCUMENT_POSITION_CONTAINS | Node.DOCUMENT_POSITION_PRECEDING
 
 		for (; node; node = node.nextSibling || node.parentNode && node.parentNode.nextSibling) {
 			if (node === other) return Node.DOCUMENT_POSITION_FOLLOWING
@@ -277,8 +277,9 @@ var boolAttrs = {
 	"&sect;": "§", "&sup2;": "²", "&sup3;": "³", "&yen;": "¥"
 }
 
-Object.keys(boolAttrs).forEach(key => addGetter(key, { isBool: true, readonly: "readOnly" }))
+Object.keys(boolAttrs).forEach(key => addGetter(key, { isBool: true, isDirty: boolAttrs[key] > 1, readonly: "readOnly" }))
 numAttrs.split(" ").forEach(key => addGetter(key, { isNum: true }))
+numAttrsNeg.split(" ").forEach(key => addGetter(key, { isNum: true, numDefault: -1 }))
 strAttrs.split(" ").forEach(key => addGetter(key, { "for": "htmlFor", "class": "className" }))
 
 function addGetter(key, opts) {
@@ -287,19 +288,28 @@ function addGetter(key, opts) {
 		configurable: true,
 		enumerable: true,
 		get: (
+			opts.isDirty ? function() { return "_" + attr in this ? this["_" + attr] : this.hasAttribute(attr) } :
 			opts.isBool ? function() { return this.hasAttribute(attr) } :
-			opts.isNum ? function() { return +this.getAttribute(attr) || 0 } :
+			opts.isNum ? function() { var v = this.getAttribute(attr); return v != null ? (+v || 0) : (opts.numDefault || 0) } :
 			function() { return this.getAttribute(attr) || "" }
 		),
 		set(value) {
-			this.setAttribute(attr, value)
+			if (opts.isDirty) this["_" + attr] = !!value
+			else if (opts.isBool && !value) this.removeAttribute(attr)
+			else this.setAttribute(attr, value)
 		}
 	})
 }
 
 ;["hasAttribute", "getAttribute", "setAttribute", "removeAttribute"].forEach(name => {
 	Element[name + "NS"] = function(ns, a, b) {
-		return this[name].call(this, a, b)
+		if (name !== "setAttribute" && ns) {
+			var lo = (":" + a).toLowerCase()
+			for (var key in this.attributes) {
+				if (key.slice(-lo.length) === lo) return this[name](key)
+			}
+		}
+		return this[name](a, b)
 	}
 })
 
@@ -422,7 +432,7 @@ function ElementNS(namespace, tag) {
 ElementNS.prototype = HTMLElement.prototype
 
 function Text(data) {
-	this.data = data
+	this.data = "" + data
 }
 
 extendNode(Text, {
@@ -562,7 +572,7 @@ exports.document = new Document()
 exports.entities = entities
 exports.mergeAttributes = mergeAttributes
 exports.selectorSplit = selector.selectorSplit
-exports.cssEscape = cssEscape
+exports.CSS = CSS
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
 exports.DOMParser = DOMParser

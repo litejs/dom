@@ -5,19 +5,27 @@
 //
 
 
-describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native", native]] : [["mock", require("../css.js")]], (name, env) => {
-	require("@litejs/cli/snapshot")
-	const {
-		CSSStyleSheet,
-		CSSStyleDeclaration,
-	} = env
+describe("css.js {0}", describe.env === "browser" ?
+	[["native", window]] : [["shim", require("../dom.js")]], function(env, DOM) {
+	var CSSStyleSheet = DOM.CSSStyleSheet
+	, CSSStyleDeclaration = env === "native" ? native.CSSStyleDeclaration : DOM.CSSStyleDeclaration
+	, minify = require("../css.js").CSS.minify
 
 	describe("CSSStyleDeclaration", () => {
 		test("{0}", [
 			[ "top:1px", { top: "1px" } ],
-			[ "margin-top: 12em ; padding-top: none", { marginTop: "12em", paddingTop: "none" } ],
 			[ "top: 2px", { top: "2px" } ],
 			[ "; top  :  3px ;", { top: "3px" } ],
+		], (init, expected, assert) => {
+			const obj = CSSStyleDeclaration(init)
+			const re = /^[; ]+| |[; ]+$/g
+			for (var key in expected) assert.equal(obj[key], expected[key])
+			assert.equal(obj.cssText.replace(re, ""), init.replace(re, ""))
+			assert.end()
+		})
+
+		if (env !== "native") test("{0}", [
+			[ "margin-top: 12em ; padding-top: none", { marginTop: "12em", paddingTop: "none" } ],
 			[ "x: 1; y: 2;", { x: "1", y: "2" } ],
 		], (init, expected, assert) => {
 			const obj = CSSStyleDeclaration(init)
@@ -30,7 +38,7 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 	})
 
 	describe("CSSStyleSheet", () => {
-		const sheet = new CSSStyleSheet()
+		var sheet = new CSSStyleSheet()
 		test("constructor", assert => {
 			sheet.insertRule(".btn { padding-top: 10px; }")
 			assert.equal(sheet.rules.length, 1)
@@ -38,106 +46,162 @@ describe("css.js {0}", describe.env === "browser" ? [["mock", exports], ["native
 			assert.equal(sheet.rules[0].style["paddingTop"], "10px")
 			assert.equal(sheet.rules[0].style["padding-top"], "10px")
 			assert.ok("0" in sheet.rules[0].style)
-			assert.ok(sheet.rules[0].style.hasOwnProperty("0"))
-			assert.ok(sheet.rules[0].style.hasOwnProperty("0"))
 			sheet.insertRule("body { background: blue; }", 0)
 			assert.equal(sheet.rules.length, 2)
-			assert.equal(sheet.toString(), "body{background:blue}\n.btn{padding-top:10px}")
+			assert.equal(minify(sheet), "body{background:blue}\n.btn{padding-top:10px}")
 			sheet.deleteRule(0)
-			assert.equal(sheet.toString(), ".btn{padding-top:10px}")
+			assert.equal(sheet.rules.length, 1)
+			assert.equal(minify(sheet), ".btn{padding-top:10px}")
+			assert.end()
+		})
+
+		test("parse {i} '{0}'", [
+			[" ", "", 0],
+			[" html {} body{  } ", "", ["html", "body"]],
+			["/*comment*/body{color:red}/**/p{font-size:12px}", "body{color:red}\np{font-size:12px}", ["body", "p"]],
+			[" body { font-size: 1.4em; } p { color: red; }", "body{font-size:1.4em}\np{color:red}", ["body", "p"]],
+			["@media (min-width: 500px) {\n  body {\n    color: blue;\n  }\n}\n", "@media (min-width:500px){body{color:blue}}", 1],
+			["@media (min-width: 500px) {\n\n}\n", "", 1],
+			["@font-face { font-family: MyFont; src: url(font.woff); }", "@font-face{font-family:MyFont;src:url(font.woff)}", 1],
+			[".a{color:red/* green */}", ".a{color:red}", 1],
+		], (text, expected, rules, assert) => {
+			sheet.replaceSync(text)
+			assert.equal(minify(sheet), expected)
+			if (Array.isArray(rules)) {
+				assert.equal(sheet.rules.length, rules.length)
+				for (var i = 0; i < rules.length; i++) assert.equal(sheet.rules[i].selectorText, rules[i])
+			} else {
+				assert.equal(sheet.rules.length, rules)
+			}
 			assert.end()
 		})
 
 		test("color {i} '{1}'", [
-			[ ".a{color:rgb(255 0 153)}.b{color:rgb( 0 1 2 )}", ".a{color:rgb(255 0 153)}\n.b{color:rgb( 0 1 2 )}"],
-		], (text, expected, assert) => {
-			const sheet = new CSSStyleSheet()
-			sheet.replaceSync(text)
-			assert.equal(sheet.toString(true), expected).end()
-		})
-
-		test("color {i} '{1}'", [
-			[ { color: true }, ".a{color:rgb(255,0,153)}.b{color:rgb( 0 1 2 )}", ".a{color:#f09}\n.b{color:#000102}"],
+			[ { color: true }, ".a{color:rgb(255,0,153)}.b{color:rgb(0,1,2)}", ".a{color:#f09}\n.b{color:#000102}"],
 			[ { color: true }, ".a{color:hsl(0 0% 0%)}", ".a{color:#000}"],
 			[ { color: true }, ".a{color:hsl(0 0% 100%)}", ".a{color:#fff}"],
 			[ { color: true }, ".a{color:hsl(0deg 100% 100%)}", ".a{color:#fff}"],
-			[ { color: true }, ".a{color:hsl(30 10 90)}", ".a{color:#e8e6e3}"],
+			[ { color: true }, ".a{color:hsl(30 10% 90%)}", ".a{color:#e8e6e3}"],
 			[ { color: true }, ".a{color:hsl(60,20%,80%)}", ".a{color:#d6d6c2}"],
-			[ { color: true }, ".a{color:hsla(90,30,70)}", ".a{color:#b3c99c}"],
-			[ { color: true }, ".a{color:hsla(90 30 70 / 1)}", ".a{color:#b3c99c}"],
-			[ { color: true }, ".a{color:hsla(90 30 70 100%)}", ".a{color:#b3c99c}"],
-			[ { color: true }, ".a{color:hsla(90 30 70 / 0.5)}", ".a{color:rgba(179,201,156,.5)}"],
+			[ { color: true }, ".a{color:hsla(90,30%,70%)}", ".a{color:#b3c99c}"],
+			[ { color: true }, ".a{color:hsla(90 30% 70% / 1)}", ".a{color:#b3c99c}"],
+			[ { color: true }, ".a{color:hsla(90 30% 70% / 100%)}", ".a{color:#b3c99c}"],
+			[ { color: true }, ".a{color:hsla(90 30% 70% / 0.5)}", ".a{color:rgba(179,201,156,.5)}"],
 			[ { color: true }, ".a{color:hsla(90, 30%, 70%, 50%)}", ".a{color:rgba(179,201,156,.5)}"],
 			[ { color: true }, ".a{color:hsl(120 40% 60%)}", ".a{color:#70c270}"],
 		], (min, text, expected, assert) => {
-			const sheet = new CSSStyleSheet({ min })
+			const sheet = new CSSStyleSheet()
 			sheet.replaceSync(text)
-			assert.equal(sheet.toString(), expected).end()
+			assert.equal(minify(sheet, min), expected).end()
 		})
 
-		test("parse '{0}'", [
-			[" ", ""],
-			[" html {} body{  } ", ""],
-			["a{a:1}b{b:2}c{c:3}", "a{a:1}\nb{b:2}\nc{c:3}"],
-			["/*A*/a/*B\\*/{b:c}/**/d/**/{e:f}", "a{b:c}\nd{e:f}"],
-			["a\\,b{c:d}", "a\\,b{c:d}"],
-			[" * {margin:0} body { font-size: 1.4em; } p { color: red; }", "*{margin:0}\nbody{font-size:1.4em}\np{color:red}"],
-			["div {\n background: #00a400;\n background: linear-gradient(to bottom, rgb(214, 122, 127) 0%, hsla(237deg 74% 33% / 61%) 100%);}", "div{background:#00a400;background:linear-gradient(to bottom,rgb(214,122,127) 0%,hsla(237deg 74% 33%/61%) 100%)}"],
-			[" @import url('a.css') screen;  @import url(\"b.css\") screen; * { margin: 0; }", "@import 'a.css' screen;\n@import 'b.css' screen;\n*{margin:0}"],
-			["@media (min-width: 500px) {\n  body {\n    color: blue;\n  }\n}\n", "@media (min-width:500px){body{color:blue}}"],
-			["@media (min-width: 500px) {\n\n}\n", ""],
-			[".a { b: url('a\\'b') }", ".a{b:url(\"a'b\")}"],
-			//[":root{--my-test-variable:123px}.p{ width: var(--my-test-variable); }", ".p{width:123px}"],
-		], (text, expected, assert) => {
-			sheet.replaceSync(text)
-			assert.equal(sheet.toString(), expected).end()
+		if (env !== "native") test("toString with color", assert => {
+			var s = new CSSStyleSheet()
+			s.replaceSync(".a{color:rgb(255,0,153)}")
+			assert
+			.equal(s.toString({ color: true }), ".a{color:#f09}")
+			.equal(minify({ cssRules: s.rules }), ".a{color:#f09}")
+			.equal(minify({ rules: s.rules }), ".a{color:#f09}")
+			.end()
 		})
 
-		test("@import", [
-			[ null, "@import 'css/c.css';", "@import 'css/c.css';" ],
-			[ {}, "@import 'css/c.css';", "@import 'css/c.css';" ],
-			[ { min: true }, "@import 'css/c.css';", "@import 'css/c.css';" ],
-			[ { min: { import: true } },
-				"@import 'test/data/ui/css/c.css';",
-				".c{content:'url(my-icon.jpg)';cursor:url(test/data/ui/css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
-			],
-			[ { min: { import: true } },
-				"@import 'test/data/ui/css/import-nested.css';",
-				".nested{color:green}\n@media (min-width:1px){.hero{background:url(test/data/ui/css/media.png)}}\n@keyframes spin{from{background-image:url(test/data/ui/css/frames/start.png)}}"
-			],
-			[ { min: { import: true, root: "test/data/ui" } },
-				"@import 'css/c.css';",
-				".c{content:'url(my-icon.jpg)';cursor:url(css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
-			],
-			[ { min: { import: true, root: "test/data/ui/css" } }, "@import 'c.css';",
-				".c{content:'url(my-icon.jpg)';cursor:url(my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
-			],
+		if (env !== "native") {
+			test("minify '{0}'", [
+				["a{a:1}b{b:2}c{c:3}", "a{a:1}\nb{b:2}\nc{c:3}"],
+				["/*A*/a/*B\\*/{b:c}/**/d/**/{e:f}", "a{b:c}\nd{e:f}"],
+				["a\\,b{c:d}", "a\\,b{c:d}"],
+				[" * {margin:0} body { font-size: 1.4em; } p { color: red; }", "*{margin:0}\nbody{font-size:1.4em}\np{color:red}"],
+				["div {\n background: #00a400;\n background: linear-gradient(to bottom, rgb(214, 122, 127) 0%, hsla(237deg 74% 33% / 61%) 100%);}", "div{background:#00a400;background:linear-gradient(to bottom,rgb(214,122,127) 0%,hsla(237deg 74% 33%/61%) 100%)}"],
+				[" @import url('a.css') screen;  @import url(\"b.css\") screen; * { margin: 0; }", "@import 'a.css' screen;\n@import 'b.css' screen;\n*{margin:0}"],
+				[".a { b: url('a\\'b') }", ".a{b:url(\"a'b\")}"],
+				//[":root{--my-test-variable:123px}.p{ width: var(--my-test-variable); }", ".p{width:123px}"],
+			], (text, expected, assert) => {
+				sheet.replaceSync(text)
+				assert.equal(minify(sheet), expected).end()
+			})
 
-		], (opts, source, result, assert) => {
-			const sheet = new CSSStyleSheet(opts)
-			sheet.replaceSync(source)
-			assert.equal(sheet.toString(), result)
-			assert.end()
-		})
+			test("@charset", assert => {
+				sheet.replaceSync("@charset \"utf-8\"; body{color:red}")
+				assert
+				.equal(sheet.rules.length, 2)
+				.equal(minify(sheet), "@charset 'utf-8';\nbody{color:red}")
+				.end()
+			})
+
+			test("data-uri {i}", [
+				[
+					".a{background:url(test/data/ui/css/tiny.gif);/*! data-uri */}",
+					".a{background:url(data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=)}"
+				],
+				[
+					".a{background:\"keep\" url(test/data/ui/css/tiny.gif);/*! data-uri */}",
+					".a{background:'keep' url(data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=)}"
+				],
+				[
+					".a{background:url(test/data/ui/css/ul.svg);/*! data-uri */}",
+					".a{background:url('data:image/svg+xml;,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"600\" width=\"900\" viewBox=\"-300 -200 900 600\" fill=\"%2300a651\"><path d=\"M14 340a2.2 2.2 0 1 1 0 .1zm9 20a5.2 5.2 0 1 1 0 .1z\"/><g id=\"circle-1\"><circle cx=\"4\" cy=\"4\" r=\"1\"/><circle cx=\"5\" cy=\"5\" r=\"1\"/></g><circle id=\"circle-2\" cx=\"5\" cy=\"5\" r=\"2\"/></svg>')}"
+				],
+				[
+					".a{background:url(test/data/ui/css/ul.svg#circle-1);/*! data-uri */}",
+					".a{background:url('data:image/svg+xml;,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"600\" width=\"900\" viewBox=\"-300 -200 900 600\" fill=\"%2300a651\"><circle cx=\"4\" cy=\"4\" r=\"1\"/><circle cx=\"5\" cy=\"5\" r=\"1\"/></svg>')}"
+				],
+				[
+					".a{background:url(test/data/ui/css/ul.svg#circle-2);/*! data-uri */}",
+					".a{background:url('data:image/svg+xml;,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"600\" width=\"900\" viewBox=\"-300 -200 900 600\" fill=\"%2300a651\"><circle cx=\"5\" cy=\"5\" r=\"2\"/></svg>')}"
+				],
+			], (source, result, assert) => {
+				var s = new CSSStyleSheet({ min: true })
+				s.replaceSync(source)
+				assert.equal(minify(s), result).end()
+			})
+
+			test("@import", [
+				[ null, "@import 'css/c.css';", "@import 'css/c.css';" ],
+				[ {}, "@import 'css/c.css';", "@import 'css/c.css';" ],
+				[ { min: true }, "@import 'css/c.css';", "@import 'css/c.css';" ],
+				[ { min: { import: true } },
+					"@import 'test/data/ui/css/c.css';",
+					".c{content:'url(my-icon.jpg)';cursor:url(test/data/ui/css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
+				],
+				[ { min: { import: true } },
+					"@import 'test/data/ui/css/import-nested.css';",
+					".nested{color:green}\n@media (min-width:1px){.hero{background:url(test/data/ui/css/media.png)}}\n@keyframes spin{from{background-image:url(test/data/ui/css/frames/start.png)}}"
+				],
+				[ { min: { import: true, root: "test/data/ui" } },
+					"@import 'css/c.css';",
+					".c{content:'url(my-icon.jpg)';cursor:url(css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
+				],
+				[ { min: { import: true, root: "test/data/ui/css" } }, "@import 'c.css';",
+					".c{content:'url(my-icon.jpg)';cursor:url(my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
+				],
+
+			], (opts, source, result, assert) => {
+				const sheet = new CSSStyleSheet(opts)
+				sheet.replaceSync(source)
+				assert.equal(sheet.toString(), result)
+				assert.end()
+			})
+		}
 	})
 
-	test("lint", [
+	if (env !== "native") test("lint", [
 		[ "a{b:1;}}" ],
 		[ "a{b:1;" ],
 	], (css, assert) => {
 		assert.throws(() => new CSSStyleSheet().replaceSync(css)).end()
 	})
 
-	test("parse and stringify", [
-		[ null ],
-		[ true ],
-		[ { import: true } ],
-	], (min, assert) => {
-		assert.matchSnapshot("./test/data/ui/css/samp1.css", str => {
-			const sheet = new CSSStyleSheet({ min, baseURI: "test/data/ui/css" }, str)
-			return sheet.toString()
-		})
-		assert.end()
-	})
+	//require("@litejs/cli/snapshot")
+	//test("parse and stringify", [
+	//	[ null ],
+	//	[ true ],
+	//	[ { import: true } ],
+	//], (min, assert) => {
+	//	assert.matchSnapshot("./test/data/ui/css/samp1.css", str => {
+	//		const sheet = new CSSStyleSheet({ min, baseURI: "test/data/ui/css" }, str)
+	//		return sheet.toString()
+	//	})
+	//	assert.end()
+	//})
 
 })

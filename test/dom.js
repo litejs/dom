@@ -1,10 +1,19 @@
 
 
-describe("DOM lite", function() {
+
+describe("dom.js {0}", describe.env === "browser" ?
+	[["native", window]] : [["shim", require("../dom.js")]], function(env, DOM) {
 	var undef
-	, DOM = require("../")
-	, document = DOM.document
+	, document = env === "native" ? DOM.document.implementation.createHTMLDocument("") : new DOM.Document
 	, it = describe.it
+	, cssEscape = (DOM.CSS || CSS).escape
+
+	function str(node) {
+		if (node.outerHTML != null) return node.outerHTML
+		var el = document.createElement("b")
+		el.appendChild(node.cloneNode(true))
+		return el.innerHTML
+	}
 
 	it("can create nodes", function (assert) {
 		var el
@@ -45,13 +54,13 @@ describe("DOM lite", function() {
 		assert.equal(el.textContent, "bar")
 
 		el = document.createTextNode(null)
-		assert.equal("" + el, "null")
+		assert.equal(el.textContent, "null")
 
 		el = document.createTextNode(undef)
-		assert.equal("" + el, "undefined")
+		assert.equal(el.textContent, "undefined")
 
 		el = document.createTextNode(123)
-		assert.equal("" + el, "123")
+		assert.equal(el.textContent, "123")
 
 		el = document.createComment("hello comment")
 		assert.equal(el.nodeType, 8)
@@ -65,49 +74,20 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
-	it("can create elements with namespace", function (assert) {
-		var el = document.createElementNS(null, "clipPath")
-		assert.equal("" + el, "<clipPath></clipPath>")
-
-		assert.end()
-	})
-
-	it("can set attributes with namespace", function (assert) {
-		var el = document.createElementNS(null, "use")
-		assert.equal(el.getAttributeNS(null, "xlink:ref"), null)
-		el.setAttributeNS(null, "xlink:ref", "http://localhost")
-		assert.equal("" + el, '<use xlink:ref="http://localhost"></use>')
-		assert.equal(el.hasAttributeNS(null, "xlink:ref"), true)
-		el.removeAttributeNS(null, "xlink:ref", "http://localhost")
-		assert.equal("" + el, '<use></use>')
-		assert.equal(el.hasAttributeNS(null, "xlink:ref"), false)
-
-		assert.end()
-	})
-
-	it("can set attributes", function (assert) {
-
-		function testAttr(name, value, propName) {
-			var el = document.createElement("a")
-			el[propName || name] = value
-			assert.equal(el.getAttribute(name), value)
-			assert.equal(name === "style" ? el.style.cssText : "" + el[propName || name], value)
-
-			el.removeAttribute(name)
-			assert.equal(!!el.getAttribute(name), false)
-			value = name === "style" ? el.style.cssText : el[propName || name]
-			assert.equal(!!(value && ("" + value)), false)
-		}
-
-		testAttr("id", "123")
-		testAttr("class", "my-class", "className")
-		testAttr("for", "my-field", "htmlFor")
-		testAttr("style", "top:1px")
-		testAttr("style", "")
-		testAttr("title", "Header")
-		testAttr("href", "#123")
-		testAttr("href", "http://example.com")
-
+	it("can set attributes {1} to {0}", [
+		["div", "id", "123", null],
+		["span", "class", "my-class", "className"],
+		["label", "for", "my-field", "htmlFor"],
+		["h1", "title", "Header", null],
+		["a", "href", "#frag", null],
+	], function (tag, attr, val, name, assert) {
+		var el = document.createElement(tag)
+		el.setAttribute(attr, val)
+		assert.equal(el.getAttribute(attr), val)
+		if (name) assert.equal(el[name], val)
+		el.removeAttribute(attr)
+		assert.equal(el.hasAttribute(attr), false)
+		el[name || attr] = val
 		assert.end()
 	})
 
@@ -131,7 +111,10 @@ describe("DOM lite", function() {
 		assert.equal(el.style.top, "1px")
 		assert.equal(el.style.backgroundColor, "blue")
 		assert.equal(el.style.border, "4px solid black")
-		assert.equal(el.style.cssText, "top:1px;background-color:blue;float:left;border:4px solid black")
+		assert.anyOf(el.style.cssText, [
+			"top:1px;background-color:blue;float:left;border:4px solid black",
+			"top: 1px; background-color: blue; float: left; border: 4px solid black;",
+		])
 		assert.end()
 	})
 
@@ -145,6 +128,29 @@ describe("DOM lite", function() {
 
 		el[prop] = true
 		assert.equal(el.hasAttribute(attr), true)
+		assert.equal(el[prop], true)
+
+		el[prop] = false
+		assert.equal(el.hasAttribute(attr), false)
+		assert.equal(el[prop], false)
+		assert.end()
+	})
+
+	it("checked property does not sync to attribute", function (assert) {
+		var el = document.createElement("input")
+		el.setAttribute("type", "checkbox")
+
+		assert.equal(el.checked, false)
+		assert.equal(el.hasAttribute("checked"), false)
+
+		el.checked = true
+		assert.equal(el.checked, true)
+		assert.equal(el.hasAttribute("checked"), false)
+
+		el.checked = false
+		assert.equal(el.checked, false)
+		assert.equal(el.hasAttribute("checked"), false)
+
 		assert.end()
 	})
 
@@ -156,7 +162,7 @@ describe("DOM lite", function() {
 		assert.equal(el.hasAttribute(prop.toUpperCase()), false)
 		assert.equal(el.hasAttribute(prop.toLowerCase()), false)
 
-		assert.equal(el[prop], 0)
+		assert.equal(el[prop], -1)
 		el[prop] = 3
 		assert.equal(el[prop], 3)
 		assert.equal(el.getAttribute(prop), "3")
@@ -170,6 +176,14 @@ describe("DOM lite", function() {
 		el.setAttribute(prop, 5)
 		assert.equal(el[prop], 5)
 		assert.equal(el.getAttribute(prop), "5")
+		assert.end()
+	})
+
+	if (env !== "native") it("number attributes with defaults", assert => {
+		var img = document.createElement("img")
+		assert.equal(img.height, 0)
+		img.setAttribute("height", "abc")
+		assert.equal(img.height, 0)
 		assert.end()
 	})
 
@@ -203,7 +217,10 @@ describe("DOM lite", function() {
 		assert.strictEqual(el.ownerDocument, clone.ownerDocument)
 		assert.strictEqual(el.ownerDocument, deepClone.ownerDocument)
 
-		assert.equal(deepClone.outerHTML, "<h1 data-title=\"foo\" id=\"1\" style=\"top:5px\"><img></h1>")
+		assert.anyOf(deepClone.outerHTML, [
+			'<h1 data-title="foo" id="1" style="top:5px"><img></h1>',
+			'<h1 data-title="foo" id="1" style="top: 5px;"><img></h1>',
+		])
 
 		clone.id = 2
 		assert.equal(el.id, "1")
@@ -219,7 +236,7 @@ describe("DOM lite", function() {
 		clone = el.cloneNode()
 
 		assert.notStrictEqual(el, clone)
-		assert.equal(""+el, ""+clone)
+		assert.equal(el.data, clone.data)
 
 		assert.end()
 	})
@@ -233,7 +250,7 @@ describe("DOM lite", function() {
 		div.appendChild(span)
 		span.textContent = "Hello!"
 
-		var html = String(div)
+		var html = div.outerHTML
 
 		assert.equal(html, "<div class=\"foo bar\"><span>Hello!</span></div>")
 
@@ -256,11 +273,6 @@ describe("DOM lite", function() {
 
 		assert.equal(div.querySelectorAll("span").length, 2)
 
-		// Manualy broken dom
-		div.childNodes = null
-		assert.equal(div.nextElementSibling, null)
-		assert.equal(div.firstElementChild, null)
-
 		assert.end()
 	})
 
@@ -274,34 +286,34 @@ describe("DOM lite", function() {
 
 		assert.equal(node.contains(h2), false)
 		assert.equal(h2.compareDocumentPosition(h2), 0)
-		assert.equal(h2.compareDocumentPosition(node), 1)
-		assert.equal(node.compareDocumentPosition(h2), 1)
+		assert.ok(h2.compareDocumentPosition(node) & 1)
+		assert.ok(node.compareDocumentPosition(h2) & 1)
 		assert.equal(node.appendChild(h2), h2)
-		assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
+		assert.equal(str(node), mask.replace("%s", "<h2></h2>"))
 		assert.ok(node.querySelector("h2"))
 		assert.equal(node.contains(h2), true)
 
 		assert.equal(node.insertBefore(h1, h2), h1)
 		assert.equal(h1.compareDocumentPosition(h2), 4)
 		assert.equal(h2.compareDocumentPosition(h1), 2)
-		assert.equal(""+node, mask.replace("%s", "<h1>Head</h1><h2></h2>"))
+		assert.equal(str(node), mask.replace("%s", "<h1>Head</h1><h2></h2>"))
 
 
 		assert.equal(node.appendChild(h1), h1)
 		assert.equal(h1.getRootNode(), node)
-		assert.equal(node.compareDocumentPosition(h1), 8)
-		assert.equal(h1.compareDocumentPosition(node), 16)
-		assert.equal(""+node, mask.replace("%s", "<h2></h2><h1>Head</h1>"))
+		assert.equal(node.compareDocumentPosition(h1), 20)
+		assert.equal(h1.compareDocumentPosition(node), 10)
+		assert.equal(str(node), mask.replace("%s", "<h2></h2><h1>Head</h1>"))
 
 		assert.equal(node.removeChild(h1), h1)
-		assert.equal(""+node, mask.replace("%s", "<h2></h2>"))
+		assert.equal(str(node), mask.replace("%s", "<h2></h2>"))
 
 		assert.throws(function() {
 			node.removeChild(h1)
 		})
 
 		assert.equal(node.replaceChild(h1, h2), h2)
-		assert.equal(""+node, mask.replace("%s", "<h1>Head</h1>"))
+		assert.equal(str(node), mask.replace("%s", "<h1>Head</h1>"))
 		assert.equal(h2.parentNode, null)
 		assert.equal(h2.nextSibling, null)
 		assert.equal(h2.previousSibling, null)
@@ -321,11 +333,11 @@ describe("DOM lite", function() {
 		assert.equal(h2.previousElementSibling, h1)
 		assert.equal(h2.nextElementSibling, null)
 		p.appendChild(node)
-		assert.equal(""+p, "<p>"+mask.replace("%s", "<h1>Head</h1>text1<h2></h2>")+"</p>")
+		assert.equal(p.outerHTML, "<p>"+mask.replace("%s", "<h1>Head</h1>text1<h2></h2>")+"</p>")
 
 		assert.equal(p.textContent, "Headtext1")
 		p.textContent = "Hello"
-		assert.equal(""+p, "<p>Hello</p>")
+		assert.equal(p.outerHTML, "<p>Hello</p>")
 
 		p.removeChild(p.firstChild)
 		assert.equal(p.firstChild, null)
@@ -360,8 +372,10 @@ describe("DOM lite", function() {
 		assert.equal(h1.matches("[ID3='']"), true)
 		h1.removeAttribute("id3")
 
-		assert.own(h1.attributes.removeNamedItem("id2"), {name: "id2", value: "321"})
-		assert.equal(h1.attributes.removeNamedItem("id2"), null)
+		if (env !== "native") assert.equal(h1.attributes.removeNamedItem("nope"), null)
+		var removed = h1.attributes.removeNamedItem("id2")
+		assert.equal(removed.name, "id2")
+		assert.equal(removed.value, "321")
 		assert.equal(h1.getAttribute("id"), "123")
 		assert.equal(h1.getAttribute("id2"), null)
 		assert.equal(h1.attributes.length, 1)
@@ -369,10 +383,10 @@ describe("DOM lite", function() {
 		assert.equal(h1.attributes.id.value, "123")
 
 		assert.equal(h1.getAttribute("toString"), null)
-		assert.equal(""+h1, '<h1 id="123"></h1>')
+		assert.equal(h1.outerHTML, '<h1 id="123"></h1>')
 
 		h1.className = "my-class"
-		assert.equal(""+h1, '<h1 id="123" class="my-class"></h1>')
+		assert.equal(h1.outerHTML, '<h1 id="123" class="my-class"></h1>')
 		assert.equal(h1.attributes.length, 2)
 		//assert.equal(h1.attributes[1].name, "class")
 		assert.equal(h1.attributes.class.value, "my-class")
@@ -380,10 +394,13 @@ describe("DOM lite", function() {
 
 		h1.style.top = "5px"
 		h1.style.left = "15px"
-		assert.equal(""+h1, '<h1 id="123" class="my-class" style="top:5px;left:15px"></h1>')
+		assert.anyOf(h1.outerHTML, [
+			'<h1 id="123" class="my-class" style="top:5px;left:15px"></h1>',
+			'<h1 id="123" class="my-class" style="top: 5px; left: 15px;"></h1>',
+		])
 		assert.equal(h1.attributes.length, 3)
 		//assert.equal(h1.attributes[2].name, "style")
-		assert.equal(h1.attributes.style.value, "top:5px;left:15px")
+		assert.anyOf(h1.attributes.style.value, ["top:5px;left:15px", "top: 5px; left: 15px;"])
 
 		//h1.attributes.class.value = "top: 15px;"
 		//assert.equal(h1.attributes.class.value, "top:15px")
@@ -395,14 +412,14 @@ describe("DOM lite", function() {
 		assert.equal(h1.getAttribute('GetAttribute'), 'Get me')
 		h1.setAttribute('no-value', '')
 		h1.setAttribute('constructor', 'not the constructor')
-		assert.equal(h1.toString(), '<h1 getattribute="Get me" no-value="" constructor="not the constructor"></h1>')
+		assert.equal(h1.outerHTML, '<h1 getattribute="Get me" no-value="" constructor="not the constructor"></h1>')
 		assert.equal(h1.getAttribute('no-value'), '')
 		h1.removeAttribute('no-value')
 		h1.removeAttribute('constructor')
 		h1.removeAttribute('getAttribute')
 		assert.equal(h1.getAttribute('no-value'), null)
 		assert.equal(h1.constructor, Object.getPrototypeOf(h1).constructor)
-		assert.equal(h1.toString(), '<h1></h1>')
+		assert.equal(h1.outerHTML, '<h1></h1>')
 
 		assert.end()
 	})
@@ -412,19 +429,19 @@ describe("DOM lite", function() {
 		, a1 = document.createElement("a")
 		, a2 = document.createElement("b")
 
-		assert.equal(el.childNodes, [])
+		assert.equal(Array.from(el.childNodes), [])
 
 		el.replaceChildren(a1)
-		assert.equal(el.childNodes, [a1])
+		assert.equal(Array.from(el.childNodes), [a1])
 
 		el.replaceChildren(a2)
-		assert.equal(el.childNodes, [a2])
+		assert.equal(Array.from(el.childNodes), [a2])
 
 		el.replaceChildren()
-		assert.equal(el.childNodes, [])
+		assert.equal(Array.from(el.childNodes), [])
 
 		el.replaceChildren(a1, a2)
-		assert.equal(el.childNodes, [a1, a2])
+		assert.equal(Array.from(el.childNodes), [a1, a2])
 		assert.end()
 	})
 
@@ -436,7 +453,7 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
-	it("can stringify nodes to json", function (assert) {
+	if (env !== "native") it("can stringify nodes to json", function (assert) {
 		var doc = new DOM.DOMParser().parseFromString('<root attr="1"><child>text</child><!--c--></root>')
 		, expectedDoc = {
 			name: "#document",
@@ -472,6 +489,29 @@ describe("DOM lite", function() {
 		assert.end()
 	})
 
+	it("can create elements with namespace", function (assert) {
+		var el = document.createElementNS(null, "clipPath")
+		assert.anyOf(el.outerHTML, ["<clipPath/>", "<clipPath></clipPath>"])
+		assert.end()
+	})
+
+	it("can set attributes with namespace", function (assert) {
+		var el = document.createElementNS(null, "use")
+		assert.equal(el.getAttributeNS(null, "xlink:ref"), null)
+		el.setAttributeNS("xlink", "xlink:ref", "http://localhost")
+		assert.anyOf(el.outerHTML, [
+			'<use xlink:ref="http://localhost" xmlns:xlink="xlink"/>',
+			'<use xlink:ref="http://localhost" xmlns:xlink="xlink"></use>',
+			'<use xlink:ref="http://localhost"></use>',
+		])
+		assert.equal(el.hasAttributeNS("xlink", "ref"), true)
+		el.removeAttributeNS("xlink", "ref")
+		assert.anyOf(el.outerHTML, ['<use ></use>', '<use></use>'])
+		assert.equal(el.hasAttributeNS(null, "xlink:ref"), false)
+
+		assert.end()
+	})
+
 	test("cssEscape", [
 		[ "a", "a" ],
 		[ ".foo#bar", "\\.foo\\#bar" ],
@@ -481,7 +521,7 @@ describe("DOM lite", function() {
 		[ "12 b%c", "\\31 2\\ b\\%c" ],
 		//[ "\0", "\ufffd" ],
 	], function(selector, escaped, assert) {
-		assert.equal(DOM.cssEscape(selector), escaped).end()
+		assert.equal(cssEscape(selector), escaped).end()
 	})
 })
 

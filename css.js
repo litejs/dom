@@ -3,12 +3,27 @@
 
 "use strict"
 
+var URL = global.URL || require("url").URL
+
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
+exports.CSS = {
+	escape: function(sel) {
+		return ("" + sel).replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, "\\$&").replace(/^(-?)([0-9])/, "$1\\3$2 ")
+	},
+	minify: function(sheet, opts) {
+		var rules = sheet.cssRules || sheet.rules
+		return Array.prototype.map.call(rules, function(rule) {
+			var text = clear(rule.cssText)
+			if (!text || /\{\s*\}$/.test(text)) return ""
+			if (opts && opts.color) text = text.replace(colorRe, colorFn)
+			return text
+		}).filter(Boolean).join("\n")
+	}
+}
 
-var fs = require("fs")
-, path = require("path")
-, read = (sheet, url, enc = "utf8") => fs.readFileSync(path.resolve(sheet.min.root || "", sheet.baseURI, url).split(/[+#]/)[0], enc)
+var toUrl = (dir) => new URL((dir || ".").replace(/\/*$/, "") + "/", "file:///").href
+, read = (sheet, url, enc = "utf8") => require("fs").readFileSync(new URL(url, new URL((sheet.baseURI || ".") + "/", new URL((sheet.min.root || ".").replace(/\/*$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.split(/[+#]/)[0], enc)
 , plugins = exports.plugins = {
 	"data-uri": function(sheet, v) {
 		var { DOMParser } = require("./dom.js")
@@ -119,7 +134,7 @@ var fs = require("fs")
 			var sheet = this.parentStyleSheet
 			, min = sheet.min
 			, text = this.text
-			, urlFn = (m,q1,q2,u) => q1 ? m : "url('" + path.join(text.baseURI, u) + "')"
+			, urlFn = (m,q1,q2,u) => q1 ? m : "url('" + new URL(u, toUrl(text.baseURI)).pathname.slice(1) + "')"
 			if (min && min.import) {
 				text = new CSSStyleSheet({
 					parentStyleSheet: sheet,
@@ -181,11 +196,9 @@ function CSSStyleDeclaration(text, parentRule = null) {
 function CSSStyleSheet(opts, text = "") {
 	Object.assign(this, opts)
 	if (opts && opts.href) {
-		this.baseURI = path.join(
-			(opts.parentStyleSheet || opts.ownerNode && opts.ownerNode.ownerDocument).baseURI || "",
-			opts.href,
-			".."
-		)
+		this.baseURI = new URL(".", new URL(opts.href, toUrl(
+			(opts.parentStyleSheet || opts.ownerNode && opts.ownerNode.ownerDocument).baseURI || ""
+		))).pathname.slice(1).replace(/\/$/, "")
 	}
 	this.replaceSync(text)
 }
@@ -253,4 +266,5 @@ CSSStyleSheet.prototype = {
 		return this.rules.map(rule => rule.cssText).filter(Boolean).join("\n")
 	}
 }
+
 

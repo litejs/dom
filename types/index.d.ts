@@ -188,4 +188,7 @@ export const document: Document
 export const entities: Record<string, string>
 export function mergeAttributes(source: HTMLElement | null, target: HTMLElement | null): void
 export function selectorSplit(selector: string): string[]
-export function cssEscape(selector: string | number): string
+export const CSS: {
+	escape(selector: string | number): string
+	minify(sheet: CSSStyleSheet, min?: { color?: boolean }): string
+}

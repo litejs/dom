@@ -4,7 +4,7 @@ import {
 	XMLSerializer,
 	HTMLElement,
 	CSSStyleSheet,
-	cssEscape,
+	CSS,
 	selectorSplit,
 	mergeAttributes,
 	JSONNode
@@ -28,7 +28,8 @@ const sheet = new CSSStyleSheet({ min: true }, ".a{color:red}")
 sheet.replaceSync(".a { color: red }")
 
 const serialized: string = new XMLSerializer().serializeToString(parsed)
-const escaped: string = cssEscape(".a b")
+const escaped: string = CSS.escape(".a b")
+const minified: string = CSS.minify(sheet)
 const parts: string[] = selectorSplit(".a .b")
 
 type ExpectDocJson = Expect<Equal<typeof docJson, JSONNode>>
