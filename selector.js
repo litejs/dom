@@ -6,9 +6,7 @@
 exports.find = find
 exports.selectorSplit = selectorSplit
 
-var selectorCache = {
-	"": () => {}
-}
+var selectorCache = {}
 , selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 , selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
 , selectorMap = exports.selectorMap = {
@@ -41,7 +39,7 @@ var selectorCache = {
 	"": "c(_.parentNode,v)"
 }
 , closest = exports.closest = walk.bind(exports, "parentNode", 1)
-, matches = exports.matches = (el, sel) => !!selectorFn(sel)(el)
+, matches = exports.matches = (el, sel) => !!(sel && selectorFn(sel)(el))
 , next = exports.next = (el, sel) => walk("nextSibling", 1, el.nextSibling, sel)
 , prev = exports.prev = (el, sel) => walk("previousSibling", 1, el.previousSibling, sel)
 
@@ -49,8 +47,8 @@ var selectorCache = {
 selectorMap["nth-last-child"] = selectorMap["nth-child"].replace("1+", "v.length-")
 
 function selectorFn(str) {
-	if (str != null && typeof str !== "string") throw Error("Invalid selector")
-	return selectorCache[str || ""] ||
+	if (!str || typeof str !== "string") throw Error("Invalid selector")
+	return selectorCache[str] ||
 	(selectorCache[str] = Function("m,c,n,p", "return (_,v,a,b)=>" +
 		selectorSplit(str).map(sel => {
 			var relation, from
@@ -61,6 +59,7 @@ function selectorFn(str) {
 				return ""
 			})
 			, tag = sel.slice(from).replace(selectorRe, (_, op, key, subSel, fn, val, quotation) => {
+				if (key[0] == + key[0]) throw Error("Invalid selector")
 				rules.push(
 					"((v='" +
 					(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/[\\']/g, "\\$&") +

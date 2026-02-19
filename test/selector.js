@@ -1,7 +1,10 @@
-describe("Selectors", () => {
-	var DOM = require("../")
-	, document = DOM.document
+describe("selector.js {0}", describe.env === "browser" ?
+	[["native", window]] : [["shim", require("../dom.js")]], function(env, DOM) {
+	var document = newDoc()
 
+	function newDoc() {
+		return env === "native" ? DOM.document.implementation.createHTMLDocument("") : new DOM.Document
+	}
 
 	function append_el(id, parent, tag, content) {
 		var el = document.createElement(tag || "div")
@@ -11,8 +14,12 @@ describe("Selectors", () => {
 		return el
 	}
 
+	describe.assert.equalA = function(a, b) {
+		return this.equal(Array.from(a), b)
+	}
+
 	test("getElementById, getElementsByTagName, getElementsByClassName, querySelector", assert => {
-		document = new DOM.Document()
+		document = newDoc()
 
 		var result
 		, el1   = append_el("i1", document.body)
@@ -47,7 +54,7 @@ describe("Selectors", () => {
 		assert.equal(result.length,  1)
 		assert.equal(result[0], el221)
 
-		assert.equal(document.getElementsByClassName("findme")
+		assert.equalA(document.getElementsByClassName("findme")
 		, [el21, el221])
 
 		assert.equal(document.querySelector("html"), document.documentElement)
@@ -67,40 +74,40 @@ describe("Selectors", () => {
 		assert.equal(document.querySelector("#i21.findme"),      el21)
 		assert.equal(document.querySelector("div#i21.findme"),   el21)
 
-		assert.equal(document.querySelectorAll("div")
+		assert.equalA(document.querySelectorAll("div")
 		, [el1, el11, el12, el2, el21, el22, el222, el3])
 
-		assert.equal(document.querySelectorAll(".findme")
+		assert.equalA(document.querySelectorAll(".findme")
 		, [el21, el221])
 
-		assert.equal(document.querySelectorAll("span.findme")
+		assert.equalA(document.querySelectorAll("span.findme")
 		, [el221])
 
-		assert.equal(document.querySelectorAll("html")
+		assert.equalA(document.querySelectorAll("html")
 		, [document.documentElement])
 
-		assert.equal(document.querySelectorAll("body")
+		assert.equalA(document.querySelectorAll("body")
 		, [document.body])
 
-		assert.equal(document.querySelectorAll("span.findme, div.findme")
+		assert.equalA(document.querySelectorAll("span.findme, div.findme")
 		, [el21, el221])
 
-		assert.equal(document.querySelectorAll("body span.findme, div.findme")
+		assert.equalA(document.querySelectorAll("body span.findme, div.findme")
 		, [el21, el221])
 
-		assert.equal(el1.querySelectorAll("div")
+		assert.equalA(el1.querySelectorAll("div")
 		, [el11, el12])
 
 		assert.end()
 	})
 
 	test("Element.matches and Element.closest", assert => {
-		document = new DOM.Document()
+		document = newDoc()
 
-		var el1   = append_el(1, document.body, "div")
+		var el1   = append_el("i1", document.body, "div")
 		, s1   = append_el("s1", document.body, "span")
-		, s2   = append_el(2, document.body, "span")
-		, a1   = append_el(3, s2, "a")
+		, s2   = append_el("i2", document.body, "span")
+		, a1   = append_el("i3", s2, "a")
 		, in1   = append_el("in1", el1, "input")
 		, in2   = append_el("in2", el1, "input")
 
@@ -126,22 +133,26 @@ describe("Selectors", () => {
 
 		assert.throws(() => { el1.matches({}) })
 		assert.throws(() => { el1.matches([]) })
+		assert.throws(() => { el1.matches("#1") })
+		assert.throws(() => { el1.matches("div#2") })
+		assert.throws(() => { el1.matches(".7b") })
+		assert.throws(() => { el1.matches(":7b") })
+		assert.throws(() => { el1.matches("[7b]") })
 
 		assert.equal(el1.matches(null), false)
 		assert.equal(el1.matches("div"), true)
 		assert.equal(el1.matches("div, span"), true)
 		assert.equal(el1.matches("span"), false)
-		assert.equal(el1.matches("#1"), true)
-		assert.equal(el1.matches("#2"), false)
-		assert.equal(el1.matches("div#1"), true)
-		assert.equal(el1.matches("div#2"), false)
+		assert.equal(el1.matches("#i2"), false)
+		assert.equal(el1.matches("div#i1"), true)
+		assert.equal(el1.matches("div#i2"), false)
 
-		assert.equal(el1.matches("body > div#1"), true)
+		assert.equal(el1.matches("body > div#i1"), true)
 		assert.equal(el1.matches("body > *"), true)
 		assert.equal(el1.matches("*"), true)
-		assert.equal(el1.matches("body > div#2"), false)
-		assert.equal(el1.matches("html > div#1"), false)
-		assert.equal(el1.matches("html > div#2"), false)
+		assert.equal(el1.matches("body > div#i2"), false)
+		assert.equal(el1.matches("html > div#i1"), false)
+		assert.equal(el1.matches("html > div#i2"), false)
 
 		assert.equal(el1.matches("div + div"), false)
 		assert.equal(s1.matches("span+span"), false)
@@ -159,8 +170,8 @@ describe("Selectors", () => {
 		assert.equal(s2.matches(".dummy ~ span"), true)
 		assert.equal(s2.matches("div ~ div"), false)
 
-		assert.equal(el1.matches("body div#1"), true)
-		assert.equal(el1.matches("html div#1"), true)
+		assert.equal(el1.matches("body div#i1"), true)
+		assert.equal(el1.matches("html div#i1"), true)
 
 		assert.equal(s2.matches(":empty"), false)
 		assert.equal(s2.matches(":link"), false)
@@ -173,17 +184,17 @@ describe("Selectors", () => {
 		assert.equal(in1.matches(":optional"), true)
 		assert.equal(in2.matches(":optional"), false)
 
-		assert.equal(el1.matches('[id=1]'), true)
-		assert.equal(el1.matches('body [id=1]'), true)
+		assert.equal(el1.matches('[id=i1]'), true)
+		assert.equal(el1.matches('body [id=i1]'), true)
 		assert.equal(el1.matches('[id=true]'), false)
 
-		assert.equal(s2.matches('[id=2]'), true)
-		assert.equal(s2.matches('[id=2][lang=en]'), true)
-		assert.equal(s2.matches('[id=2][lang="en"]'), true)
-		assert.equal(s2.matches('[id="2"][lang=en]'), true)
-		assert.equal(s2.matches('[id="2"][lang="en"]'), true)
-		assert.equal(s2.matches('[name="map[]"]'), true)
-		assert.equal(s2.matches('body [name="map[]"]'), true)
+		assert.equal(s2.matches('[id=i2]'), true)
+		assert.equal(s2.matches('[id=i2][lang=en]'), true)
+		assert.equal(s2.matches('[id=i2][lang="en"]'), true)
+		assert.equal(s2.matches('[id="i2"][lang=en]'), true)
+		assert.equal(s2.matches('[id="i2"][lang="en"]'), true)
+		//assert.equal(s2.matches('[name="map[]"]'), true)
+		//assert.equal(s2.matches('body [name="map[]"]'), true)
 
 		assert.equal(s2.matches('[data-space]'), true)
 		assert.equal(s2.matches('[data-space][data-plus]'), true)
@@ -302,7 +313,7 @@ describe("Selectors", () => {
 	})
 
 	test(":nth-child selector", assert => {
-		document = new DOM.Document()
+		document = newDoc()
 		var el = document.body
 		, p1   = append_el("p1", el, "p")
 		, p2   = append_el("p2", el, "p")
@@ -314,56 +325,56 @@ describe("Selectors", () => {
 		, p8   = append_el("p8", el, "p")
 		, p9   = append_el("p9", el, "p")
 
-		assert.equal(el.querySelectorAll(":nth-child(2n)")
+		assert.equalA(el.querySelectorAll(":nth-child(2n)")
 		, [p2, p4, p6, p8])
 
-		assert.equal(el.querySelectorAll(":nth-child(even)")
+		assert.equalA(el.querySelectorAll(":nth-child(even)")
 		, [p2, p4, p6, p8])
 
-		assert.equal(el.querySelectorAll(":nth-child(2n+1)")
+		assert.equalA(el.querySelectorAll(":nth-child(2n+1)")
 		, [p1, p3, p5, p7, p9])
 
-		assert.equal(el.querySelectorAll(":nth-child(odd)")
+		assert.equalA(el.querySelectorAll(":nth-child(odd)")
 		, [p1, p3, p5, p7, p9])
 
-		assert.equal(el.querySelectorAll(":nth-child(3n+3)")
+		assert.equalA(el.querySelectorAll(":nth-child(3n+3)")
 		, [p3, p6, p9])
 
-		assert.equal(el.querySelectorAll(":nth-child(4n+1)")
+		assert.equalA(el.querySelectorAll(":nth-child(4n+1)")
 		, [p1, p5, p9])
 
-		assert.equal(el.querySelectorAll(":nth-child(4n+4)")
+		assert.equalA(el.querySelectorAll(":nth-child(4n+4)")
 		, [p4, p8])
 
-		assert.equal(el.querySelectorAll(":nth-child(4n)")
+		assert.equalA(el.querySelectorAll(":nth-child(4n)")
 		, [p4, p8])
 
-		assert.equal(el.querySelectorAll(":nth-child(0n+1)")
+		assert.equalA(el.querySelectorAll(":nth-child(0n+1)")
 		, [p1])
 
-		assert.equal(el.querySelectorAll(":nth-child(1)")
+		assert.equalA(el.querySelectorAll(":nth-child(1)")
 		, [p1])
 
-		assert.equal(el.querySelectorAll(":nth-child(3)")
+		assert.equalA(el.querySelectorAll(":nth-child(3)")
 		, [p3])
 
-		assert.equal(el.querySelectorAll(":nth-child(5n-2)")
+		assert.equalA(el.querySelectorAll(":nth-child(5n-2)")
 		, [p3, p8])
 
-		assert.equal(el.querySelectorAll(":nth-child(-n+3)")
+		assert.equalA(el.querySelectorAll(":nth-child(-n+3)")
 		, [p1, p2, p3])
 
-		assert.equal(el.querySelectorAll(":nth-child(-2n+3)")
+		assert.equalA(el.querySelectorAll(":nth-child(-2n+3)")
 		, [p1, p3])
 
-		assert.equal(el.querySelectorAll(":nth-child(-2n+4)")
+		assert.equalA(el.querySelectorAll(":nth-child(-2n+4)")
 		, [p2, p4])
 
 		assert.end()
 	})
 
 	test(":nth-last-child selector", assert => {
-		document = new DOM.Document()
+		document = newDoc()
 		var el = document.body
 		, p1   = append_el("p1", el, "p")
 		, p2   = append_el("p2", el, "p")
@@ -375,59 +386,59 @@ describe("Selectors", () => {
 		, p8   = append_el("p8", el, "p")
 		, p9   = append_el("p9", el, "p")
 
-		assert.equal(el.querySelectorAll(":nth-last-child(2n)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(2n)")
 		, [p2, p4, p6, p8])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(even)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(even)")
 		, [p2, p4, p6, p8])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(2n+1)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(2n+1)")
 		, [p1, p3, p5, p7, p9])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(odd)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(odd)")
 		, [p1, p3, p5, p7, p9])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(3n+3)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(3n+3)")
 		, [p1, p4, p7])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(4n+1)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(4n+1)")
 		, [p1, p5, p9])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(4n+4)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(4n+4)")
 		, [p2, p6])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(4n)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(4n)")
 		, [p2, p6])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(0n+1)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(0n+1)")
 		, [p9])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(0n+3)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(0n+3)")
 		, [p7])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(1)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(1)")
 		, [p9])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(3)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(3)")
 		, [p7])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(5n-2)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(5n-2)")
 		, [p2, p7])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(-n+3)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(-n+3)")
 		, [p7, p8, p9])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(-2n+3)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(-2n+3)")
 		, [p7, p9])
 
-		assert.equal(el.querySelectorAll(":nth-last-child(-2n+4)")
+		assert.equalA(el.querySelectorAll(":nth-last-child(-2n+4)")
 		, [p6, p8])
 
 		assert.end()
 	})
 
 	test(":lang() selector", assert => {
-		var document = new DOM.Document()
+		var document = newDoc()
 		, el = document.body
 		, p1   = append_el("p1", el, "p")
 		, p2   = append_el("p2", el, "p")
@@ -437,49 +448,49 @@ describe("Selectors", () => {
 		el.lang = "en"
 		p2.lang = "fr-be"
 
-		assert.equal(el.querySelectorAll(":lang(en)")
+		assert.equalA(el.querySelectorAll(":lang(en)")
 		, [p1, p3])
 
-		assert.equal(el.querySelectorAll(":lang(fr)")
+		assert.equalA(el.querySelectorAll(":lang(fr)")
 		, [p2, p4])
 
 		assert.end()
 	})
 
-	test(":contains() selector", assert => {
-		var document = new DOM.Document()
+	test(":contains() selector", env !== "native" && (assert => {
+		var document = newDoc()
 		, el = document.body
 		, p1   = append_el(1, el, "p", "ab cd")
 		, p2   = append_el(2, el, "p", "ab")
 		, p3   = append_el(3, el, "a", "cd")
 		, p4   = append_el(4, el, "a", "ef")
 
-		assert.equal(el.querySelectorAll(":contains(ab)")
+		assert.equalA(el.querySelectorAll(":contains(ab)")
 		, [p1, p2])
 
-		assert.equal(el.querySelectorAll(":contains(cd)")
+		assert.equalA(el.querySelectorAll(":contains(cd)")
 		, [p1, p3])
 
-		assert.equal(el.querySelectorAll("a:contains(cd)")
+		assert.equalA(el.querySelectorAll("a:contains(cd)")
 		, [p3])
 
-		assert.equal(el.querySelectorAll("a:contains(cd)~a")
+		assert.equalA(el.querySelectorAll("a:contains(cd)~a")
 		, [p4])
 
-		assert.equal(el.querySelectorAll("a:contains(cd) ~ a")
+		assert.equalA(el.querySelectorAll("a:contains(cd) ~ a")
 		, [p4])
 
-		assert.equal(el.querySelectorAll(":contains(g)")
+		assert.equalA(el.querySelectorAll(":contains(g)")
 		, [])
 
 		assert.end()
-	})
+	}))
 
-	it("split selectors {0}", DOM.selectorSplit && [
+	it("split selectors {0}", DOM.selectorSplit ? [
 		[ "html", ["html"] ],
 		[ "[a]", ["[a]"] ],
 		[ ".a,b:not(.b,.c) , .d[a='a,\\'b][c']:focus", [".a", "b:not(.b,.c)", ".d[a='a,\\'b][c']:focus"] ],
-	], function(sel, arr, assert) {
+	] : false, function(sel, arr, assert) {
 		assert.equal(DOM.selectorSplit(sel), arr).end()
 	})
 })

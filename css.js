@@ -3,6 +3,7 @@
 
 "use strict"
 
+/* c8 ignore next */
 var URL = global.URL || require("url").URL
 
 exports.CSSStyleDeclaration = CSSStyleDeclaration
