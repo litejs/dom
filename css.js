@@ -8,13 +8,38 @@ var URL = global.URL || require("url").URL
 
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
-exports.CSS = {
+var CSS = exports.CSS = {
 	escape(sel) {
 		return ("" + sel).replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, "\\$&").replace(/^(-?)([0-9])/, "$1\\3$2 ")
 	},
 	minify(sheet, opts) {
 		var rules = sheet.cssRules || sheet.rules
+		, root = opts && opts.root || ""
 		return Array.prototype.map.call(rules, function(rule) {
+			// Handle @import inlining
+			if (opts && opts.import && rule.href) {
+				var imported = new CSSStyleSheet({
+					href: rule.href,
+					parentStyleSheet: sheet
+				}, read(root, rule.href, sheet.baseURI))
+				, urlFn = (m,q1,q2,u) => q1 ? m : "url('" + new URL(u, toUrl(imported.baseURI)).pathname.slice(1) + "')"
+				if (sheet.baseURI !== imported.baseURI) {
+					updateImportUrls(imported, urlFn)
+				}
+				return CSS.minify(imported, opts)
+			}
+
+			// Handle plugins on style rules
+			if (rule.style && rule.style._plugins) {
+				var style = rule.style
+				for (var i = 0; i < style._plugins.length; i++) {
+					var idx = style._plugins[i][0]
+					, name = style._plugins[i][1]
+					, k = style[idx]
+					style[k] = clear(plugins[name](root, sheet.baseURI, style[k]))
+				}
+			}
+
 			var text = clear(rule.cssText)
 			if (!text || /\{\s*\}$/.test(text)) return ""
 			if (opts && opts.color) text = text.replace(colorRe, colorFn)
@@ -24,16 +49,16 @@ exports.CSS = {
 }
 
 var toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///").href
-, read = (sheet, url, enc = "utf8") => require("fs").readFileSync(new URL(url, new URL((sheet.baseURI || ".") + "/", new URL((sheet.min.root || ".").replace(/\/+$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.split(/[+#]/)[0], enc)
+, read = (root, url, baseURI, enc = "utf8") => require("fs").readFileSync(new URL(url, new URL((baseURI || ".") + "/", new URL((root || ".").replace(/\/+$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.split(/[+#]/)[0], enc)
 , plugins = exports.plugins = {
-	"data-uri": function(sheet, v) {
+	"data-uri": function(root, baseURI, v) {
 		var { DOMParser } = require("./dom.js")
 		return v.replace(urlRe, function(_, q1, q2, url) {
 			if (q1) return _
 			var frag = url.split("#")[1]
 			, ext = url.split(/[?#]/)[0].split(".").pop()
 			, enc = ext === "svg" ? "utf8" : "base64"
-			url = read(sheet, url, enc)
+			url = read(root, url, baseURI, enc)
 			if (ext === "svg") {
 				url = new DOMParser().parseFromString(url, "application/xml")
 				if (frag && (frag = url.getElementById(frag))) {
@@ -79,11 +104,9 @@ var toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///")
 , styleHandler = {
 	get(style, prop) {
 		if (prop === "cssText") {
-			var min = style.parentRule && style.parentRule.parentStyleSheet.min
 			for (var out = [], name, value, i = style.length; i--; ) {
 				name = style[i]
 				value = style.__[i] || style[name]
-				if (min && min.color) value = value.replace(colorRe, colorFn)
 				out[i] = name + ":" + value
 			}
 			return out.join(";")
@@ -93,14 +116,13 @@ var toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///")
 	set(style, prop, val) {
 		if (prop === "cssText") {
 			var m, k
-			, sheet = style.parentRule && style.parentRule.parentStyleSheet
-			, min = sheet && sheet.min
 			, re = /([*_]?[-a-z]+)\s*:((?:("|')(?:\\.|(?!\3)[^\\])*?\3|[^"';])+)|\/\*!?((?:[^*]|\*(?!\/))*)\*\//ig
 			, len = 0
 			, lastIdx = {}
+			, _plugins = []
 			for (; (m = re.exec(val)); ) {
 				if (m[4]) {
-					if (min && len && plugins[m[4] = m[4].trim()]) style[k = style[len - 1]] = clear(plugins[m[4]](sheet, style[k]))
+					if (len && plugins[m[4] = m[4].trim()]) _plugins.push([len - 1, m[4]])
 				} else {
 					k = m[1]
 					if (lastIdx[k] >= 0) style.__[lastIdx[k]] = style[k]
@@ -110,6 +132,7 @@ var toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///")
 				}
 			}
 			style.length = len
+			if (_plugins.length) style._plugins = _plugins
 		} else {
 			if (!style[prop]) style[style.length++] = prop
 			style[prop] = style[prop === "cssFloat" ? "float" : prop.replace(/[A-Z]/g, "-$&").toLowerCase()] = clear(val)
@@ -131,22 +154,7 @@ var toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///")
 	},
 	import: {
 		get cssText() {
-			var sheet = this.parentStyleSheet
-			, min = sheet.min
-			, text = this.text
-			, urlFn = (m,q1,q2,u) => q1 ? m : "url('" + new URL(u, toUrl(text.baseURI)).pathname.slice(1) + "')"
-			if (min && min.import) {
-				text = new CSSStyleSheet({
-					parentStyleSheet: sheet,
-					href: this.href,
-					min
-				}, read(sheet, this.href))
-				if (sheet.baseURI !== text.baseURI) {
-					updateImportUrls(text, urlFn)
-				}
-				text += ""
-			}
-			return text
+			return this.text
 		},
 		set cssText(text) {
 			this.href = text.split(/['"()]+/)[1]
@@ -219,7 +227,6 @@ function updateImportUrls(sheet, urlFn) {
 
 CSSStyleSheet.prototype = {
 	baseURI: "",
-	root: "",
 	disabled: false,
 	type: "text/css",
 	deleteRule(idx) {
@@ -260,8 +267,7 @@ CSSStyleSheet.prototype = {
 		}
 		if (depth > 0) throw Error("Unclosed block")
 	},
-	toString(min) {
-		if (min) this.min = min
+	toString() {
 		return this.rules.map(rule => rule.cssText).filter(Boolean).join("\n")
 	}
 }

@@ -51,9 +51,10 @@ xhr.onload = function() {
 xhr.send();
 
 // Minify CSS
-const sheet = new CSSStyleSheet({ min: { color: true } })
+import { CSS } from "@litejs/dom/css.js";
+const sheet = new CSSStyleSheet()
 sheet.replaceSync(".a { color: hsl(0 0% 100%) }")
-console.log(sheet.toString())
+console.log(CSS.minify(sheet, { color: true }))
 // .a{color:#fff}
 ```
 

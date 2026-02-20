@@ -199,7 +199,7 @@ var boolAttrs = {
 	},
 	toString(min) {
 		return rawTextElements[this.tagName] ? (
-			this.tagName === "STYLE" && (min === true || min && min.css) ? "\n" + makeSheet(this, min.css || true) + "\n" :
+			this.tagName === "STYLE" && (min === true || min && min.css) ? "\n" + CSS.minify(makeSheet(this), typeof min.css === "object" ? min.css : null) + "\n" :
 			this.textContent
 		) : this.childNodes.map(node => node.toString(min)).join("")
 	},
@@ -548,11 +548,10 @@ function getSibling(node, step, type) {
 	return type ? getElement(silbings, index + step, step) : silbings && silbings[index + step] || null
 }
 
-function makeSheet(el, min) {
+function makeSheet(el) {
 	if (el.tagName === "STYLE" || el.tagName === "LINK" && el.rel === "stylesheet" && el.href) return new CSSStyleSheet({
 		href: el.href,
-		ownerNode: el,
-		min
+		ownerNode: el
 	}, el.tagName === "STYLE" && el.textContent)
 }
 

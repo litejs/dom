@@ -99,9 +99,9 @@ describe("css.js {0}", describe.env === "browser" ?
 			var s = new CSSStyleSheet()
 			s.replaceSync(".a{color:rgb(255,0,153)}")
 			assert
-			.equal(s.toString({ color: true }), ".a{color:#f09}")
-			.equal(minify({ cssRules: s.rules }), ".a{color:#f09}")
-			.equal(minify({ rules: s.rules }), ".a{color:#f09}")
+			.equal(minify(s, { color: true }), ".a{color:#f09}")
+			.equal(minify({ cssRules: s.rules }, { color: true }), ".a{color:#f09}")
+			.equal(minify({ rules: s.rules }, { color: true }), ".a{color:#f09}")
 			.end()
 		})
 
@@ -150,35 +150,38 @@ describe("css.js {0}", describe.env === "browser" ?
 					".a{background:url('data:image/svg+xml;,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"600\" width=\"900\" viewBox=\"-300 -200 900 600\" fill=\"%2300a651\"><circle cx=\"5\" cy=\"5\" r=\"2\"/></svg>')}"
 				],
 			], (source, result, assert) => {
-				var s = new CSSStyleSheet({ min: true })
+				var s = new CSSStyleSheet()
 				s.replaceSync(source)
 				assert.equal(minify(s), result).end()
 			})
 
 			test("@import", [
 				[ null, "@import 'css/c.css';", "@import 'css/c.css';" ],
-				[ {}, "@import 'css/c.css';", "@import 'css/c.css';" ],
-				[ { min: true }, "@import 'css/c.css';", "@import 'css/c.css';" ],
-				[ { min: { import: true } },
+				[ null, "@import 'css/c.css';", "@import 'css/c.css';" ],
+				[ null, "@import 'css/c.css';", "@import 'css/c.css';" ],
+				[ { import: true },
 					"@import 'test/data/ui/css/c.css';",
 					".c{content:'url(my-icon.jpg)';cursor:url(test/data/ui/css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
 				],
-				[ { min: { import: true } },
+				[ { import: true },
 					"@import 'test/data/ui/css/import-nested.css';",
 					".nested{color:green}\n@media (min-width:1px){.hero{background:url(test/data/ui/css/media.png)}}\n@keyframes spin{from{background-image:url(test/data/ui/css/frames/start.png)}}"
 				],
-				[ { min: { import: true, root: "test/data/ui" } },
+				[ { import: true, root: "test/data/ui" },
 					"@import 'css/c.css';",
 					".c{content:'url(my-icon.jpg)';cursor:url(css/my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
 				],
-				[ { min: { import: true, root: "test/data/ui/css" } }, "@import 'c.css';",
+				[ { import: true, root: "test/data/ui/css" }, "@import 'c.css';",
 					".c{content:'url(my-icon.jpg)';cursor:url(my-icon.jpg);background:url(/static/star.gif) bottom right repeat-x blue;mask-image:image(url(https://example.com/images/mask.png),skyblue,linear-gradient(rgb(0 0 0/100%),transparent))}"
 				],
-
 			], (opts, source, result, assert) => {
-				const sheet = new CSSStyleSheet(opts)
+				const sheet = new CSSStyleSheet()
 				sheet.replaceSync(source)
-				assert.equal(sheet.toString(), result)
+				if (opts) {
+					assert.equal(minify(sheet, opts), result)
+				} else {
+					assert.equal(sheet.toString(), result)
+				}
 				assert.end()
 			})
 		}
