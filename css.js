@@ -53,6 +53,7 @@ var URL = global.URL || require("url").URL
 			if (!text || /\{\s*\}$/.test(text)) return ""
 			if (vars) text = text.replace(varRe, (_, v, fb) => vars[v] || fb || _)
 			if (opts && opts.color) text = text.replace(colorRe, colorFn)
+			if (opts && opts.url) text = text.replace(urlRe, (m, q1, q2, u) => q1 ? m : "url(" + opts.url(u) + ")")
 			return text
 		}).filter(Boolean).join("\n")
 	}

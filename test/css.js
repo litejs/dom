@@ -135,6 +135,26 @@ describe("css.js {0}", describe.env === "browser" ?
 				assert.equal(minify(sheet, opts), expected).end()
 			})
 
+			test("url callback", assert => {
+				var map = { "img/icon.png": "icon_abc.png", "bg.jpg": "bg_123.jpg" }
+				sheet.replaceSync(".a{background:url(img/icon.png)}.b{background:url(bg.jpg)}.c{color:red}")
+				assert.equal(
+					minify(sheet, { url: function(path) { return map[path] || path } }),
+					".a{background:url(icon_abc.png)}\n.b{background:url(bg_123.jpg)}\n.c{color:red}"
+				)
+				sheet.replaceSync(".a{background:url(https://cdn.example.com/x.png) url(keep.png)}")
+				assert.equal(
+					minify(sheet, { url: function() { return "replaced.png" } }),
+					".a{background:url(https://cdn.example.com/x.png) url(replaced.png)}"
+				)
+				sheet.replaceSync('.a{content:"url(skip.png)";background:url(real.png)}')
+				assert.equal(
+					minify(sheet, { url: function() { return "mapped.png" } }),
+					".a{content:'url(skip.png)';background:url(mapped.png)}"
+				)
+				assert.end()
+			})
+
 			test("@charset", assert => {
 				sheet.replaceSync("@charset \"utf-8\"; body{color:red}")
 				assert
