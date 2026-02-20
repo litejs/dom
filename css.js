@@ -3,19 +3,29 @@
 
 "use strict"
 
-/* c8 ignore next */
-var URL = global.URL || require("url").URL
-
 exports.CSSStyleDeclaration = CSSStyleDeclaration
 exports.CSSStyleSheet = CSSStyleSheet
-var CSS = exports.CSS = {
+
+/* c8 ignore next */
+var URL = global.URL || require("url").URL
+, varRe = /var\((--[^,)]+)(?:,([^)]+))?\)/g
+, CSS = exports.CSS = {
 	escape(sel) {
 		return ("" + sel).replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, "\\$&").replace(/^(-?)([0-9])/, "$1\\3$2 ")
 	},
 	minify(sheet, opts) {
 		var rules = sheet.cssRules || sheet.rules
 		, root = opts && opts.root || ""
-		return Array.prototype.map.call(rules, function(rule) {
+		, vars = opts && opts.var ? {} : null
+		, varFn = vars && function(_, n) { return vars[n] || _ }
+		return Array.prototype.map.call(rules, rule => {
+			if (vars && rule.selectorText === ":root") {
+				if (rule.style) for (var i = 0; i < rule.style.length; i++) {
+					var n = rule.style[i]
+					if (n.slice(0, 2) === "--") vars[n] = rule.style[n].replace(varRe, varFn)
+				}
+				return ""
+			}
 			// Handle @import inlining
 			if (opts && opts.import && rule.href) {
 				var imported = new CSSStyleSheet({
@@ -31,24 +41,23 @@ var CSS = exports.CSS = {
 
 			// Handle plugins on style rules
 			if (rule.style && rule.style._plugins) {
-				var style = rule.style
-				for (var i = 0; i < style._plugins.length; i++) {
-					var idx = style._plugins[i][0]
-					, name = style._plugins[i][1]
+				for (var style = rule.style, j = 0; j < style._plugins.length; j++) {
+					var idx = style._plugins[j][0]
+					, pn = style._plugins[j][1]
 					, k = style[idx]
-					style[k] = clear(plugins[name](root, sheet.baseURI, style[k]))
+					style[k] = clear(plugins[pn](root, sheet.baseURI, style[k]))
 				}
 			}
 
 			var text = clear(rule.cssText)
 			if (!text || /\{\s*\}$/.test(text)) return ""
+			if (vars) text = text.replace(varRe, (_, v, fb) => vars[v] || fb || _)
 			if (opts && opts.color) text = text.replace(colorRe, colorFn)
 			return text
 		}).filter(Boolean).join("\n")
 	}
 }
-
-var toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///").href
+, toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///").href
 , read = (root, url, baseURI, enc = "utf8") => require("fs").readFileSync(new URL(url, new URL((baseURI || ".") + "/", new URL((root || ".").replace(/\/+$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.split(/[+#]/)[0], enc)
 , plugins = exports.plugins = {
 	"data-uri": function(root, baseURI, v) {

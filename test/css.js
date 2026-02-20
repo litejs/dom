@@ -114,10 +114,25 @@ describe("css.js {0}", describe.env === "browser" ?
 				["div {\n background: #00a400;\n background: linear-gradient(to bottom, rgb(214, 122, 127) 0%, hsla(237deg 74% 33% / 61%) 100%);}", "div{background:#00a400;background:linear-gradient(to bottom,rgb(214,122,127) 0%,hsla(237deg 74% 33%/61%) 100%)}"],
 				[" @import url('a.css') screen;  @import url(\"b.css\") screen; * { margin: 0; }", "@import 'a.css' screen;\n@import 'b.css' screen;\n*{margin:0}"],
 				[".a { b: url('a\\'b') }", ".a{b:url(\"a'b\")}"],
-				//[":root{--my-test-variable:123px}.p{ width: var(--my-test-variable); }", ".p{width:123px}"],
-			], (text, expected, assert) => {
+				], (text, expected, assert) => {
 				sheet.replaceSync(text)
 				assert.equal(minify(sheet), expected).end()
+			})
+
+			test("var {i} '{1}'", [
+				[ { var: true }, ":root{--a:123px}.p{width:var(--a)}", ".p{width:123px}" ],
+				[ { var: true }, ":root{--a:red}.p{color:var(--a);top:1px}", ".p{color:red;top:1px}" ],
+				[ { var: true }, ":root{--a:1px;--b:2px}.p{top:var(--a);left:var(--b)}", ".p{top:1px;left:2px}" ],
+				[ { var: true }, ".p{width:var(--a,5px)}", ".p{width:5px}" ],
+				[ { var: true }, ":root{--a:1px}.p{width:var(--a,5px)}", ".p{width:1px}" ],
+				[ { var: true }, ":root{--a:1px;--b:var(--a)}.p{width:var(--b)}", ".p{width:1px}" ],
+				[ { var: true }, ":root{--a:red}:root{--b:blue}.p{color:var(--a);bg:var(--b)}", ".p{color:red;bg:blue}" ],
+				[ { var: true }, ":root{--a:1px}.p{border:var(--a) solid red}", ".p{border:1px solid red}" ],
+				[ { var: true }, ".p{width:var(--a)}", ".p{width:var(--a)}" ],
+				[ { var: true }, ":root{--b:var(--x)}.p{width:var(--b)}", ".p{width:var(--x)}" ],
+			], (opts, text, expected, assert) => {
+				sheet.replaceSync(text)
+				assert.equal(minify(sheet, opts), expected).end()
 			})
 
 			test("@charset", assert => {
