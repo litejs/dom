@@ -8,7 +8,7 @@ exports.CSSStyleSheet = CSSStyleSheet
 
 /* c8 ignore next */
 var URL = global.URL || require("url").URL
-, varRe = /var\((--[^,)]+)(?:,([^)]+))?\)/g
+, varRe = /var\((--[^,)]+),?\s*([^)]*)\)/g
 , CSS = exports.CSS = {
 	escape(sel) {
 		return ("" + sel).replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, "\\$&").replace(/^(-?)([0-9])/, "$1\\3$2 ")
@@ -91,7 +91,7 @@ var URL = global.URL || require("url").URL
 	q ? (q = str.indexOf("'") == -1 ? "'" : "\"", q + str.replace(q === "'" ? /\\(")/g : /\\(')/g, "$1")) + q :
 	c ? "" :
 	_.replace(/[\t\n]+/g, " ")
-	.replace(/ +(?=[,;{}>~+\/])/g, "").replace(/([,;{}>~+\/]) +/g, "$1")
+	.replace(/ *([,;{}>~+\/]) */g, "$1")
 	.replace(/;(?=})/g, "")
 	.replace(/: +/g, ":")
 	.replace(/([ :,])0\.([0-9])/g, "$1.$2")
