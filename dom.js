@@ -411,6 +411,9 @@ extendNode(HTMLElement, Element, {
 	namespaceURI: "http://www.w3.org/1999/xhtml",
 	nodeType: 1,
 	tagName: null,
+	get elements() {
+		return this.tagName === "FORM" ? selector.find(this, "input,select,textarea,button") : undefined
+	},
 	get sheet() {
 		return makeSheet(this)
 	},

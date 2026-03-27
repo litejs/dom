@@ -609,6 +609,34 @@ describe("dom.js {0}", describe.env === "browser" ?
 		assert.end()
 	})
 
+	it("form.elements returns form controls", function(assert) {
+		var form = document.createElement("form")
+		, input = document.createElement("input")
+		, select = document.createElement("select")
+		, textarea = document.createElement("textarea")
+		, button = document.createElement("button")
+		, div = document.createElement("div")
+
+		form.appendChild(input)
+		form.appendChild(select)
+		form.appendChild(textarea)
+		form.appendChild(button)
+		form.appendChild(div)
+
+		assert.equal(form.elements.length, 4)
+		assert.equal(form.elements[0], input)
+		assert.equal(form.elements[1], select)
+		assert.equal(form.elements[2], textarea)
+		assert.equal(form.elements[3], button)
+		assert.end()
+	})
+
+	it("elements is undefined on non-form elements", function(assert) {
+		var div = document.createElement("div")
+		assert.equal(div.elements, undefined)
+		assert.end()
+	})
+
 	test("cssEscape", [
 		[ "a", "a" ],
 		[ ".foo#bar", "\\.foo\\#bar" ],
