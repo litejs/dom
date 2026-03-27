@@ -414,6 +414,13 @@ extendNode(HTMLElement, Element, {
 	get elements() {
 		return this.tagName === "FORM" ? selector.find(this, "input,select,textarea,button") : undefined
 	},
+	get labels() {
+		if (!selector.matches(this, "input,select,textarea,button")) return
+		var labels = this.id ? selector.find(this.ownerDocument, "label[for='" + this.id + "']") : []
+		, parent = selector.closest(this, "label")
+		if (parent && labels.indexOf(parent) < 0) labels.push(parent)
+		return labels
+	},
 	get sheet() {
 		return makeSheet(this)
 	},

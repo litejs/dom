@@ -14,6 +14,9 @@ describe("dom.js {0}", describe.env === "browser" ?
 		el.appendChild(node.cloneNode(true))
 		return el.innerHTML
 	}
+	describe.assert.arrayLike = function(actual, expected, message) {
+		return this.equal(Array.from(actual), expected, message)
+	}
 
 	it("can create nodes", function (assert) {
 		var el
@@ -429,19 +432,19 @@ describe("dom.js {0}", describe.env === "browser" ?
 		, a1 = document.createElement("a")
 		, a2 = document.createElement("b")
 
-		assert.equal(Array.from(el.childNodes), [])
+		assert.arrayLike(el.childNodes, [])
 
 		el.replaceChildren(a1)
-		assert.equal(Array.from(el.childNodes), [a1])
+		assert.arrayLike(el.childNodes, [a1])
 
 		el.replaceChildren(a2)
-		assert.equal(Array.from(el.childNodes), [a2])
+		assert.arrayLike(el.childNodes, [a2])
 
 		el.replaceChildren()
-		assert.equal(Array.from(el.childNodes), [])
+		assert.arrayLike(el.childNodes, [])
 
 		el.replaceChildren(a1, a2)
-		assert.equal(Array.from(el.childNodes), [a1, a2])
+		assert.arrayLike(el.childNodes, [a1, a2])
 		assert.end()
 	})
 
@@ -631,9 +634,31 @@ describe("dom.js {0}", describe.env === "browser" ?
 		assert.end()
 	})
 
-	it("elements is undefined on non-form elements", function(assert) {
+	it("elements and labels are undefined on non-form elements", function(assert) {
 		var div = document.createElement("div")
 		assert.equal(div.elements, undefined)
+		assert.equal(div.labels, undefined)
+		assert.end()
+	})
+
+	it("el.labels returns associated labels", function(assert) {
+		var div = document.createElement("div")
+		document.body.appendChild(div)
+
+		div.innerHTML = "<label for=cheese>I like cheese.</label><input type=checkbox id=cheese>" +
+			"<label>Name<input class=noid></label>" +
+			"<label for=dup id=dup-label><input id=dup></label>"
+
+		var cheese = document.getElementById("cheese")
+		, noId = div.querySelector(".noid")
+		, dup = document.getElementById("dup")
+
+		assert.arrayLike(cheese.labels, [ cheese.previousElementSibling ])
+		assert.arrayLike(noId.labels, [ noId.parentNode ])
+		// label found by both for-attr and closest, should not duplicate
+		assert.arrayLike(dup.labels, [ dup.parentNode ])
+
+		document.body.removeChild(div)
 		assert.end()
 	})
 
