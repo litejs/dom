@@ -66,7 +66,7 @@ describe("XMLHttpRequest", () => {
 	it("calls onerror", (assert, mock) => {
 		assert.setTimeout(5000)
 		var xhr = new XMLHttpRequest()
-		xhr.open("GET", "http://0.0.0.0:0")
+		xhr.open("GET", "http://127.0.0.1:1")
 		xhr.onerror = () => {
 			assert.equal(xhr.status, 0)
 			assert.equal(xhr.statusText, "")

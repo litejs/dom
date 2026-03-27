@@ -59,7 +59,10 @@ var URL = global.URL || require("url").URL
 	}
 }
 , toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///").href
-, read = (root, url, baseURI, enc = "utf8") => require("fs").readFileSync(new URL(url, new URL((baseURI || ".") + "/", new URL((root || ".").replace(/\/+$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.split(/[+#]/)[0], enc)
+, read = (root, url, baseURI, enc = "utf8") => require("fs").readFileSync(
+	new URL(url, new URL((baseURI || ".") + "/", new URL((root || ".").replace(/\/+$/, "") + "/", "file:///" + process.cwd() + "/"))).pathname.replace(/^\/(?=\w:)|[+#].*/, ""),
+	enc
+)
 , plugins = exports.plugins = {
 	"data-uri": function(root, baseURI, v) {
 		var { DOMParser } = require("./dom.js")

@@ -29,6 +29,6 @@
     "url": "https://github.com/litejs/dom.git"
   },
   "devDependencies": {
-    "@litejs/cli": "25.1.0"
+    "@litejs/cli": "26.3.0"
   }
 }
