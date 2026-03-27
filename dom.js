@@ -223,10 +223,10 @@ var boolAttrs = {
 }
 , Element = {
 	get firstElementChild() {
-		return getElement(this.childNodes, 0, 1, 1)
+		return getElement(this.childNodes, 0, 1)
 	},
 	get lastElementChild() {
-		return getElement(this.childNodes, this.childNodes.length - 1, -1, 1)
+		return getElement(this.childNodes, this.childNodes.length - 1, -1)
 	},
 	get nextElementSibling() {
 		return getSibling(this, 1, 1)
