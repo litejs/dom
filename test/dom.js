@@ -512,6 +512,103 @@ describe("dom.js {0}", describe.env === "browser" ?
 		assert.end()
 	})
 
+	it("addEventListener and dispatchEvent", function(assert, mock) {
+		var el = document.createElement("div")
+		, fn = mock.fn()
+
+		el.addEventListener("test", fn)
+		el.dispatchEvent(new DOM.Event("test"))
+
+		assert.equal(fn.called, 1)
+		assert.equal(fn.calls[0].args[0].type, "test")
+		assert.end()
+	})
+
+	it("removeEventListener", function(assert, mock) {
+		var el = document.createElement("div")
+		, fn1 = mock.fn()
+		, fn2 = mock.fn()
+
+		// removing with no listeners is a no-op
+		el.removeEventListener("test", fn1)
+
+		el.addEventListener("test", fn1)
+		el.addEventListener("test", fn2)
+
+		// removing non-matching fn is a no-op
+		el.removeEventListener("test", function() {})
+		el.removeEventListener("test", fn1)
+		el.dispatchEvent(new DOM.Event("test"))
+
+		assert.equal(fn1.called, 0)
+		assert.equal(fn2.called, 1)
+		assert.end()
+	})
+
+	it("events bubble with ev.target preserved", function(assert, mock) {
+		var parent = document.createElement("div")
+		, child = document.createElement("span")
+		, parentFn = mock.fn()
+
+		parent.appendChild(child)
+		parent.addEventListener("click", parentFn)
+		child.dispatchEvent(new DOM.Event("click", { bubbles: true }))
+
+		assert.equal(parentFn.called, 1)
+		assert.equal(parentFn.calls[0].args[0].target, child)
+		assert.end()
+	})
+
+	it("stopPropagation prevents bubbling", function(assert, mock) {
+		var parent = document.createElement("div")
+		, child = document.createElement("span")
+		, parentFn = mock.fn()
+
+		parent.appendChild(child)
+		parent.addEventListener("click", parentFn)
+		child.addEventListener("click", function(ev) { ev.stopPropagation() })
+		child.dispatchEvent(new DOM.Event("click", { bubbles: true }))
+
+		assert.equal(parentFn.called, 0)
+		assert.end()
+	})
+
+	it("non-bubbling event stays on target", function(assert, mock) {
+		var parent = document.createElement("div")
+		, child = document.createElement("span")
+		, parentFn = mock.fn()
+		, childFn = mock.fn()
+
+		parent.appendChild(child)
+		parent.addEventListener("focus", parentFn)
+		child.addEventListener("focus", childFn)
+		child.dispatchEvent(new DOM.Event("focus"))
+
+		assert.equal(childFn.called, 1)
+		assert.equal(parentFn.called, 0)
+		assert.end()
+	})
+
+	it("click dispatches click event", function(assert, mock) {
+		var el = document.createElement("button")
+		, fn = mock.fn()
+
+		el.addEventListener("click", fn)
+		el.click()
+
+		assert.equal(fn.called, 1)
+		assert.equal(fn.calls[0].args[0].type, "click")
+		assert.end()
+	})
+
+	it("preventDefault sets defaultPrevented", function(assert) {
+		var ev = new DOM.Event("test", { cancelable: true })
+		assert.equal(ev.defaultPrevented, false)
+		ev.preventDefault()
+		assert.equal(ev.defaultPrevented, true)
+		assert.end()
+	})
+
 	test("cssEscape", [
 		[ "a", "a" ],
 		[ ".foo#bar", "\\.foo\\#bar" ],

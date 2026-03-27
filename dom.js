@@ -19,6 +19,7 @@ var boolAttrs = {
 , svgVoidElements = {
 	circle:1, ellipse:1, image:1, line:1, path:1, polygon:1, polyline:1, rect:1, stop:1, use:1,
 }
+, listeners = new WeakMap()
 , rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
 , hasOwn = voidElements.hasOwnProperty
@@ -319,6 +320,18 @@ function Attr(node, name, value) {
 	this.value = "" + value
 }
 
+function Event(type, opts) {
+	Object.assign(this, {type, bubbles: false, cancelable: false, defaultPrevented: false}, opts)
+}
+Event.prototype = {
+	stopPropagation() {
+		this.bubbles = false
+	},
+	preventDefault() {
+		if (this.cancelable) this.defaultPrevented = true
+	}
+}
+
 function NamedNodeMap(node) {
 	Object.defineProperties(this, {
 		length: { get() { return this.names().length } },
@@ -404,8 +417,29 @@ extendNode(HTMLElement, Element, {
 	blur() {
 		this.ownerDocument.activeElement = this.ownerDocument.body || null
 	},
+	click() {
+		this.dispatchEvent(new Event("click", { bubbles: true, cancelable: true }))
+	},
 	closest(sel) {
 		return selector.closest(this, sel)
+	},
+	addEventListener(type, fn) {
+		var map = listeners.get(this)
+		if (!map) listeners.set(this, map = {})
+		;(map[type] || (map[type] = [])).push(fn)
+	},
+	dispatchEvent(ev) {
+		if (!ev.target) ev.target = this
+		var fns = (listeners.get(this) || {})[ev.type]
+		if (fns) fns.forEach(function(fn) { fn.call(this, ev) }, this)
+		if (ev.bubbles && this.parentNode && this.parentNode.dispatchEvent) {
+			this.parentNode.dispatchEvent(ev)
+		}
+	},
+	removeEventListener(type, fn) {
+		var fns = (listeners.get(this) || {})[type]
+		, i = fns ? fns.indexOf(fn) : -1
+		if (i > -1) fns.splice(i, 1)
 	},
 	focus() {
 		this.ownerDocument.activeElement = this
@@ -571,6 +605,7 @@ exports.CSSStyleSheet = CSSStyleSheet
 exports.DOMParser = DOMParser
 exports.Document = Document
 exports.DocumentFragment = DocumentFragment
+exports.Event = Event
 exports.HTMLElement = HTMLElement
 exports.Node = Node
 exports.XMLSerializer = XMLSerializer
