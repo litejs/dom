@@ -222,6 +222,9 @@ var boolAttrs = {
 	}
 }
 , Element = {
+	get children() {
+		return this.childNodes.filter(node => node.nodeType === 1)
+	},
 	get firstElementChild() {
 		return getElement(this.childNodes, 0, 1)
 	},

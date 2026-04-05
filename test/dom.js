@@ -273,6 +273,9 @@ describe("dom.js {0}", describe.env === "browser" ?
 		assert.equal(div.firstElementChild.tagName, "DIV")
 		assert.equal(div.lastChild, t2)
 		assert.equal(div.lastElementChild.tagName, "P")
+		assert.equal(div.children.length, 2)
+		assert.equal(div.children[0].tagName, "DIV")
+		assert.equal(div.children[1].tagName, "P")
 
 		assert.equal(div.querySelectorAll("span").length, 2)
 
