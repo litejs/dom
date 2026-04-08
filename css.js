@@ -19,10 +19,12 @@ var URL = global.URL || require("url").URL
 		, vars = opts && opts.var ? {} : null
 		, varFn = vars && function(_, n) { return vars[n] || _ }
 		return Array.prototype.map.call(rules, rule => {
-			if (vars && rule.selectorText === ":root") {
-				if (rule.style) for (var i = 0; i < rule.style.length; i++) {
-					var n = rule.style[i]
-					if (n.slice(0, 2) === "--") vars[n] = rule.style[n].replace(varRe, varFn)
+			var sel = rule.selectorText
+			, style = rule.style
+			if (vars && sel === ":root") {
+				if (style) for (var i = 0; i < style.length; i++) {
+					var n = style[i]
+					if (n.slice(0, 2) === "--") vars[n] = style[n].replace(varRe, varFn)
 				}
 				return ""
 			}
@@ -40,8 +42,8 @@ var URL = global.URL || require("url").URL
 			}
 
 			// Handle plugins on style rules
-			if (rule.style && rule.style._plugins) {
-				for (var style = rule.style, j = 0; j < style._plugins.length; j++) {
+			if (style && style._plugins) {
+				for (var j = 0; j < style._plugins.length; j++) {
 					var idx = style._plugins[j][0]
 					, pn = style._plugins[j][1]
 					, k = style[idx]
@@ -49,7 +51,7 @@ var URL = global.URL || require("url").URL
 				}
 			}
 
-			var text = clear(rule.cssText)
+			var text = clear(opts && style && style.__ ? sel + "{" + cssText(style, opts.prefix) + "}" : rule.cssText)
 			if (!text || /\{\s*\}$/.test(text)) return ""
 			if (vars) text = text.replace(varRe, (_, v, fb) => vars[v] || fb || _)
 			if (opts && opts.color) text = text.replace(colorRe, colorFn)
@@ -114,17 +116,18 @@ var URL = global.URL || require("url").URL
 , toRgba = (rgbHex, alpha) => ("rgba(" + rgbHex.replace(/../g, x => parseInt(x, 16)+",") + alpha + ")").replace("0.", ".")
 , colorRe = /\b(rgb|hsl)a?\s*\(\s*(\d+)(?:deg)?[\s,]+(\d+)[\s,%]+(\d+)%?(?:[\s,\/]+(0?\.?\d+)(%?))?\s*\)/g
 , colorFn = (_, name, a, b, c, d, p) => (_ = toRgb[name](a, b, c), (p ? d/=100 : d) < 1 ? toRgba(_, d) : "#" + _.replace(/(\w)\1(\w)\2(\w)\3/, "$1$2$3"))
+, cssText = (style, prefix) => {
+	for (var out = [], name, value, i = style.length; i--; ) {
+		name = style[i]
+		value = style.__[i] || style[name]
+		out[i] = name + ":" + value
+		if (prefix && prefix[name]) out[i] = prefix[name].join(out[i] + ";") + out[i] + ";" + out[i]
+	}
+	return out.join(";")
+}
 , styleHandler = {
 	get(style, prop) {
-		if (prop === "cssText") {
-			for (var out = [], name, value, i = style.length; i--; ) {
-				name = style[i]
-				value = style.__[i] || style[name]
-				out[i] = name + ":" + value
-			}
-			return out.join(";")
-		}
-		return style[prop] || ""
+		return prop === "cssText" ? cssText(style) : style[prop] || ""
 	},
 	set(style, prop, val) {
 		if (prop === "cssText") {

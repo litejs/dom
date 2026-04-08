@@ -11,10 +11,7 @@ jobs:
     - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
     - run: node --import=@litejs/cli/test.js test/load.mjs
     - name: Browser tests
-      run: |
-        npx lj serve &
-        google-chrome --headless --virtual-time-budget=3000 --enable-logging=stderr http://127.0.0.1:8080/test/index.html 2>&1 | sed -n '/INFO:CONSOLE/s,.*"\(.*\)".*,\1,p' | tee /tmp/browser-test.txt
-        grep -q "# pass" /tmp/browser-test.txt && ! grep -q "FAIL" /tmp/browser-test.txt
+      run: npx lj ui-test test/index.html
     - run: npx lj lint
     - run: ./test/readme.sh
     - run: npx tsc -p test/tsconfig.json --noEmit

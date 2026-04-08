@@ -135,6 +135,21 @@ describe("css.js {0}", describe.env === "browser" ?
 				assert.equal(minify(sheet, opts), expected).end()
 			})
 
+			test("prefix {i} '{1}'", [
+				[ { prefix: { "mask-image": ["-webkit-"] } },
+					".a{color:red;mask-image:url('mask-image: .png');top:1}",
+					".a{color:red;-webkit-mask-image:url('mask-image: .png');mask-image:url('mask-image: .png');top:1}" ],
+				[ { prefix: { "transition": ["-webkit-", "-moz-"] } },
+					".a{transition:all .3s}",
+					".a{-webkit-transition:all .3s;-moz-transition:all .3s;transition:all .3s}" ],
+				[ { prefix: { "mask-image": ["-webkit-"] } },
+					".a{color:red}",
+					".a{color:red}" ],
+			], (opts, text, expected, assert) => {
+				sheet.replaceSync(text)
+				assert.equal(minify(sheet, opts), expected).end()
+			})
+
 			test("url callback", assert => {
 				var map = { "img/icon.png": "icon_abc.png", "bg.jpg": "bg_123.jpg" }
 				sheet.replaceSync(".a{background:url(img/icon.png)}.b{background:url(bg.jpg)}.c{color:red}")
