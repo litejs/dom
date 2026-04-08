@@ -105,6 +105,14 @@ describe("css.js {0}", describe.env === "browser" ?
 			.end()
 		})
 
+		if (env !== "native") test("remove empty style element", assert => {
+			var DOMParser = DOM.DOMParser
+			, doc = new DOMParser().parseFromString("<html><head><style>.unused{color:red}</style></head><body></body></html>")
+			assert
+			.equal(doc.toString({ css: { used: { classes: new Set(["btn"]) } } }), "<html><head></head><body></body></html>")
+			.end()
+		})
+
 		if (env !== "native") {
 			test("minify '{0}'", [
 				["a{a:1}b{b:2}c{c:3}", "a{a:1}\nb{b:2}\nc{c:3}"],

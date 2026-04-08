@@ -464,9 +464,10 @@ extendNode(HTMLElement, Element, {
 		var attrs = this.attributes.toString(minify)
 		, isXml = this.ownerDocument.contentType === "application/xml"
 		, voidEl = this.ownerDocument.documentElement.tagName === "svg" ? svgVoidElements : voidElements
-		return "<" + this.localName +
+		, content = voidEl[this.tagName] ? null : Node.toString.call(this, minify)
+		return minify && this.tagName === "STYLE" && !content.trim() ? "" : "<" + this.localName +
 			(attrs ? " " + (attrs.slice(-1) === "/" ? attrs + " " : attrs) : "") +
-			(voidEl[this.tagName] ? (isXml ? "/>" : ">") : ">" + Node.toString.call(this, minify) + "</" + this.localName + ">")
+			(voidEl[this.tagName] ? (isXml ? "/>" : ">") : ">" + content + "</" + this.localName + ">")
 	}
 })
 
