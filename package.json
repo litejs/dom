@@ -1,6 +1,6 @@
 {
   "name": "@litejs/dom",
-  "version": "26.4.0",
+  "version": "26.4.1",
   "description": "A small DOM library for server-side testing, rendering, and handling of HTML files",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -29,6 +29,6 @@
     "url": "https://github.com/litejs/dom.git"
   },
   "devDependencies": {
-    "@litejs/cli": "26.3.0"
+    "@litejs/cli": "26.4.0"
   }
 }
