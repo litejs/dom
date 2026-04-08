@@ -150,6 +150,33 @@ describe("css.js {0}", describe.env === "browser" ?
 				assert.equal(minify(sheet, opts), expected).end()
 			})
 
+			test("used {i} '{1}'", [
+				[ { used: { classes: new Set(["btn"]) } },
+					".btn{color:red}.nav{top:1}",
+					".btn{color:red}" ],
+				[ { used: { classes: new Set(["btn"]) } },
+					".btn,.nav{color:red}",
+					".btn{color:red}" ],
+				[ { used: { classes: new Set(["btn", "nav"]) } },
+					".btn .nav{color:red}.unused{top:1}",
+					".btn .nav{color:red}" ],
+				[ { used: { classes: new Set(["btn"]) } },
+					".btn .nav{color:red}",
+					"" ],
+				[ { used: { keep: /^is-/ } },
+					".is-active{color:red}.btn{top:1}",
+					".is-active{color:red}" ],
+				[ { used: { classes: new Set(["btn"]), keep: /^icon-/ } },
+					".btn{color:red}.icon-star{top:1}.unused{left:0}",
+					".btn{color:red}\n.icon-star{top:1}" ],
+				[ { used: { classes: new Set(["btn"]) } },
+					"body{margin:0}.btn{color:red}",
+					"body{margin:0}\n.btn{color:red}" ],
+			], (opts, text, expected, assert) => {
+				sheet.replaceSync(text)
+				assert.equal(minify(sheet, opts), expected).end()
+			})
+
 			test("url callback", assert => {
 				var map = { "img/icon.png": "icon_abc.png", "bg.jpg": "bg_123.jpg" }
 				sheet.replaceSync(".a{background:url(img/icon.png)}.b{background:url(bg.jpg)}.c{color:red}")

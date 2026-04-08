@@ -51,6 +51,11 @@ var URL = global.URL || require("url").URL
 				}
 			}
 
+			if (opts && opts.used && sel) {
+				sel = filterSelectors(sel, opts.used)
+				if (!sel) return ""
+			}
+
 			var text = clear(opts && style && style.__ ? sel + "{" + cssText(style, opts.prefix) + "}" : rule.cssText)
 			if (!text || /\{\s*\}$/.test(text)) return ""
 			if (vars) text = text.replace(varRe, (_, v, fb) => vars[v] || fb || _)
@@ -59,6 +64,16 @@ var URL = global.URL || require("url").URL
 			return text
 		}).filter(Boolean).join("\n")
 	}
+}
+, filterSelectors = (text, used) => {
+	var classes = used.classes
+	, keep = used.keep
+	return require("./selector.js").selectorSplit(text).filter(sel => {
+		for (var m, classRe = /\.([-\w]+)/g; (m = classRe.exec(sel)); ) {
+			if (!(classes && classes.has(m[1]) || keep && keep.test(m[1]))) return false
+		}
+		return true
+	}).join(",")
 }
 , toUrl = (dir) => new URL((dir || ".").replace(/\/+$/, "") + "/", "file:///").href
 , read = (root, url, baseURI, enc = "utf8") => require("fs").readFileSync(
