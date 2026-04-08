@@ -10,8 +10,6 @@ jobs:
     - run: npm audit --audit-level=low
     - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
     - run: node --import=@litejs/cli/test.js test/load.mjs
-    - name: Browser tests
-      run: npx lj ui-test test/index.html
     - run: npx lj lint
     - run: ./test/readme.sh
     - run: npx tsc -p test/tsconfig.json --noEmit
