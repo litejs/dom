@@ -34,9 +34,8 @@ var URL = global.URL || require("url").URL
 					href: rule.href,
 					parentStyleSheet: sheet
 				}, read(root, rule.href, sheet.baseURI))
-				, urlFn = (m,q1,q2,u) => q1 ? m : "url('" + new URL(u, toUrl(imported.baseURI)).pathname.slice(1) + "')"
 				if (sheet.baseURI !== imported.baseURI) {
-					updateImportUrls(imported, urlFn)
+					updateImportUrls(imported, (m,q1,q2,u) => q1 ? m : "url('" + new URL(u, toUrl(imported.baseURI)).pathname.slice(1) + "')")
 				}
 				return CSS.minify(imported, opts)
 			}
