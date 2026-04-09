@@ -59,6 +59,7 @@ var URL = global.URL || require("url").URL
 			var text = clear(opts && style && style.__ ? sel + "{" + cssText(style, opts.prefix) + "}" : rule.cssText)
 			if (!text || /\{\s*\}$/.test(text)) return ""
 			if (vars) text = text.replace(varRe, (_, v, fb) => vars[v] || fb || _)
+			if (opts && opts.calc) text = text.replace(calcRe, calcFn)
 			if (opts && opts.color) text = text.replace(colorRe, colorFn)
 			if (opts && opts.url) text = text.replace(urlRe, (m, q1, q2, u) => q1 ? m : "url(" + opts.url(u) + ")")
 			return text
@@ -129,6 +130,13 @@ var URL = global.URL || require("url").URL
 	}
 }
 , toRgba = (rgbHex, alpha) => ("rgba(" + rgbHex.replace(/../g, x => parseInt(x, 16)+",") + alpha + ")").replace("0.", ".")
+, calcRe = /calc\(\s*(-?[\d.]+)([a-z%]*)\s*([+\-*/])\s*(-?[\d.]+)([a-z%]*)\s*\)/g
+, calcFn = (m, a, au, op, b, bu) => {
+	a -= 0
+	b -= 0
+	op = (op == "*" && !(au && bu)) ? (a *= b, au || bu) : (op == "/") ? (a /= b, !bu && b !== 0 && au) : au && au == bu && (op == "+" ? a += b : op === "-" ? a -= b : au -= 0, au)
+	return op ? (+a.toFixed(3) + op).replace(/^(-?)0\./, "$1.") : m
+}
 , colorRe = /\b(rgb|hsl)a?\s*\(\s*(\d+)(?:deg)?[\s,]+(\d+)[\s,%]+(\d+)%?(?:[\s,\/]+(0?\.?\d+)(%?))?\s*\)/g
 , colorFn = (_, name, a, b, c, d, p) => (_ = toRgb[name](a, b, c), (p ? d/=100 : d) < 1 ? toRgba(_, d) : "#" + _.replace(/(\w)\1(\w)\2(\w)\3/, "$1$2$3"))
 , cssText = (style, prefix) => {

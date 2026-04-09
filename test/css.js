@@ -158,6 +158,42 @@ describe("css.js {0}", describe.env === "browser" ?
 				assert.equal(minify(sheet, opts), expected).end()
 			})
 
+			test("calc {i} '{1}'", [
+				[ { calc: true },
+					".a{top:calc(10px + 100px)}",
+					".a{top:110px}" ],
+				[ { calc: true },
+					".a{width:calc(2 * 10px)}",
+					".a{width:20px}" ],
+				[ { calc: true },
+					".a{width:calc(100px / 4)}",
+					".a{width:25px}" ],
+				[ { calc: true },
+					".a{top:calc(100px - 20px)}",
+					".a{top:80px}" ],
+				[ { calc: true },
+					".a{left:calc(100% - 20px)}",
+					".a{left:calc(100% - 20px)}" ],
+				[ { calc: true },
+					".a{top:calc(10px)}",
+					".a{top:calc(10px)}" ],
+				[ { calc: true },
+					".a{top:calc(10px * 5px)}",
+					".a{top:calc(10px * 5px)}" ],
+				[ { calc: true },
+					".a{top:calc(10px / 0)}",
+					".a{top:calc(10px/0)}" ],
+				[ { calc: true },
+					".a{top:calc(var(--gap) * 2)}",
+					".a{top:calc(var(--gap) * 2)}" ],
+				[ { calc: true, var: true },
+					":root{--gap:1px}.a{top:calc(var(--gap) / 2)}",
+					".a{top:.5px}" ],
+			], (opts, text, expected, assert) => {
+				sheet.replaceSync(text)
+				assert.equal(minify(sheet, opts), expected).end()
+			})
+
 			test("used {i} '{1}'", [
 				[ { used: { classes: new Set(["btn"]) } },
 					".btn{color:red}.nav{top:1}",
