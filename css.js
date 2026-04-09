@@ -40,8 +40,8 @@ var URL = global.URL || require("url").URL
 				return CSS.minify(imported, opts)
 			}
 
-			if (opts && opts.used && sel) {
-				sel = filterSelectors(sel, opts.used)
+			if (opts && opts.prune && sel) {
+				sel = filterSelectors(sel, opts.prune)
 				if (!sel) return ""
 			}
 
@@ -66,11 +66,11 @@ var URL = global.URL || require("url").URL
 	}
 }
 , filterSelectors = (text, used) => {
-	var classes = used.classes
-	, keep = used.keep
+	var keep = used.keep
+	, keepRe = used.keepRe
 	return require("./selector.js").selectorSplit(text).filter(sel => {
 		for (var m, classRe = /\.([-\w]+)/g; (m = classRe.exec(sel)); ) {
-			if (!(classes && classes.has(m[1]) || keep && keep.test(m[1]))) return false
+			if (!(keep && keep.has(m[1]) || keepRe && keepRe.test(m[1]))) return false
 		}
 		return true
 	}).join(",")

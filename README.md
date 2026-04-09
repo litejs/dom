@@ -53,10 +53,21 @@ xhr.send();
 // Minify CSS
 import { CSS } from "@litejs/dom/css.js";
 const sheet = new CSSStyleSheet()
-sheet.replaceSync(".a { color: hsl(0 0% 100%) }")
-console.log(CSS.minify(sheet, { color: true }))
-// .a{color:#fff}
+sheet.replaceSync(":root{--gap:10px} .a { color: hsl(0 0% 100%); top: calc(var(--gap) + 5px) }")
+console.log(CSS.minify(sheet, { var: true, calc: true, color: true }))
+// .a{color:#fff;top:15px}
 ```
+
+### CSS.minify options
+
+- **calc** &ndash; resolve static `calc()` expressions, e.g. `calc(10px + 5px)` &rarr; `15px`
+- **color** &ndash; shorten `rgb()`/`hsl()` to hex, e.g. `rgb(255,0,0)` &rarr; `#f00`
+- **import** &ndash; inline `@import` rules, rewriting relative URLs
+- **prefix** &ndash; add vendor prefixes, e.g. `{ "mask-image": ["-webkit-"] }`
+- **prune** &ndash; remove unused selectors `{ keep: Set, keepRe: RegExp }`
+- **root** &ndash; base directory for resolving `@import` paths
+- **url** &ndash; URL rewrite callback `(path) => newPath`
+- **var** &ndash; inline CSS custom properties from `:root`
 
 ## Contributing
 
