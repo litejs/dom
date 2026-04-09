@@ -41,6 +41,11 @@ var URL = global.URL || require("url").URL
 				return CSS.minify(imported, opts)
 			}
 
+			if (opts && opts.used && sel) {
+				sel = filterSelectors(sel, opts.used)
+				if (!sel) return ""
+			}
+
 			// Handle plugins on style rules
 			if (style && style._plugins) {
 				for (var j = 0; j < style._plugins.length; j++) {
@@ -49,11 +54,6 @@ var URL = global.URL || require("url").URL
 					, k = style[idx]
 					style[k] = clear(plugins[pn](root, sheet.baseURI, style[k]))
 				}
-			}
-
-			if (opts && opts.used && sel) {
-				sel = filterSelectors(sel, opts.used)
-				if (!sel) return ""
 			}
 
 			var text = clear(opts && style && style.__ ? sel + "{" + cssText(style, opts.prefix) + "}" : rule.cssText)
