@@ -4,7 +4,7 @@
 describe("dom.js {0}", describe.env === "browser" ?
 	[["native", window]] : [["shim", require("../dom.js")]], function(env, DOM) {
 	var undef
-	, document = env === "native" ? DOM.document.implementation.createHTMLDocument("") : new DOM.Document
+	, document = DOM.document.implementation.createHTMLDocument("")
 	, it = describe.it
 	, cssEscape = (DOM.CSS || CSS).escape
 
@@ -278,6 +278,11 @@ describe("dom.js {0}", describe.env === "browser" ?
 		assert.equal(div.children[1].tagName, "P")
 
 		assert.equal(div.querySelectorAll("span").length, 2)
+
+		var wrap = document.createElement("section")
+		wrap.appendChild(document.createElement("p"))
+		wrap.firstChild.outerHTML = "<em>a</em><b>b</b>"
+		assert.equal(wrap.innerHTML, "<em>a</em><b>b</b>")
 
 		assert.end()
 	})

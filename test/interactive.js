@@ -2,7 +2,7 @@
 describe("interactive.js {0}", describe.env === "browser" ?
 	[["native", window]] : [["shim", require("../dom.js")]], function(env, DOM) {
 
-	var document = env === "native" ? DOM.document : new DOM.Document
+	var document = env === "native" ? DOM.document : DOM.document.implementation.createHTMLDocument("")
 
 	it("have focus and blur", assert => {
 		var el = document.createElement("input")
@@ -20,7 +20,7 @@ describe("interactive.js {0}", describe.env === "browser" ?
 		document.body.removeChild(el)
 
 		if (env !== "native") {
-			var doc = new DOM.Document()
+			var doc = DOM.document.implementation.createHTMLDocument("")
 			, body = doc.body
 			doc.body = null
 			var input = doc.createElement("input")

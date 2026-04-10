@@ -3,7 +3,7 @@ describe("selector.js {0}", describe.env === "browser" ?
 	var document = newDoc()
 
 	function newDoc() {
-		return env === "native" ? DOM.document.implementation.createHTMLDocument("") : new DOM.Document
+		return DOM.document.implementation.createHTMLDocument("")
 	}
 
 	function append_el(id, parent, tag, content) {

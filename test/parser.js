@@ -9,6 +9,25 @@ describe("parser", () => {
 	, path = require("path")
 	, test = describe.test
 
+	test("implementation.createDocument", assert => {
+		var impl = document.implementation
+		, doctype = impl.createDocumentType("svg")
+		, doc = impl.createDocument("http://www.w3.org/2000/svg", "svg", doctype)
+
+		assert.equal(doc.firstChild, doctype)
+		assert.equal(doc.documentElement.tagName, "svg")
+		assert.equal(doc.documentElement.getAttribute("xmlns"), "http://www.w3.org/2000/svg")
+
+		assert.equal(impl.createDocument(null, "root", null).documentElement.tagName, "ROOT")
+
+		// Element.toString on a document without documentElement, with XML > escape
+		var orphan = impl.createDocument(null, "", null).createElement("x")
+		orphan.textContent = "a>b&c<d"
+		assert.equal(orphan.toString(), "<x>a&gt;b&amp;c&lt;d</x>")
+
+		assert.end()
+	})
+
 	test("MDN DOMParser example", assert => {
 		var xmlStr = '<q id="a"><span id="b">hey!</span></q>'
 		, doc = parser.parseFromString(xmlStr, "application/xml")

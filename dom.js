@@ -85,7 +85,7 @@ var boolAttrs = {
 		, attrRe = /([^=\s]+)(?:\s*=\s*(("|')((?:\\\3|[\s\S])*?)\3|[^\s"'`=<>]+)|)/g
 		, frag = doc.createDocumentFragment()
 		, tree = frag
-		, voidEl = doc.documentElement.tagName === "svg" ? svgVoidElements : voidElements
+		, voidEl = (doc.documentElement || 0).tagName === "svg" ? svgVoidElements : voidElements
 
 		for (; (m = tagRe.exec(html)); ) {
 			if (m[4]) {
@@ -464,7 +464,7 @@ extendNode(HTMLElement, Element, {
 	toString(minify) {
 		var attrs = this.attributes.toString(minify)
 		, isXml = this.ownerDocument.contentType === "application/xml"
-		, voidEl = this.ownerDocument.documentElement.tagName === "svg" ? svgVoidElements : voidElements
+		, voidEl = (this.ownerDocument.documentElement || 0).tagName === "svg" ? svgVoidElements : voidElements
 		, content = voidEl[this.tagName] ? null : Node.toString.call(this, minify)
 		return minify && this.tagName === "STYLE" && !content.trim() ? "" : "<" + this.localName +
 			(attrs ? " " + (attrs.slice(-1) === "/" ? attrs + " " : attrs) : "") +
@@ -521,9 +521,6 @@ extendNode(DocumentType, {
 function Document() {
 	this.childNodes = []
 	this.attributes = new NamedNodeMap(this)
-	this
-	.appendChild(this.createElement("html"))
-	.appendChild(this.body = this.createElement("body"))
 }
 
 extendNode(Document, Element, {
@@ -540,7 +537,7 @@ extendNode(Document, Element, {
 	},
 	nodeType: 9,
 	nodeName: "#document",
-	contentType: "text/html",
+	contentType: "application/xml",
 	createElement: own(HTMLElement),
 	createElementNS: own(ElementNS),
 	createTextNode: own(Text),
@@ -550,17 +547,40 @@ extendNode(Document, Element, {
 		return selector.find(this, "#" + id, 1)
 	},
 	implementation: {
+		createDocument,
+		createHTMLDocument,
 		createDocumentType: own(DocumentType)
 	},
 })
 
+function createHTMLDocument(title) {
+	var doc = new Document()
+	, html = doc.appendChild(doc.createElement("html"))
+	, head = html.appendChild(doc.createElement("head"))
+	doc.contentType = "text/html"
+	if (title != null) {
+		head.appendChild(doc.createElement("title")).textContent = title
+	}
+	html.appendChild(doc.body = doc.createElement("body"))
+	return doc
+}
+function createDocument(ns, qname, doctype) {
+	var doc = new Document()
+	if (doctype) doc.appendChild(doctype)
+	if (qname) {
+		qname = ns ? doc.createElementNS(ns, qname) : doc.createElement(qname)
+		if (ns) qname.setAttribute("xmlns", ns)
+		doc.appendChild(qname)
+	}
+	return doc
+}
 function DOMParser() {}
 function XMLSerializer() {}
 
-DOMParser.prototype.parseFromString = (str, mime) => {
-	var doc = new Document()
+DOMParser.prototype.parseFromString = function(str, mime) {
+	var doc = mime && /xml/.test(mime) ? createDocument(null, "", null) : createHTMLDocument("")
 	doc.contentType = mime || "text/html"
-	doc.documentElement.outerHTML = str
+	doc.innerHTML = str
 	return doc
 }
 XMLSerializer.prototype.serializeToString = doc => doc.toString()
@@ -613,7 +633,9 @@ function mergeAttributes(source, target) {
 	}
 }
 
-exports.document = new Document()
+exports.createDocument = createDocument
+exports.createHTMLDocument = createHTMLDocument
+exports.document = createHTMLDocument("")
 exports.entities = entities
 exports.mergeAttributes = mergeAttributes
 exports.selectorSplit = selector.selectorSplit
