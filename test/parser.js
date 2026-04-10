@@ -2,7 +2,7 @@
 describe("parser", () => {
 	require("@litejs/cli/snapshot")
 
-	var { Document, DOMParser, XMLSerializer } = require("../")
+	var { document, DOMParser, XMLSerializer } = require("../")
 	, parser = new DOMParser()
 	, serializer = new XMLSerializer()
 	, fs = require("fs")
@@ -26,8 +26,7 @@ describe("parser", () => {
 
 	test("parse and stringify", assert => {
 		assert.matchSnapshot("./test/data/ui/index.html", str => {
-			var document = new Document()
-			document.documentElement.outerHTML = str
+			var document = parser.parseFromString(str)
 			assert.equal(document.querySelector("span").textContent, "&<>'\"")
 			assert.equal(document.querySelector("span").title, "&<>'\"")
 			assert.equal(document.styleSheets.length, 3)
@@ -154,10 +153,7 @@ describe("parser", () => {
 
 	function readDom(fileName) {
 		var src = fs.readFileSync(path.resolve(fileName.split("?")[0]), "utf8").trim()
-		, document = new Document()
-		document.documentElement.outerHTML = src
-
-		return document
+		return parser.parseFromString(src)
 	}
 })
 

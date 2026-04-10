@@ -104,7 +104,7 @@ var boolAttrs = {
 			} else {
 				tree.appendChild(
 					m[2] ? doc.createComment(m[2].replace(unescRe, unescFn)) :
-					m[1] ? doc.createDocumentType(m[1]) :
+					m[1] ? doc.implementation.createDocumentType(m[1]) :
 					doc.createTextNode(m[0].replace(unescRe, unescFn))
 				)
 			}
@@ -543,11 +543,13 @@ extendNode(Document, Element, {
 	createElementNS: own(ElementNS),
 	createTextNode: own(Text),
 	createComment: own(Comment),
-	createDocumentType: own(DocumentType), //Should be document.implementation.createDocumentType(name, publicId, systemId)
 	createDocumentFragment: own(DocumentFragment),
 	getElementById(id) {
 		return selector.find(this, "#" + id, 1)
-	}
+	},
+	implementation: {
+		createDocumentType: own(DocumentType)
+	},
 })
 
 function DOMParser() {}
