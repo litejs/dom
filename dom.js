@@ -271,7 +271,8 @@ var boolAttrs = {
 }
 , quotedAttrRe = /[\s"'`=<>]/
 , escRe = /<|&(?=[a-z#])/gi
-, escFn = chr => chr === "<" ? "&lt;" : "&amp;"
+, escReXml = /[<&>]/g
+, escFn = chr => chr === "<" ? "&lt;" : chr === ">" ? "&gt;" : "&amp;"
 , unescRe = /&[a-z]{1,31};?|&#(x|)([\da-f]+);/ig
 , unescFn = (ent, hex, num) => num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : entities[ent] || ent
 , entities = {
@@ -376,7 +377,7 @@ NamedNodeMap.prototype = {
 			if (loName === "style" && minify && map.ownerElement.style) { /* Access to style makes _style */ }
 			var attr = map.getNamedItem(loName)
 			, name = attr.name
-			, value = attr.value.replace(escRe, escFn)
+			, value = attr.value.replace(isXml ? escReXml : escRe, escFn)
 			if (!isXml) {
 				if (hasOwn.call(boolAttrs, loName)) return name
 				if (minify) {
@@ -489,7 +490,8 @@ extendNode(Text, {
 	nodeType: 3,
 	nodeName: "#text",
 	toString(minify) {
-		return (minify ? ("" + this.data).trim() : "" + this.data).replace(escRe, escFn)
+		return (minify ? ("" + this.data).trim() : "" + this.data).replace(
+			this.ownerDocument.contentType === "application/xml" ? escReXml : escRe, escFn)
 	}
 })
 
