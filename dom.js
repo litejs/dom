@@ -397,7 +397,11 @@ extendNode(HTMLElement, Element, {
 		this.style.cssText = value
 	},
 	get sheet() {
-		return makeSheet(this)
+		var el = this
+		if (el.tagName === "STYLE" || el.tagName === "LINK" && el.rel === "stylesheet" && el.href) return new CSSStyleSheet({
+			href: el.href,
+			ownerNode: el
+		}, el.tagName === "STYLE" && el.textContent)
 	},
 	blur() {
 		this.ownerDocument.activeElement = this.ownerDocument.body || null
@@ -570,13 +574,6 @@ function getSibling(node, step, type) {
 	var silbings = node.parentNode && node.parentNode.childNodes
 	, index = silbings ? silbings.indexOf(node) : -1
 	return type ? getElement(silbings, index + step, step) : silbings && silbings[index + step] || null
-}
-
-function makeSheet(el) {
-	if (el.tagName === "STYLE" || el.tagName === "LINK" && el.rel === "stylesheet" && el.href) return new CSSStyleSheet({
-		href: el.href,
-		ownerNode: el
-	}, el.tagName === "STYLE" && el.textContent)
 }
 
 function mergeAttributes(source, target) {
