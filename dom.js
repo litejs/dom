@@ -59,12 +59,6 @@ var numAttrs = "height size tabIndex width"
 	get previousSibling() {
 		return getSibling(this, -1, 0)
 	},
-	get style() {
-		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
-	},
-	set style(value) {
-		this.style.cssText = value
-	},
 	appendChild(el) {
 		return this.insertBefore(el)
 	},
@@ -395,6 +389,12 @@ extendNode(HTMLElement, Element, {
 		, parent = selector.closest(this, "label")
 		if (parent && labels.indexOf(parent) < 0) labels.push(parent)
 		return labels
+	},
+	get style() {
+		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
+	},
+	set style(value) {
+		this.style.cssText = value
 	},
 	get sheet() {
 		return makeSheet(this)
