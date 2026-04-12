@@ -390,8 +390,8 @@ describe("dom.js {0}", describe.env === "browser" ?
 		assert.equal(h1.getAttribute("id"), "123")
 		assert.equal(h1.getAttribute("id2"), null)
 		assert.equal(h1.attributes.length, 1)
-		//assert.equal(h1.attributes[0].name, "id")
-		assert.equal(h1.attributes.id.value, "123")
+		assert.equal(h1.attributes[0].name, "id")
+		assert.equal(h1.attributes[0].value, "123")
 
 		assert.equal(h1.getAttribute("toString"), null)
 		assert.equal(h1.outerHTML, '<h1 id="123"></h1>')
@@ -399,8 +399,8 @@ describe("dom.js {0}", describe.env === "browser" ?
 		h1.className = "my-class"
 		assert.equal(h1.outerHTML, '<h1 id="123" class="my-class"></h1>')
 		assert.equal(h1.attributes.length, 2)
-		//assert.equal(h1.attributes[1].name, "class")
-		assert.equal(h1.attributes.class.value, "my-class")
+		assert.equal(h1.attributes[1].name, "class")
+		assert.equal(h1.attributes[1].value, "my-class")
 
 
 		h1.style.top = "5px"
@@ -410,8 +410,8 @@ describe("dom.js {0}", describe.env === "browser" ?
 			'<h1 id="123" class="my-class" style="top: 5px; left: 15px;"></h1>',
 		])
 		assert.equal(h1.attributes.length, 3)
-		//assert.equal(h1.attributes[2].name, "style")
-		assert.anyOf(h1.attributes.style.value, ["top:5px;left:15px", "top: 5px; left: 15px;"])
+		assert.equal(h1.attributes[2].name, "style")
+		assert.anyOf(h1.attributes[2].value, ["top:5px;left:15px", "top: 5px; left: 15px;"])
 
 		//h1.attributes.class.value = "top: 15px;"
 		//assert.equal(h1.attributes.class.value, "top:15px")
@@ -431,6 +431,26 @@ describe("dom.js {0}", describe.env === "browser" ?
 		assert.equal(h1.getAttribute('no-value'), null)
 		assert.equal(h1.constructor, Object.getPrototypeOf(h1).constructor)
 		assert.equal(h1.outerHTML, '<h1></h1>')
+
+		assert.end()
+	})
+
+	it("stringify", function (assert) {
+		var stringify = require("../stringify.js").stringify
+		, div = document.createElement("div")
+		div.setAttribute("class", "a")
+		div.appendChild(document.createTextNode("hello"))
+		var span = document.createElement("span")
+		span.id = "s1"
+		span.appendChild(document.createTextNode("world"))
+		div.appendChild(span)
+
+		assert.equal(stringify(div), '<div class="a">hello<span id="s1">world</span></div>')
+		assert.equal(stringify(div, null, true), 'hello<span id="s1">world</span>')
+
+		var comment = document.createComment("test")
+		div.appendChild(comment)
+		assert.equal(stringify(div), '<div class="a">hello<span id="s1">world</span><!--test--></div>')
 
 		assert.end()
 	})

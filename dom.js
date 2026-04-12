@@ -3,27 +3,13 @@
 
 "use strict"
 
-var boolAttrs = {
-	async:1, autoplay:1, loop:1, checked:2, defer:1, disabled:1, muted:1, multiple:1, nomodule:1, playsinline:1, readonly:1, required:1, selected:2
-}
-, numAttrs = "height size tabIndex width"
+var numAttrs = "height size tabIndex width"
 , numAttrsNeg = "maxLength minLength"
 , strAttrs = "accept accesskey autocapitalize autofocus capture class contenteditable crossorigin dir for hidden href id integrity lang name nonce rel slot spellcheck src title type translate"
-, defaultAttrs = {
-	"form method get":1, "input type text":1,
-	"script type text/javascript":1, "style type text/css":1
-}
-, voidElements = {
-	AREA:1, BASE:1, BR:1, COL:1, EMBED:1, HR:1, IMG:1, INPUT:1, KEYGEN:1, LINK:1, MENUITEM:1, META:1, PARAM:1, SOURCE:1, TRACK:1, WBR:1
-}
-, svgVoidElements = {
-	circle:1, ellipse:1, image:1, line:1, path:1, polygon:1, polyline:1, rect:1, stop:1, use:1,
-}
 , listeners = new WeakMap()
-, rawTextElements = { SCRIPT: /<(?=\/script)/i, STYLE: /<(?=\/style)/i }
 , rawTextEscape = { SCRIPT: /<(?=\/script|!--)/ig, STYLE: /<(?=\/style|!--)/ig }
-, hasOwn = voidElements.hasOwnProperty
 , { CSS, CSSStyleDeclaration, CSSStyleSheet } = require("./css.js")
+, { stringify, boolAttrs, voidElements, svgVoidElements, rawTextElements } = require("./stringify.js")
 , selector = require("./selector.js")
 , Node = {
 	ELEMENT_NODE:                1,
@@ -75,7 +61,7 @@ var boolAttrs = {
 	},
 	// innerHTML and outerHTML should be extensions to the Element interface
 	get innerHTML() {
-		return Node.toString.call(this)
+		return stringify(this, null, true)
 	},
 	set innerHTML(html) {
 		var child, m, re, text
@@ -199,10 +185,7 @@ var boolAttrs = {
 		return selector.find(this, sel)
 	},
 	toString(min) {
-		return rawTextElements[this.tagName] ? (
-			this.tagName === "STYLE" && (min === true || min && min.css) ? "\n" + CSS.minify(makeSheet(this), typeof min.css === "object" ? min.css : null) + "\n" :
-			this.textContent
-		) : this.childNodes.map(node => node.toString(min)).join("")
+		return stringify(this, min)
 	},
 	toJSON() {
 		var node = this
@@ -211,7 +194,7 @@ var boolAttrs = {
 		}
 		if (node.nodeType === 1) {
 			json.attributes = {}
-			node.attributes.names().forEach(name => json.attributes[name] = node.getAttribute(name))
+			for (var a = 0; a < node.attributes.length; a++) json.attributes[node.attributes[a].name] = node.attributes[a].value
 		}
 		if (node.nodeType === 1 || node.nodeType === 9) {
 			json.children = node.childNodes.map(child => child.toJSON())
@@ -238,7 +221,7 @@ var boolAttrs = {
 		return getSibling(this, -1, 1)
 	},
 	get outerHTML() {
-		return this.toString()
+		return stringify(this)
 	},
 	set outerHTML(html) {
 		var frag = this.ownerDocument.createDocumentFragment()
@@ -269,10 +252,6 @@ var boolAttrs = {
 		return selector.find(this, "." + sel.replace(/\s+/g, "."))
 	}
 }
-, quotedAttrRe = /[\s"'`=<>]/
-, escRe = /<|&(?=[a-z#])/gi
-, escReXml = /[<&>]/g
-, escFn = chr => chr === "<" ? "&lt;" : chr === ">" ? "&gt;" : "&amp;"
 , unescRe = /&[a-z]{1,31};?|&#(x|)([\da-f]+);/ig
 , unescFn = (ent, hex, num) => num ? String.fromCharCode(parseInt(num, hex === "" ? 10 : 16)) : entities[ent] || ent
 , entities = {
@@ -310,8 +289,8 @@ function addGetter(key, opts) {
 	Element[name + "NS"] = function(ns, a, b) {
 		if (name !== "setAttribute" && ns) {
 			var lo = (":" + a).toLowerCase()
-			for (var key in this.attributes) {
-				if (key.endsWith(lo)) return this[name](key)
+			for (var i = 0; i < this.attributes.length; i++) {
+				if (this.attributes[i].name.toLowerCase().endsWith(lo)) return this[name](this.attributes[i].name)
 			}
 		}
 		return this[name](a, b)
@@ -338,58 +317,50 @@ Event.prototype = {
 
 function NamedNodeMap(node) {
 	Object.defineProperties(this, {
-		length: { get() { return this.names().length } },
+		_length: { value: 0, writable: true },
+		_map: { value: Object.create(null) },
 		ownerElement: { value: node }
 	})
 }
 
 NamedNodeMap.prototype = {
-	names() {
-		this.getNamedItem("style")
-		return Object.keys(this)
+	get length() {
+		if (this.ownerElement._style) this.getNamedItem("style")
+		return this._length
 	},
 	getNamedItem(name) {
 		var loName = name.toLowerCase()
-		, attr = this[loName] || null
+		, i = this._map[loName]
 		if (loName === "style" && this.ownerElement._style) {
-			if (attr === null) attr = this[loName] = new Attr(this.ownerElement, name, "")
-			attr.value = this.ownerElement._style.cssText
+			if (i == null) {
+				this._map[loName] = i = this._length++
+				this[i] = new Attr(this.ownerElement, name, "")
+			}
+			this[i].value = this.ownerElement._style.cssText
 		}
-		return attr
+		return i != null ? this[i] : null
 	},
 	removeNamedItem(name) {
 		var loName = name.toLowerCase()
-		, attr = this[loName] || null
-		if (loName === "style") delete this.ownerElement._style
-		if (attr !== null) delete this[loName]
+		, i = this._map[loName]
+		, attr = i != null ? this[i] : null
+		if (loName === "style") this.ownerElement._style = null
+		if (i != null) {
+			for (; i < this._length - 1; i++) {
+				this[i] = this[i + 1]
+				this._map[this[i].name.toLowerCase()] = i
+			}
+			this._map[loName] = this[--this._length] = null
+		}
 		return attr
 	},
 	setNamedItem(attr) {
-		var oldAttr = this.getNamedItem(attr.name)
-		this[attr.name.toLowerCase()] = attr
+		var loName = attr.name.toLowerCase()
+		, i = this._map[loName]
+		, oldAttr = i != null ? this[i] : null
+		if (i == null) this._map[loName] = i = this._length++
+		this[i] = attr
 		return oldAttr
-	},
-	toString(minify) {
-		var map = this
-		, tagName = map.ownerElement.tagName
-		, isXml = map.ownerElement.ownerDocument.contentType === "application/xml"
-		return map.names().map(loName => {
-			if (loName === "style" && minify && map.ownerElement.style) { /* Access to style makes _style */ }
-			var attr = map.getNamedItem(loName)
-			, name = attr.name
-			, value = attr.value.replace(isXml ? escReXml : escRe, escFn)
-			if (!isXml) {
-				if (hasOwn.call(boolAttrs, loName)) return name
-				if (minify) {
-					value = loName.slice(0, 2) === "on" ? value.replace(/^[\s\uFEFF\xA0;]+|[\s\uFEFF\xA0;]+$/g, "") : value.replace(/\s+/g, " ").trim()
-					if (hasOwn.call(defaultAttrs, (tagName + " " + name + " " + value).toLowerCase())) return
-					if (!quotedAttrRe.test(value)) return name + "=" + value
-					if (value.split("\"").length > value.split("'").length) return name + "='" + value.replace(/'/g, "&#39;") + "'"
-				}
-				name = loName
-			}
-			return name + "=\"" + value.replace(/"/g, "&quot;") + "\""
-		}).filter(Boolean).join(" ")
 	}
 }
 
@@ -460,15 +431,6 @@ extendNode(HTMLElement, Element, {
 	},
 	matches(sel) {
 		return selector.matches(this, sel)
-	},
-	toString(minify) {
-		var attrs = this.attributes.toString(minify)
-		, isXml = this.ownerDocument.contentType === "application/xml"
-		, voidEl = (this.ownerDocument.documentElement || 0).tagName === "svg" ? svgVoidElements : voidElements
-		, content = voidEl[this.tagName] ? null : Node.toString.call(this, minify)
-		return minify && this.tagName === "STYLE" && !content.trim() ? "" : "<" + this.localName +
-			(attrs ? " " + (attrs.slice(-1) === "/" ? attrs + " " : attrs) : "") +
-			(voidEl[this.tagName] ? (isXml ? "/>" : ">") : ">" + content + "</" + this.localName + ">")
 	}
 })
 
@@ -488,11 +450,7 @@ function Text(data) {
 
 extendNode(Text, {
 	nodeType: 3,
-	nodeName: "#text",
-	toString(minify) {
-		return (minify ? ("" + this.data).trim() : "" + this.data).replace(
-			this.ownerDocument.contentType === "application/xml" ? escReXml : escRe, escFn)
-	}
+	nodeName: "#text"
 })
 
 function Comment(data) {
@@ -501,10 +459,7 @@ function Comment(data) {
 
 extendNode(Comment, {
 	nodeType: 8,
-	nodeName: "#comment",
-	toString(minify) {
-		return minify ? "" : "<!--" + this.data + "-->"
-	}
+	nodeName: "#comment"
 })
 
 function DocumentType(data) {
@@ -512,10 +467,7 @@ function DocumentType(data) {
 }
 
 extendNode(DocumentType, {
-	nodeType: 10,
-	toString() {
-		return "<" + this.data + ">"
-	}
+	nodeType: 10
 })
 
 function Document() {
@@ -583,7 +535,7 @@ DOMParser.prototype.parseFromString = function(str, mime) {
 	doc.innerHTML = str
 	return doc
 }
-XMLSerializer.prototype.serializeToString = doc => doc.toString()
+XMLSerializer.prototype.serializeToString = doc => stringify(doc)
 
 
 function own(Class) {
@@ -629,7 +581,7 @@ function makeSheet(el) {
 
 function mergeAttributes(source, target) {
 	if (source && target && source.attributes) {
-		source.attributes.names().forEach(attr => target.setAttribute(attr, source.getAttribute(attr)))
+		for (var i = 0; i < source.attributes.length; i++) target.setAttribute(source.attributes[i].name, source.attributes[i].value)
 	}
 }
 
@@ -648,4 +600,6 @@ exports.DocumentFragment = DocumentFragment
 exports.Event = Event
 exports.HTMLElement = HTMLElement
 exports.Node = Node
+exports.stringify = stringify
 exports.XMLSerializer = XMLSerializer
+
