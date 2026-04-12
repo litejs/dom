@@ -327,8 +327,7 @@ NamedNodeMap.prototype = {
 		, i = this._map[loName]
 		if (loName === "style" && this.ownerElement._style) {
 			if (i == null) {
-				this._map[loName] = i = this._length++
-				this[i] = new Attr(this.ownerElement, name, "")
+				this[i = this._map[loName] = this._length++] = new Attr(this.ownerElement, name, "")
 			}
 			this[i].value = this.ownerElement._style.cssText
 		}
@@ -350,10 +349,9 @@ NamedNodeMap.prototype = {
 	},
 	setNamedItem(attr) {
 		var loName = attr.name.toLowerCase()
+		, oldAttr = null
 		, i = this._map[loName]
-		, oldAttr = i != null ? this[i] : null
-		if (i == null) this._map[loName] = i = this._length++
-		this[i] = attr
+		this[i == null ? this._map[loName] = this._length++ : (oldAttr = this[i], i)] = attr
 		return oldAttr
 	}
 }

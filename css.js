@@ -19,12 +19,14 @@ var URL = global.URL || require("url").URL
 		, vars = opts && opts.var ? {} : null
 		, varFn = vars && function(_, n) { return vars[n] || _ }
 		return Array.prototype.map.call(rules, rule => {
-			var sel = rule.selectorText
+			var i, text, tmp
+			, sel = rule.selectorText
 			, style = rule.style
+
 			if (vars && sel === ":root") {
-				if (style) for (var i = 0; i < style.length; i++) {
-					var n = style[i]
-					if (n.slice(0, 2) === "--") vars[n] = style[n].replace(varRe, varFn)
+				if (style) for (i = 0; i < style.length; i++) {
+					tmp = style[i]
+					if (tmp.slice(0, 2) === "--") vars[tmp] = style[tmp].replace(varRe, varFn)
 				}
 				return ""
 			}
@@ -46,16 +48,13 @@ var URL = global.URL || require("url").URL
 			}
 
 			// Handle plugins on style rules
-			if (style && style._plugins) {
-				for (var j = 0; j < style._plugins.length; j++) {
-					var idx = style._plugins[j][0]
-					, pn = style._plugins[j][1]
-					, k = style[idx]
-					style[k] = clear(plugins[pn](root, sheet.baseURI, style[k]))
+			if ((tmp = style && style._plugins)) {
+				for (i = 0; i < tmp.length; i++) {
+					style[text = style[tmp[i][0]]] = clear(plugins[tmp[i][1]](root, sheet.baseURI, style[text]))
 				}
 			}
 
-			var text = clear(opts && style && style.__ ? sel + "{" + cssText(style, opts.prefix) + "}" : rule.cssText)
+			text = clear(opts && style && style.__ ? sel + "{" + cssText(style, opts.prefix) + "}" : rule.cssText)
 			if (!text || /\{\s*\}$/.test(text)) return ""
 			if (vars) text = text.replace(varRe, (_, v, fb) => vars[v] || fb || _)
 			if (opts && opts.calc) text = text.replace(calcRe, calcFn)
