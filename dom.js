@@ -555,8 +555,8 @@ function extendNode(obj, extras) {
 }
 
 function removeChilds(node) {
-	node.childNodes.forEach(child => child.parentNode = null)
-	node.childNodes.length = 0
+	for (var arr = node.childNodes, len = arr.length; len > 0; ) arr[--len].parentNode = null
+	arr.length = 0
 }
 
 function getElement(childs, index, step) {
