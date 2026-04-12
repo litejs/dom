@@ -59,49 +59,6 @@ var numAttrs = "height size tabIndex width"
 	get previousSibling() {
 		return getSibling(this, -1, 0)
 	},
-	// innerHTML and outerHTML should be extensions to the Element interface
-	get innerHTML() {
-		return stringify(this, null, true)
-	},
-	set innerHTML(html) {
-		var child, m, re, text
-		, node = this
-		, doc = node.ownerDocument || node
-		, tagRe = /<(!--([\s\S]*?)--!?|!\[CDATA\[([\s\S]*?)\]\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)((?:("|')(?:\\\7|[\s\S])*?\7|[^>])*?)(\/?)>|[^<]+|</g
-		, attrRe = /([^=\s]+)(?:\s*=\s*(("|')((?:\\\3|[\s\S])*?)\3|[^\s"'`=<>]+)|)/g
-		, frag = doc.createDocumentFragment()
-		, tree = frag
-		, voidEl = (doc.documentElement || 0).tagName === "svg" ? svgVoidElements : voidElements
-
-		for (; (m = tagRe.exec(html)); ) {
-			if (m[4]) {
-				tree = tree.parentNode || tree
-			} else if (m[5]) {
-				child = doc.contentType === "text/html" ? doc.createElement(m[5]) : doc.createElementNS(null, m[5])
-				if (m[6]) {
-					m[6].replace(attrRe, setAttr)
-				}
-				tree.appendChild(child)
-				if ((re = rawTextElements[child.tagName])) {
-					for (text = ""; (m = tagRe.exec(html)) && !re.test(m[0]); text += m[3] || m[0]);
-					child.textContent = text.replace(unescRe, unescFn)
-					if (!m) break
-				} else if (!voidEl[child.tagName] && !m[8]) tree = child
-			} else {
-				tree.appendChild(
-					m[2] ? doc.createComment(m[2].replace(unescRe, unescFn)) :
-					m[1] ? doc.implementation.createDocumentType(m[1]) :
-					doc.createTextNode(m[0].replace(unescRe, unescFn))
-				)
-			}
-		}
-		removeChilds(node)
-		node.appendChild(frag)
-
-		function setAttr(_, name, value, q, qvalue) {
-			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
-		}
-	},
 	get style() {
 		return this._style || (this._style = CSSStyleDeclaration(this.getAttribute("style") || ""))
 	},
@@ -220,12 +177,55 @@ var numAttrs = "height size tabIndex width"
 	get previousElementSibling() {
 		return getSibling(this, -1, 1)
 	},
+	get innerHTML() {
+		return stringify(this, null, true)
+	},
+	set innerHTML(html) {
+		var child, m, re, text
+		, node = this
+		, doc = node.ownerDocument || node
+		, tagRe = /<(!--([\s\S]*?)--!?|!\[CDATA\[([\s\S]*?)\]\]|[?!][\s\S]*?)>|<(\/?)([^ \/>]+)((?:("|')(?:\\\7|[\s\S])*?\7|[^>])*?)(\/?)>|[^<]+|</g
+		, attrRe = /([^=\s]+)(?:\s*=\s*(("|')((?:\\\3|[\s\S])*?)\3|[^\s"'`=<>]+)|)/g
+		, frag = doc.createDocumentFragment()
+		, tree = frag
+		, voidEl = (doc.documentElement || 0).tagName === "svg" ? svgVoidElements : voidElements
+
+		for (; (m = tagRe.exec(html)); ) {
+			if (m[4]) {
+				tree = tree.parentNode || tree
+			} else if (m[5]) {
+				child = doc.contentType === "text/html" ? doc.createElement(m[5]) : doc.createElementNS(null, m[5])
+				if (m[6]) {
+					m[6].replace(attrRe, setAttr)
+				}
+				tree.appendChild(child)
+				if ((re = rawTextElements[child.tagName])) {
+					for (text = ""; (m = tagRe.exec(html)) && !re.test(m[0]); text += m[3] || m[0]);
+					child.textContent = text.replace(unescRe, unescFn)
+					if (!m) break
+				} else if (!voidEl[child.tagName] && !m[8]) tree = child
+			} else {
+				tree.appendChild(
+					m[2] ? doc.createComment(m[2].replace(unescRe, unescFn)) :
+					m[1] ? doc.implementation.createDocumentType(m[1]) :
+					doc.createTextNode(m[0].replace(unescRe, unescFn))
+				)
+			}
+		}
+		node.replaceChildren(frag)
+
+		function setAttr(_, name, value, q, qvalue) {
+			child.setAttribute(name, (q ? qvalue : value || "").replace(unescRe, unescFn))
+		}
+	},
 	get outerHTML() {
 		return stringify(this)
 	},
 	set outerHTML(html) {
-		var frag = this.ownerDocument.createDocumentFragment()
-		frag.innerHTML = html
+		var tmp = this.ownerDocument.createElement("div")
+		, frag = this.ownerDocument.createDocumentFragment()
+		tmp.innerHTML = html
+		frag.childNodes = tmp.childNodes
 		this.parentNode.replaceChild(frag, this)
 	},
 	replaceChildren() {

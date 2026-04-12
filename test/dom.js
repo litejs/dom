@@ -284,6 +284,13 @@ describe("dom.js {0}", describe.env === "browser" ?
 		wrap.firstChild.outerHTML = "<em>a</em><b>b</b>"
 		assert.equal(wrap.innerHTML, "<em>a</em><b>b</b>")
 
+		var wrap2 = document.createElement("section")
+		wrap2.appendChild(document.createElement("span"))
+		wrap2.appendChild(document.createElement("p"))
+		wrap2.appendChild(document.createElement("span"))
+		wrap2.children[1].outerHTML = "<b>replaced</b>"
+		assert.equal(wrap2.innerHTML, "<span></span><b>replaced</b><span></span>")
+
 		assert.end()
 	})
 
